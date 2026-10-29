@@ -84,14 +84,14 @@ select.field { height: 34px; font-size: 13px; cursor: pointer; padding: 0 6px; }
 .lobbyrow { flex: 1; min-height: 0; display: flex; gap: 8px; }
 .panel { background: #fff; border: 2px solid var(--ink); display: flex; flex-direction: column; min-height: 0; }
 .panel .ph { height: 22px; flex: none; background: var(--ink); color: var(--desk); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 10px; font-weight: 700; }
-.slots { flex: 1; min-height: 0; padding: 8px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 8px; }
-.slot { border: 2px dashed var(--lo); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--mute); }
-.slot.on { border: 2px solid var(--ink); background: var(--desk); justify-content: flex-start; gap: 10px; padding: 0 10px; color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
-.slotav { width: 60px; height: 60px; flex: none; border: 2px solid var(--ink); background: #fff; }
-.slotav svg { width: 56px; height: 56px; display: block; }
-.slotnm { min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
-.slotnm b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tag { align-self: flex-start; background: var(--ink); color: var(--desk); font-size: 10px; font-weight: 700; line-height: 12px; padding: 0 4px; }
+.slots { flex: 1; min-height: 0; padding: 8px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 6px; }
+.slot { border: 2px dashed var(--lo); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--mute); min-width: 0; }
+.slot.on { border: 2px solid var(--ink); background: var(--desk); flex-direction: column; justify-content: center; gap: 3px; padding: 2px 4px; color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.slotav { width: 40px; height: 40px; flex: none; border: 2px solid var(--ink); background: #fff; }
+.slotav svg { width: 36px; height: 36px; display: block; }
+.slotnm { min-width: 0; max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; }
+.slotnm b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag { align-self: center; background: var(--ink); color: var(--desk); font-size: 10px; font-weight: 700; line-height: 12px; padding: 0 4px; }
 .config { width: 300px; flex: none; background: var(--paper); border: 3px solid var(--ink); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); padding: 10px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
 .config .g { display: flex; flex-direction: column; gap: 4px; }
 .wlist { margin-top: 6px; max-height: 120px; overflow-y: auto; background: #fff; border: 2px solid var(--ink); padding: 6px 8px; font-size: 12px; line-height: 17px; }
@@ -157,6 +157,41 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 .status span { background: var(--paper); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); padding: 2px 8px; white-space: nowrap; }
 .status .grow { flex: 1; }
 .status .btn { height: 24px; padding: 0 10px; font-size: 10px; font-weight: 700; }
+
+/* multiplayer: jogo mais largo, com barra lateral de placar e palpites */
+.board.wide { width: 1166px; margin-left: -583px; }
+#sGame .win.big { width: 1154px; }
+.content.gcontent { flex-direction: row; }
+.gmain { width: 862px; flex: none; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.side { width: 262px; flex: none; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.side .panel { min-height: 0; }
+.plist { height: 254px; flex: none; overflow-y: auto; }
+.prow { display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 6px; border-bottom: 1px solid #d0d0d0; font-size: 12px; }
+.prow .rk { width: 20px; flex: none; font-size: 10px; color: var(--mute); }
+.prow .pav { width: 22px; height: 22px; flex: none; border: 1px solid var(--ink); background: #fff; }
+.prow .pav svg { width: 20px; height: 20px; display: block; }
+.prow b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.prow.me b { font-weight: 700; text-decoration: underline; }
+.prow .ptag { flex: none; font-family: var(--font-pixel); font-size: 6px; line-height: 8px; }
+.prow .pts { flex: none; min-width: 34px; text-align: right; font-family: var(--font-pixel); font-size: 9px; }
+.prow.drawing { background: var(--desk); }
+.prow.ok { background: #cfe8c8; }
+.prow.off { opacity: .45; }
+.slot.off { opacity: .45; }
+.chat { flex: 1; }
+.clog { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 8px; font-size: 12px; line-height: 16px; }
+.cl { margin: 0 0 3px; overflow-wrap: anywhere; }
+.cl.sys { color: var(--mute); }
+.cl.ok { color: #1d6b1d; font-weight: 700; }
+.cl.warn { color: var(--orange-dk); font-weight: 700; }
+.cl.priv { color: #2B4EC4; }
+.cform { flex: none; display: flex; gap: 4px; padding: 6px; border-top: 2px solid var(--ink); background: var(--paper); }
+.cform input { flex: 1; min-width: 0; height: 32px; border: 3px solid var(--ink); background: #fff; box-shadow: inset 2px 2px 0 var(--lo); padding: 0 8px; font-size: 13px; font-weight: 700; }
+.cform input:disabled { background: #e6e6e6; }
+.cform input:focus-visible { outline: 3px solid var(--orange); outline-offset: 1px; }
+.cform button { width: 44px; height: 32px; font-size: 10px; font-weight: 700; }
+.over .note { max-width: 560px; font-size: 13px; font-weight: 700; white-space: pre-line; }
+#sGame.viewer .tools, #sGame.viewer .cur, #sGame.viewer .swatches { opacity: .35; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -195,7 +230,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 </div>
 <div style="display:flex;justify-content:flex-end;padding:10px 6px 4px"><button type="submit" class="bigbtn">ENTRAR NA SALA</button></div>
 </form>
-<p class="note" style="border-top:2px solid var(--lo);padding-top:10px">Sala única do time, com 15 vagas. O avatar é sorteado a partir do apelido. A escolha de avatar vem numa próxima etapa.</p>
+<div style="display:flex;justify-content:center"><button type="button" class="btn" id="trainBtn" hidden style="height:32px;padding:0 14px;font-size:11px;font-weight:700">JOGAR SOZINHO (TREINO)</button></div>
+<p class="note" style="border-top:2px solid var(--lo);padding-top:10px">Sala única do time, com 25 vagas. O avatar é sorteado a partir do apelido. A escolha de avatar vem numa próxima etapa.</p>
 </div>
 </div>
 </section>
@@ -216,7 +252,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 </div>
 <div class="lobbyrow">
 <div class="panel" style="flex:1;min-width:0">
-<div class="ph"><span>JOGADORES NA SALA</span><span id="slotCount">1/15</span></div>
+<div class="ph"><span>JOGADORES NA SALA</span><span id="slotCount">1/25</span></div>
 <div class="slots" id="slots"></div>
 </div>
 <div class="config">
@@ -226,7 +262,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <div class="g"><label class="flabel" for="selRounds">RODADAS</label><select class="field" id="selRounds"><option value="3">3 rodadas</option><option value="5" selected>5 rodadas</option><option value="8">8 rodadas</option><option value="10">10 rodadas</option></select></div>
 <div class="g"><label class="flabel" for="selTime">TEMPO POR RODADA</label><select class="field" id="selTime"><option value="45">45 segundos</option><option value="60" selected>60 segundos</option><option value="90">90 segundos</option><option value="120">120 segundos</option></select></div>
 <button type="button" class="bigbtn" id="startBtn">INICIAR PARTIDA</button>
-<p class="note">Modo treino: ainda não há servidor, então por enquanto você joga sozinho para testar. Os outros jogadores aparecem na lista quando o multiplayer entrar.</p>
+<p class="note" id="lobbyNote">Modo treino: o servidor não está configurado, então você joga sozinho para testar.</p>
 </div>
 </div>
 </div>
@@ -242,11 +278,11 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 </div>
 <div class="winbtns" aria-hidden="true"><span>_</span><span>X</span></div>
 </div>
-<div class="content">
-
+<div class="content gcontent">
+<div class="gmain">
 <div class="strip">
 <div class="sbox sa"><span class="tag">TEMA</span><span class="tema" id="gTema">HALLOWEEN</span></div>
-<div class="sbox sb"><span class="flabel" style="font-size:10px;line-height:12px">SUA PALAVRA (só você vê)</span><div class="letters" id="gWord"></div></div>
+<div class="sbox sb"><span class="flabel" id="gWordLbl" style="font-size:10px;line-height:12px">SUA PALAVRA (só você vê)</span><div class="letters" id="gWord"></div></div>
 <div class="sbox sc"><div><span class="rd" id="gRound">RODADA 1/5</span><div class="segs" id="gSegs" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><span class="time" id="gTime">1:00</span></div>
 </div>
 
@@ -295,7 +331,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <div class="cvhint" id="cvHint"><b>Desenhe a palavra</b>Clique e arraste para desenhar.</div>
 <div class="over" id="over" hidden>
 <div class="big" id="ovTitle">TEMPO ESGOTADO!</div>
-<div class="was">A palavra era<b id="ovWord"></b></div>
+<div class="was" id="ovWas">A palavra era<b id="ovWord"></b></div>
+<p class="note" id="ovNote"></p>
 <div class="acts">
 <button type="button" class="bigbtn" id="ovNext">PRÓXIMA RODADA</button>
 <button type="button" class="bigbtn alt" id="ovLobby">VOLTAR AO LOBBY</button>
@@ -324,7 +361,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <button type="button" class="sw" data-color="#8A4B1F" aria-label="Marrom" style="background:#8A4B1F"></button>
 <button type="button" class="sw" data-color="#3A2A5A" aria-label="Roxo escuro" style="background:#3A2A5A"></button>
 </div>
-<div class="tip">ATALHOS: P lápis, B pincel, F balde, E borracha, I conta-gotas, L linha, R retângulo, O círculo, S spray, M traço, G forma, 1 a 4 tamanho, Ctrl+Z desfazer.</div>
+<div class="tip" id="tipText">ATALHOS: P lápis, B pincel, F balde, E borracha, I conta-gotas, L linha, R retângulo, O círculo, S spray, M traço, G forma, 1 a 4 tamanho, Ctrl+Z desfazer.</div>
 <button type="button" class="skip" id="skipBtn">PULAR<br>PALAVRA</button>
 </div>
 
@@ -337,6 +374,12 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <button type="button" class="btn" id="leaveBtn">SAIR DA RODADA</button>
 </div>
 
+</div>
+<aside class="side" aria-label="Placar e palpites">
+<div class="panel"><div class="ph"><span>PLACAR</span><span id="pcount">0</span></div><div class="plist" id="plist"></div></div>
+<div class="panel chat"><div class="ph"><span>PALPITES</span></div><div class="clog" id="clog" aria-live="polite"></div>
+<form class="cform" id="cform" autocomplete="off"><input id="guessInput" maxlength="60" autocomplete="off" spellcheck="false" placeholder="Digite seu palpite..." aria-label="Seu palpite" disabled><button type="submit" class="btn" id="guessBtn" disabled>OK</button></form></div>
+</aside>
 </div>
 </div>
 </section>
@@ -356,8 +399,15 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
      Cada tema tem nome, grupo (aparece como seção na lista) e palavras entre aspas.
      O tema "Mix geral" é montado sozinho no fim com todas as palavras.
      ===================================================================== */
-  var MAX_PLAYERS = 15;
+  var MAX_PLAYERS = 25;
   var NICK_KEY = 'gartic-listening-nick';
+
+  /* Endereço do servidor no Render. Troque pelo endereço do seu servidor depois de publicá-lo. */
+  var SERVER_URL = 'https://COLE-AQUI.onrender.com';
+  var LOCAL_URL = 'http://localhost:3000';
+  var IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var API = IS_LOCAL ? LOCAL_URL : SERVER_URL;
+  var MP_READY = IS_LOCAL || SERVER_URL.indexOf('COLE-AQUI') === -1;
 
   var THEMES = {
 
@@ -690,7 +740,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     for (var k in screens) screens[k].hidden = (k !== name);
     if (name === 'login') sticker.textContent = 'ENTRAR';
     else if (name === 'lobby') sticker.textContent = 'LOBBY';
-    else sticker.textContent = THEMES[game.theme].nome.toUpperCase();
+    else sticker.textContent = (game.themeName || THEMES[game.theme].nome).toUpperCase();
     fit();
     if (name === 'login') $('nick').focus();
   }
@@ -730,8 +780,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       return;
     }
     saveNick(n);
-    me = { nick: n };
-    enterLobby();
+    if (!MP_READY) { me = { nick: n }; players = [{ nick: n, me: true }]; enterLobby(); lobbyNote(); return; }
+    mpConnect(n);
   });
 
   /* ---------- lobby ---------- */
@@ -769,10 +819,10 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     for (var i = 0; i < MAX_PLAYERS; i++) {
       var d = document.createElement('div');
       if (i < players.length) {
-        d.className = 'slot on';
+        d.className = 'slot on' + (players[i].online === false ? ' off' : '');
         var av = document.createElement('div');
         av.className = 'slotav';
-        av.innerHTML = avatarSvg(players[i].nick, 56);
+        av.innerHTML = avatarSvg(players[i].nick, 36);
         var nm = document.createElement('div');
         nm.className = 'slotnm';
         var b = document.createElement('b');
@@ -796,7 +846,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   }
 
   function enterLobby() {
-    players = [{ nick: me.nick, me: true }];
+    if (!mp.joined) players = [{ nick: me.nick, me: true }];
     $('whoNick').textContent = me.nick;
     $('whoAv').innerHTML = avatarSvg(me.nick, 28);
     renderSlots();
@@ -804,12 +854,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     $('startBtn').focus();
   }
 
-  $('logoutBtn').addEventListener('click', function () {
-    me = null;
-    nickInput.value = loadNick();
-    previewAvatar();
-    show('login');
-  });
+  $('logoutBtn').addEventListener('click', function () { goLogin(); });
 
   /* =====================================================================
      CANVAS
@@ -1085,6 +1130,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   function undo() {
     if (cur || state.locked || !actions.length) return;
     actions.pop();
+    net({ k: 'undo' });
     replay();
     ui();
   }
@@ -1094,6 +1140,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     var a = { t: 'clear' };
     actions.push(a);
     drawAction(ctx, a);
+    net({ k: 'act', a: a });
     ui();
   }
 
@@ -1174,6 +1221,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   function commit() {
     if (!cur) return;
     if (sprayTimer) { clearInterval(sprayTimer); sprayTimer = null; }
+    netEnd();
     drawAction(ctx, cur);
     octx.clearRect(0, 0, W, H);
     actions.push(cur);
@@ -1205,6 +1253,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       var f = { t: 'fill', c: state.color, x: Math.floor(p[0]), y: Math.floor(p[1]) };
       drawAction(ctx, f);
       actions.push(f);
+      net({ k: 'act', a: f });
       ui();
       return;
     }
@@ -1226,6 +1275,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       emitSpray();
       sprayTimer = setInterval(emitSpray, 28);
     }
+    netBegin();
     ui();
   });
 
@@ -1262,7 +1312,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
      PARTIDA (modo treino, sem servidor)
      ===================================================================== */
 
-  var game = { theme: 'halloween', total: 5, seconds: 60, round: 0, word: '', endAt: 0, timer: null, bag: [] };
+  var game = { theme: 'halloween', themeName: '', total: 5, seconds: 60, round: 0, word: '', endAt: 0, timer: null, bag: [], mp: false, isDrawer: true, knows: false };
   var gWord = $('gWord'), gTime = $('gTime'), gRound = $('gRound'), over = $('over');
   var segEls = all('#gSegs span');
 
@@ -1274,9 +1324,10 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     return a;
   }
 
-  function renderWord() {
+  function renderWord(txt) {
     gWord.textContent = '';
-    var w = game.word, n = w.length;
+    var w = (txt === undefined ? game.word : txt), n = w.length;
+    if (!n) return;
     var size = Math.max(14, Math.min(30, Math.floor((420 - (n - 1) * 4) / n)));
     for (var i = 0; i < n; i++) {
       var ch = w.charAt(i);
@@ -1289,7 +1340,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
         d.style.width = size + 'px';
         d.style.height = size + 'px';
         d.style.fontSize = Math.max(7, Math.round(size * 0.46)) + 'px';
-        d.textContent = ch.toUpperCase();
+        d.textContent = ch === '_' ? '' : ch.toUpperCase();
       }
       gWord.appendChild(d);
     }
@@ -1309,7 +1360,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     gTime.classList.toggle('warn', left <= 10);
     var lit = Math.ceil(segEls.length * left / game.seconds);
     for (var i = 0; i < segEls.length; i++) segEls[i].classList.toggle('off', i >= lit);
-    if (left <= 0) endRound();
+    if (left <= 0 && !game.mp) endRound();
   }
 
   function stopTimer() {
@@ -1342,13 +1393,22 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     var last = game.round >= game.total;
     $('ovTitle').textContent = last ? 'FIM DA PARTIDA!' : 'TEMPO ESGOTADO!';
     $('ovNext').hidden = last;
+    $('ovNote').textContent = '';
+    $('ovLobby').hidden = false;
+    $('ovWas').hidden = false;
     over.hidden = false;
     ui();
     (last ? $('ovLobby') : $('ovNext')).focus();
   }
 
   function startGame() {
+    game.mp = false;
+    game.isDrawer = true;
+    game.knows = true;
     game.theme = selTheme.value;
+    game.themeName = THEMES[game.theme].nome;
+    $('gWordLbl').textContent = 'SUA PALAVRA (só você vê)';
+    setViewer(false);
     game.total = Number(selRounds.value);
     game.seconds = Number(selTime.value);
     game.round = 0;
@@ -1359,6 +1419,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   }
 
   function leaveGame() {
+    game.mp = false;
+    setViewer(false);
     stopTimer();
     if (cur) commit();
     state.locked = false;
@@ -1366,11 +1428,12 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     show('lobby');
   }
 
-  $('startBtn').addEventListener('click', startGame);
+  $('startBtn').addEventListener('click', onStartClick);
   $('ovNext').addEventListener('click', startRound);
   $('ovLobby').addEventListener('click', leaveGame);
-  $('leaveBtn').addEventListener('click', leaveGame);
+  $('leaveBtn').addEventListener('click', function () { if (game.mp) goLogin(); else leaveGame(); });
   $('skipBtn').addEventListener('click', function () {
+    if (game.mp) { if (game.isDrawer && mp.sock && !state.locked) mp.sock.emit('skip'); return; }
     if (state.locked) return;
     if (cur) commit();
     newWord();
@@ -1379,12 +1442,459 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     ui();
   });
 
+  /* =====================================================================
+     MULTIPLAYER (conversa com o servidor)
+     ===================================================================== */
+
+  var mp = { sock: null, joined: false, nick: '', tries: 0, retry: null, drawer: '' };
+  var rcur = null;                    // traço de outro jogador, em andamento
+  var netTimer = null, netSent = 0, netShapeKey = '';
+  var ovTimer = null;
+  var clog = $('clog'), plist = $('plist'), guessInput = $('guessInput'), guessBtn = $('guessBtn');
+  var submitBtn = document.querySelector('#loginForm .bigbtn');
+  var tipEl = $('tipText'), tipOrig = tipEl.textContent;
+  var skipBtn = $('skipBtn');
+
+  function sameNick(a, b) { return String(a || '').toLowerCase() === String(b || '').toLowerCase(); }
+
+  /* ---------- envio do desenho (só quem está desenhando) ---------- */
+
+  function net(m) {
+    if (game.mp && game.isDrawer && mp.sock && mp.joined) mp.sock.emit('draw', m);
+  }
+
+  function netBegin() {
+    if (!(game.mp && game.isDrawer) || !cur) return;
+    net({ k: 'begin', a: JSON.parse(JSON.stringify(cur)) });
+    netSent = cur.p ? cur.p.length : 0;
+    netShapeKey = cur.a ? cur.a.join(',') : '';
+    if (netTimer) clearInterval(netTimer);
+    netTimer = setInterval(netFlush, 50);
+  }
+
+  function netFlush() {
+    if (!cur || !(game.mp && game.isDrawer)) return;
+    if (cur.p && cur.p.length > netSent) {
+      net({ k: 'pts', p: cur.p.slice(netSent) });
+      netSent = cur.p.length;
+    } else if (cur.t === 'shape') {
+      var key = cur.a.join(',');
+      if (key !== netShapeKey) { netShapeKey = key; net({ k: 'shape', a: cur.a.slice() }); }
+    }
+  }
+
+  function netEnd() {
+    if (netTimer) { clearInterval(netTimer); netTimer = null; }
+    if (!cur || !(game.mp && game.isDrawer)) return;
+    netFlush();
+    net({ k: 'end' });
+  }
+
+  /* ---------- recepção do desenho (quem está adivinhando) ---------- */
+
+  function paintCur(a) {
+    octx.clearRect(0, 0, W, H);
+    if (a.t === 'stroke') {
+      if (a.p.length >= 2) seg(octx, a, a.p[0], a.p[1], a.p[0], a.p[1]);
+      for (var i = 2; i + 1 < a.p.length; i += 2) seg(octx, a, a.p[i - 2], a.p[i - 1], a.p[i], a.p[i + 1]);
+    } else if (a.t === 'spray') drawSpray(octx, a);
+    else if (a.t === 'shape') drawShape(octx, a);
+  }
+
+  function rxEnd() {
+    if (!rcur) return;
+    drawAction(ctx, rcur);
+    octx.clearRect(0, 0, W, H);
+    actions.push(rcur);
+    rcur = null;
+    ui();
+  }
+
+  function onDraw(m) {
+    if (game.isDrawer || !m) return;
+    var i;
+    if (m.k === 'begin') {
+      if (rcur) rxEnd();
+      rcur = m.a;
+      paintCur(rcur);
+    } else if (m.k === 'pts' && rcur) {
+      var arr = m.p || [];
+      if (rcur.t === 'stroke') {
+        for (i = 0; i + 1 < arr.length; i += 2) {
+          var px = rcur.p[rcur.p.length - 2], py = rcur.p[rcur.p.length - 1];
+          rcur.p.push(arr[i], arr[i + 1]);
+          seg(octx, rcur, px, py, arr[i], arr[i + 1]);
+        }
+      } else if (rcur.t === 'spray') {
+        for (i = 0; i < arr.length; i++) rcur.p.push(arr[i]);
+        drawSpray(octx, { c: rcur.c, px: rcur.px, p: arr });
+      }
+    } else if (m.k === 'shape' && rcur && rcur.t === 'shape') {
+      rcur.a = m.a;
+      paintCur(rcur);
+    } else if (m.k === 'end') {
+      rxEnd();
+    } else if (m.k === 'act') {
+      if (rcur) rxEnd();
+      drawAction(ctx, m.a);
+      actions.push(m.a);
+      ui();
+    } else if (m.k === 'undo') {
+      if (rcur) rxEnd();
+      actions.pop();
+      replay();
+      ui();
+    }
+  }
+
+  function onSnapshot(m) {
+    actions = m.actions || [];
+    rcur = m.cur || null;
+    replay();
+    octx.clearRect(0, 0, W, H);
+    if (rcur) paintCur(rcur);
+    ui();
+  }
+
+  /* ---------- placar e chat ---------- */
+
+  function setPlayers(list) {
+    players = list.map(function (p) {
+      return { nick: p.nick, score: p.score, online: p.online, drawing: p.drawing, guessed: p.guessed, me: me ? sameNick(p.nick, me.nick) : false };
+    });
+    renderSlots();
+    renderScore();
+  }
+
+  function renderScore() {
+    plist.textContent = '';
+    var list = players.map(function (p, i) { return { p: p, i: i }; });
+    list.sort(function (a, b) { return (b.p.score || 0) - (a.p.score || 0) || a.i - b.i; });
+    list.forEach(function (it, idx) {
+      var p = it.p;
+      var row = document.createElement('div');
+      row.className = 'prow' + (p.me ? ' me' : '') + (p.drawing ? ' drawing' : '') + (p.guessed ? ' ok' : '') + (p.online === false ? ' off' : '');
+      var rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = (idx + 1) + '.';
+      var av = document.createElement('span'); av.className = 'pav'; av.innerHTML = avatarSvg(p.nick, 20);
+      var nm = document.createElement('b'); nm.textContent = p.nick;
+      var tg = document.createElement('span'); tg.className = 'ptag'; tg.textContent = p.drawing ? 'DESENHA' : (p.guessed ? 'ACERTOU' : '');
+      var pt = document.createElement('span'); pt.className = 'pts'; pt.textContent = String(p.score || 0);
+      row.appendChild(rk); row.appendChild(av); row.appendChild(nm); row.appendChild(tg); row.appendChild(pt);
+      plist.appendChild(row);
+    });
+    $('pcount').textContent = String(players.length);
+  }
+
+  function addChat(m) {
+    var d = document.createElement('div');
+    d.className = 'cl ' + (m.k || 'sys') + (m.priv ? ' priv' : '');
+    if (m.k === 'msg') {
+      var b = document.createElement('b');
+      b.textContent = m.nick + ': ';
+      d.appendChild(b);
+      d.appendChild(document.createTextNode((m.priv ? '(entre quem sabe) ' : '') + m.text));
+    } else d.textContent = m.text;
+    var stick = clog.scrollTop + clog.clientHeight >= clog.scrollHeight - 30;
+    clog.appendChild(d);
+    while (clog.children.length > 150) clog.removeChild(clog.firstChild);
+    if (stick) clog.scrollTop = clog.scrollHeight;
+  }
+
+  function setGuessState() {
+    var on = !!(game.mp && mp.joined);
+    guessInput.disabled = !on;
+    guessBtn.disabled = !on;
+    if (!on) guessInput.placeholder = 'Modo treino: sem palpites';
+    else if (game.isDrawer) guessInput.placeholder = 'Chat de quem sabe';
+    else if (game.knows) guessInput.placeholder = 'Chat de quem acertou';
+    else guessInput.placeholder = 'Digite seu palpite...';
+  }
+
+  function setViewer(on) {
+    $('sGame').classList.toggle('viewer', on);
+    tipEl.textContent = on ? 'Você está adivinhando! Digite o palpite no campo ao lado. Quem acerta antes ganha mais pontos.' : tipOrig;
+    skipBtn.hidden = on;
+    $('leaveBtn').textContent = game.mp ? 'SAIR DA SALA' : 'SAIR DA RODADA';
+    setGuessState();
+  }
+
+  $('cform').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = guessInput.value.trim();
+    if (!t || !mp.sock || !mp.joined) return;
+    mp.sock.emit('guess', t);
+    guessInput.value = '';
+  });
+
+  function lobbyNote() {
+    $('lobbyNote').textContent = mp.joined
+      ? 'Sala online. Qualquer pessoa pode iniciar quando todos estiverem aqui. São necessários pelo menos 2 jogadores; sozinho, o botão abre o modo treino.'
+      : 'Modo treino: o servidor não está configurado, então você joga sozinho para testar.';
+  }
+
+  /* ---------- conexão ---------- */
+
+  function setBusy(b, msg, isErr) {
+    submitBtn.disabled = b;
+    nickHint.textContent = msg || NICK_HELP;
+    nickHint.classList.toggle('err', !!isErr);
+  }
+
+  function mpClose() {
+    if (mp.retry) { clearTimeout(mp.retry); mp.retry = null; }
+    if (netTimer) { clearInterval(netTimer); netTimer = null; }
+    if (mp.sock) {
+      try { mp.sock.emit('leave'); mp.sock.close(); } catch (e) { /* já fechado */ }
+      mp.sock = null;
+    }
+    mp.joined = false;
+  }
+
+  function mpFail(msg) {
+    var wasIn = current !== 'login';
+    mpClose();
+    if (wasIn) goLogin();
+    setBusy(false, msg, true);
+    $('trainBtn').hidden = false;
+  }
+
+  $('trainBtn').addEventListener('click', function () {
+    var n = cleanNick(nickInput.value);
+    if (nickError(n)) { nickHint.textContent = nickError(n); nickHint.classList.add('err'); return; }
+    mpClose();
+    me = { nick: n };
+    players = [{ nick: n, me: true }];
+    $('trainBtn').hidden = true;
+    setBusy(false);
+    enterLobby();
+    lobbyNote();
+  });
+
+  function goLogin() {
+    mpClose();
+    stopTimer();
+    if (ovTimer) { clearInterval(ovTimer); ovTimer = null; }
+    game.mp = false;
+    game.isDrawer = true;
+    state.locked = false;
+    setViewer(false);
+    over.hidden = true;
+    ghost.hidden = true;
+    cur = null;
+    rcur = null;
+    me = null;
+    players = [];
+    nickInput.value = loadNick();
+    previewAvatar();
+    setBusy(false);
+    show('login');
+  }
+
+  function loadClient(cb) {
+    if (window.io) { cb(); return; }
+    var s = document.createElement('script');
+    function retry() {
+      if (s.parentNode) s.parentNode.removeChild(s);
+      mp.tries++;
+      var limit = IS_LOCAL ? 2 : 30;
+      if (mp.tries >= limit) {
+        mpFail(IS_LOCAL
+          ? 'Não achei o servidor no seu computador. Rode "node server.js" na pasta server e tente de novo.'
+          : 'Não consegui falar com o servidor. Espere um minuto e tente de novo.');
+        return;
+      }
+      setBusy(true, 'Acordando o servidor, isso pode levar até 1 minuto... (' + mp.tries + ')');
+      mp.retry = setTimeout(function () { loadClient(cb); }, 4000);
+    }
+    s.onload = function () { if (window.io) cb(); else retry(); };
+    s.onerror = retry;
+    s.src = API + '/socket.io/socket.io.js';
+    document.head.appendChild(s);
+  }
+
+  function mpConnect(n) {
+    mp.nick = n;
+    mp.tries = 0;
+    $('trainBtn').hidden = true;
+    setBusy(true, 'Conectando ao servidor...');
+    loadClient(openSocket);
+  }
+
+  function openSocket() {
+    if (mp.sock) { try { mp.sock.close(); } catch (e) { /* segue */ } }
+    var sock = window.io(API, { reconnection: true, reconnectionDelay: 1000, reconnectionDelayMax: 5000, timeout: 20000 });
+    mp.sock = sock;
+    sock.on('connect', function () { sock.emit('join', { nick: mp.nick }); });
+    sock.on('connect_error', function () { if (!mp.joined) setBusy(true, 'Servidor acordando, aguarde...'); });
+    sock.on('disconnect', function (why) {
+      if (why === 'io server disconnect') sock.connect();
+      if (mp.joined) addChat({ k: 'warn', text: 'Conexão perdida. Tentando reconectar...' });
+    });
+    sock.on('join_error', function (m) { mpFail((m && m.msg) || 'Não foi possível entrar.'); });
+    sock.on('joined', onJoined);
+    sock.on('players', setPlayers);
+    sock.on('chat', addChat);
+    sock.on('game_start', onGameStart);
+    sock.on('round', onRound);
+    sock.on('word', onWord);
+    sock.on('hint', function (m) { if (game.mp && !game.knows && !game.isDrawer) showMask(m.mask); });
+    sock.on('snapshot', onSnapshot);
+    sock.on('draw', onDraw);
+    sock.on('round_end', onRoundEnd);
+  }
+
+  function onJoined(m) {
+    var first = !mp.joined;
+    mp.joined = true;
+    me = { nick: m.nick };
+    setPlayers(m.players);
+    setBusy(false);
+    if (current === 'login') { enterLobby(); lobbyNote(); }
+    else if (!first) addChat({ k: 'ok', text: 'Reconectado.' });
+  }
+
+  /* ---------- partida online ---------- */
+
+  function onStartClick() {
+    if (mp.sock && mp.joined) {
+      var online = players.filter(function (p) { return p.online !== false; }).length;
+      if (online >= 2) {
+        var key = selTheme.value;
+        mp.sock.emit('start', { key: key, nome: THEMES[key].nome, words: THEMES[key].palavras, rounds: Number(selRounds.value), seconds: Number(selTime.value) });
+        return;
+      }
+    }
+    startGame();
+  }
+
+  function showMask(mask) {
+    var n = (mask.match(/[\p{L}\p{N}_]/gu) || []).length;
+    $('gWordLbl').textContent = game.isDrawer ? 'SUA PALAVRA (só você vê)' : 'ADIVINHE A PALAVRA (' + n + ' LETRAS)';
+    renderWord(mask);
+  }
+
+  function onGameStart(m) {
+    stopTimer();
+    if (ovTimer) { clearInterval(ovTimer); ovTimer = null; }
+    var fresh = !(current === 'game' && game.mp);
+    game.mp = true;
+    game.isDrawer = false;
+    game.knows = false;
+    if (THEMES[m.key]) game.theme = m.key;
+    game.themeName = m.nome;
+    game.total = m.total;
+    game.seconds = m.seconds;
+    game.round = 0;
+    $('gTema').textContent = m.nome;
+    actions = [];
+    cur = null;
+    rcur = null;
+    octx.clearRect(0, 0, W, H);
+    replay();
+    over.hidden = true;
+    state.locked = true;
+    setViewer(true);
+    renderWord('');
+    gRound.textContent = 'RODADA 0/' + m.total;
+    if (fresh) clog.textContent = '';
+    show('game');
+    ui();
+  }
+
+  function onRound(m) {
+    stopTimer();
+    if (ovTimer) { clearInterval(ovTimer); ovTimer = null; }
+    game.mp = true;
+    game.round = m.n;
+    game.total = m.total;
+    game.seconds = m.seconds;
+    game.isDrawer = sameNick(m.drawer, me && me.nick);
+    game.knows = game.isDrawer;
+    mp.drawer = m.drawer;
+    gRound.textContent = 'RODADA ' + m.n + '/' + m.total;
+    actions = [];
+    cur = null;
+    rcur = null;
+    octx.clearRect(0, 0, W, H);
+    replay();
+    over.hidden = true;
+    state.locked = !game.isDrawer;
+    setViewer(!game.isDrawer);
+    game.word = '';
+    showMask(m.mask);
+    game.endAt = Date.now() + m.left;
+    tick();
+    game.timer = setInterval(tick, 250);
+    if (current !== 'game') show('game');
+    ui();
+    if (!game.isDrawer && window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+      try { guessInput.focus({ preventScroll: true }); } catch (e) { /* segue */ }
+    }
+  }
+
+  function onWord(m) {
+    game.word = m.word;
+    game.knows = true;
+    $('gWordLbl').textContent = game.isDrawer ? 'SUA PALAVRA (só você vê)' : 'VOCÊ ACERTOU! A PALAVRA É:';
+    renderWord(m.word);
+    setGuessState();
+  }
+
+  function onRoundEnd(m) {
+    stopTimer();
+    if (netTimer) { clearInterval(netTimer); netTimer = null; }
+    if (sprayTimer) { clearInterval(sprayTimer); sprayTimer = null; }
+    if (rcur) rxEnd();
+    cur = null;
+    octx.clearRect(0, 0, W, H);
+    state.locked = true;
+    ghost.hidden = true;
+    var title = 'TEMPO ESGOTADO!';
+    if (m.reason === 'all') title = 'TODOS ACERTARAM!';
+    else if (m.reason === 'drawer_left') title = 'O DESENHISTA SAIU';
+    else if (m.reason === 'few') title = 'PARTIDA ENCERRADA';
+    if (m.last && m.reason !== 'few') title = 'FIM DA PARTIDA!';
+    $('ovTitle').textContent = title;
+    $('ovWord').textContent = m.word || '';
+    $('ovWas').hidden = !m.word;
+    var lines = [];
+    if (m.reason === 'few') lines.push('Poucos jogadores na sala.');
+    if (m.last && m.ranking) {
+      m.ranking.slice(0, 5).forEach(function (r, i) { lines.push((i + 1) + 'º ' + r.nick + ' ' + r.score); });
+    } else if (m.gains && m.gains.length) {
+      lines.push(m.gains.slice(0, 4).map(function (g) { return g.nick + ' +' + g.gain; }).join('   '));
+    } else {
+      lines.push('Ninguém pontuou.');
+    }
+    var base = lines.join('\n');
+    var note = $('ovNote');
+    note.textContent = base;
+    $('ovNext').hidden = true;
+    $('ovLobby').hidden = !m.last;
+    over.hidden = false;
+    if (ovTimer) { clearInterval(ovTimer); ovTimer = null; }
+    if (!m.last) {
+      var t = m.nextIn;
+      note.textContent = base + '\nPróxima rodada em ' + t + 's';
+      ovTimer = setInterval(function () {
+        t--;
+        if (t < 0) { clearInterval(ovTimer); ovTimer = null; return; }
+        note.textContent = base + '\nPróxima rodada em ' + t + 's';
+      }, 1000);
+    } else {
+      $('ovLobby').focus();
+    }
+    ui();
+  }
+
   /* ---------- escala para telas pequenas ---------- */
 
   var stage = $('stage');
   var board = $('board');
   function fit() {
-    var s = Math.min(1, stage.clientWidth / BOARD_W);
+    var wide = current === 'game';
+    board.classList.toggle('wide', wide);
+    var s = Math.min(1, stage.clientWidth / (wide ? 1166 : BOARD_W));
     board.style.transform = 'scale(' + s + ')';
     stage.style.height = Math.ceil(board.offsetHeight * s) + 'px';
   }

@@ -15,6 +15,10 @@ const { Server } = require('socket.io');
 const PORT = Number(process.env.PORT) || 3000;
 const MAX_PLAYERS = 25;
 const GRACE_MS = 20000;   // tempo para quem caiu voltar com o mesmo apelido sem perder pontos
+const ROOM_W = 8, ROOM_H = 8;   // tamanho da sala do lobby, em quadrados
+const BLOCKED = [[2, 0], [5, 0], [0, 5]];   // quadrados ocupados por móveis
+function isBlocked(x, y) { return BLOCKED.some(function (t) { return t[0] === x && t[1] === y; }); }
+const REACTS = 8;         // quantidade de reações disponíveis
 const BETWEEN_S = 8;      // pausa entre rodadas
 const ALLOWED = (process.env.ALLOWED_ORIGIN || '')
   .split(',')
@@ -100,6 +104,28 @@ function nickError(n) {
   return '';
 }
 
+/* avatar: 15 números (pele, cabelo, ... fundo) separados por ponto; limites iguais aos do cliente */
+const AV_LIMITS = [11, 16, 14, 8, 9, 11, 10, 18, 9, 9, 5, 12, 12, 12, 7];
+function cleanAvatar(v) {
+  if (typeof v !== 'string' || !/^\d{1,2}(\.\d{1,2}){14}$/.test(v)) return '';
+  const a = v.split('.').map(Number);
+  for (let i = 0; i < AV_LIMITS.length; i++) if (a[i] >= AV_LIMITS[i]) return '';
+  return a.join('.');
+}
+function avatarTaken(av, exceptKey) {
+  return room.players.some(function (p) { return p.av && p.av === av && p.key !== exceptKey; });
+}
+function takenList() { return room.players.filter(function (p) { return p.av; }).map(function (p) { return { k: p.av, n: p.nick }; }); }
+
+function newStats() { return { hits: 0, misses: 0, fast: null, drawnHits: 0, mystery: 0, reacts: 0 }; }
+function freeTile() {
+  for (let i = 0; i < 40; i++) {
+    const x = Math.floor(Math.random() * ROOM_W), y = Math.floor(Math.random() * ROOM_H);
+    if (!isBlocked(x, y) && !room.players.some(function (q) { return q.x === x && q.y === y; })) return { x: x, y: y };
+  }
+  return { x: 4, y: 4 };
+}
+
 function playerByKey(key) { return room.players.find(function (p) { return p.key === key; }) || null; }
 function playerOf(socket) { return socket.data && socket.data.key ? playerByKey(socket.data.key) : null; }
 function onlinePlayers() { return room.players.filter(function (p) { return p.online; }); }
@@ -108,6 +134,9 @@ function publicPlayers() {
   return room.players.map(function (p) {
     return {
       nick: p.nick,
+      av: p.av || '',
+      x: p.x,
+      y: p.y,
       score: p.score,
       online: p.online,
       drawing: room.phase === 'round' && room.drawer === p.key,
@@ -118,6 +147,27 @@ function publicPlayers() {
 
 function sendPlayers() { io.emit('players', publicPlayers()); }
 function sys(text, kind) { io.emit('chat', { k: kind || 'sys', text: text }); }
+
+function computeAwards() {
+  const ps = room.players;
+  const out = [];
+  function pick(id, title, score, detail) {
+    let w = null, v = null;
+    ps.forEach(function (p) {
+      const x = score(p);
+      if (x === null || x === undefined) return;
+      if (v === null || x > v) { v = x; w = p; }
+    });
+    if (w) out.push({ id: id, title: title, nick: w.nick, av: w.av || '', detail: detail(v, w) });
+  }
+  pick('fast', 'RÁPIDO NO GATILHO', function (p) { return p.stats.fast === null ? null : -p.stats.fast; }, function (v) { return 'acertou em ' + (-v).toFixed(1).replace('.', ',') + ' s'; });
+  pick('artist', 'MELHOR ARTISTA', function (p) { return p.stats.drawnHits >= 1 ? p.stats.drawnHits : null; }, function (v) { return v + (v === 1 ? ' acerto' : ' acertos') + ' nos seus desenhos'; });
+  pick('guesser', 'MESTRE DOS PALPITES', function (p) { return p.stats.hits >= 1 ? p.stats.hits : null; }, function (v) { return v + (v === 1 ? ' palavra' : ' palavras') + ' adivinhadas'; });
+  pick('loved', 'MAIS APLAUDIDO', function (p) { return p.stats.reacts >= 2 ? p.stats.reacts : null; }, function (v) { return v + ' reações nos desenhos'; });
+  pick('mystery', 'DESENHO MISTERIOSO', function (p) { return p.stats.mystery >= 1 ? p.stats.mystery : null; }, function (v) { return 'ninguém adivinhou ' + (v === 1 ? 'um desenho' : v + ' desenhos'); });
+  pick('chute', 'CHUTADOR', function (p) { return p.stats.misses >= 4 ? p.stats.misses : null; }, function (v) { return v + ' palpites errados'; });
+  return out;
+}
 
 function ranking() {
   return room.players
@@ -212,7 +262,7 @@ function startGame(starter, data) {
   room.n = 0;
   room.turn = -1;
   room.order = shuffle(onlinePlayers().map(function (p) { return p.key; }));
-  room.players.forEach(function (p) { p.score = 0; p.gain = 0; p.guessed = false; });
+  room.players.forEach(function (p) { p.score = 0; p.gain = 0; p.guessed = false; p.stats = newStats(); });
   io.emit('game_start', { key: room.cfg.key, nome: room.cfg.nome, total: total, seconds: seconds, by: playerOf(starter).nick });
   sys('Partida iniciada: ' + room.cfg.nome + ', ' + total + ' rodadas de ' + seconds + 's.');
   startRound();
@@ -265,8 +315,10 @@ function endRound(reason) {
   if (room.phase !== 'round') return;
   clearTimers();
   room.phase = 'between';
+  commitCur();
   const last = room.n >= room.cfg.total;
   const drawer = playerByKey(room.drawer);
+  if (drawer && reason === 'time' && !room.players.some(function (q) { return q.guessed; })) drawer.stats.mystery++;
   const gains = room.players
     .filter(function (p) { return p.gain > 0; })
     .sort(function (a, b) { return b.gain - a.gain; })
@@ -278,6 +330,8 @@ function endRound(reason) {
     nextIn: last ? 0 : BETWEEN_S,
     drawer: drawer ? drawer.nick : '',
     gains: gains,
+    actions: room.actions,
+    awards: last ? computeAwards() : null,
     ranking: last ? ranking() : null
   });
   sendPlayers();
@@ -306,11 +360,15 @@ function abortGame(reason) {
 function correctGuess(p) {
   p.guessed = true;
   const left = Math.max(0, (room.endAt - Date.now()) / 1000);
+  const took = Math.max(0, room.cfg.seconds - left);
+  p.stats.hits++;
+  if (p.stats.fast === null || took < p.stats.fast) p.stats.fast = took;
   const pts = 100 + Math.round(400 * left / room.cfg.seconds);
   p.score += pts;
   p.gain += pts;
   const d = playerByKey(room.drawer);
   if (d) {
+    d.stats.drawnHits++;
     const dp = Math.round(pts / 4);
     d.score += dp;
     d.gain += dp;
@@ -441,6 +499,15 @@ const server = http.createServer(function (req, res) {
     res.end('Servidor do Gartic Listening no ar. Jogadores conectados: ' + onlinePlayers().length + ' de ' + MAX_PLAYERS + '.');
     return;
   }
+  if (url === '/avatars') {
+    const origin = req.headers.origin || '';
+    const h = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
+    if (!ALLOWED.length) h['Access-Control-Allow-Origin'] = '*';
+    else if (ALLOWED.indexOf(origin) !== -1) { h['Access-Control-Allow-Origin'] = origin; h['Vary'] = 'Origin'; }
+    res.writeHead(200, h);
+    res.end(JSON.stringify({ taken: takenList() }));
+    return;
+  }
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('Não encontrado.');
 });
@@ -458,21 +525,26 @@ io.on('connection', function (socket) {
       const err = nickError(nick);
       if (err) { socket.emit('join_error', { msg: err }); return; }
       const key = nick.toLowerCase();
+      const av = cleanAvatar(data && data.av);
       let p = playerByKey(key);
       let returning = false;
       if (p) {
         if (p.online) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return; }
+        if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return; }
         if (p.offTimer) { clearTimeout(p.offTimer); p.offTimer = null; }
+        if (av) p.av = av;
         p.id = socket.id;
         p.online = true;
         returning = true;
       } else {
         if (room.players.length >= MAX_PLAYERS) { socket.emit('join_error', { msg: 'A sala está cheia (' + MAX_PLAYERS + ' jogadores).' }); return; }
-        p = { nick: nick, key: key, id: socket.id, online: true, score: 0, gain: 0, guessed: false, offTimer: null, lastMsg: 0 };
+        if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return; }
+        const t = freeTile();
+        p = { nick: nick, key: key, av: av, x: t.x, y: t.y, stats: newStats(), lastReact: 0, lastSay: 0, lastWalk: 0, id: socket.id, online: true, score: 0, gain: 0, guessed: false, offTimer: null, lastMsg: 0 };
         room.players.push(p);
       }
       socket.data.key = key;
-      socket.emit('joined', { nick: p.nick, players: publicPlayers(), phase: room.phase });
+      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase });
       sys(p.nick + (returning ? ' voltou.' : ' entrou.'));
       sendPlayers();
       sendStateTo(socket, p);
@@ -503,6 +575,45 @@ io.on('connection', function (socket) {
     } catch (e) { console.error('draw', e); }
   });
 
+  socket.on('walk', function (m) {
+    try {
+      const p = playerOf(socket);
+      if (!p || room.phase !== 'lobby' || !m) return;
+      const now = Date.now();
+      if (now - p.lastWalk < 120) return;
+      p.lastWalk = now;
+      const x = Math.floor(Number(m.x)), y = Math.floor(Number(m.y));
+      if (!(x >= 0 && x < ROOM_W && y >= 0 && y < ROOM_H) || isBlocked(x, y)) return;
+      p.x = x; p.y = y;
+      sendPlayers();
+    } catch (e) { console.error('walk', e); }
+  });
+  socket.on('say', function (txt) {
+    try {
+      const p = playerOf(socket);
+      if (!p || room.phase !== 'lobby') return;
+      const now = Date.now();
+      if (now - p.lastSay < 700) return;
+      p.lastSay = now;
+      const text = String(txt || '').replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+      if (!text) return;
+      io.emit('say', { nick: p.nick, text: text });
+    } catch (e) { console.error('say', e); }
+  });
+  socket.on('react', function (m) {
+    try {
+      const p = playerOf(socket);
+      if (!p || room.phase !== 'round') return;
+      const now = Date.now();
+      if (now - p.lastReact < 500) return;
+      const e = Math.floor(Number(m && m.e));
+      if (!(e >= 0 && e < REACTS)) return;
+      p.lastReact = now;
+      const d = playerByKey(room.drawer);
+      if (d && d !== p) d.stats.reacts++;
+      io.emit('react', { nick: p.nick, e: e });
+    } catch (err) { console.error('react', err); }
+  });
   socket.on('skip', function () {
     try {
       const p = playerOf(socket);
@@ -536,6 +647,7 @@ io.on('connection', function (socket) {
           return;
         }
         if (w.length >= 5 && lev(t, w) <= 1) socket.emit('chat', { k: 'warn', text: 'Quase! Está perto.' });
+        p.stats.misses++;
         io.emit('chat', { k: 'msg', nick: p.nick, text: text });
       } else if (room.phase === 'round') {
         // quem já sabe a palavra só conversa com quem também sabe

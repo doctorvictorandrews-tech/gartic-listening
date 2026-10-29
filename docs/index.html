@@ -192,6 +192,44 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 .cform button { width: 44px; height: 32px; font-size: 10px; font-weight: 700; }
 .over .note { max-width: 560px; font-size: 13px; font-weight: 700; white-space: pre-line; }
 #sGame.viewer .tools, #sGame.viewer .cur, #sGame.viewer .swatches { opacity: .35; pointer-events: none; }
+
+/* painel do desenhista: botões grandes com relevo, prévia do traço, tamanho em controle deslizante, cores recentes */
+.board.wide { width: 1202px; margin-left: -601px; }
+#sGame .win.big { width: 1190px; }
+.gmain { width: 898px; }
+.tools { width: 140px; padding: 4px; }
+.tgrid { grid-template-columns: repeat(3, 38px); gap: 5px; justify-content: center; }
+.tool { width: 38px; height: 38px; position: relative; }
+.tool svg { width: 24px; height: 24px; stroke-width: 1.8; }
+.tool::after { content: attr(data-k); position: absolute; right: 2px; bottom: 1px; font-family: var(--font-pixel); font-size: 7px; line-height: 7px; color: var(--ink); opacity: .7; }
+.tools .btn { border: 2px solid var(--ink); background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), inset -3px -3px 0 var(--lo), 2px 3px 0 var(--ink); }
+.tools .btn:hover:not(:disabled):not(.is-on) { background: #e6e6e6; }
+.tools .btn:active:not(:disabled), .tools .btn.is-on { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi), 0 0 0 var(--ink); }
+.tools .btn.is-on { background: var(--desk); }
+.tools .btn:disabled { box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.duo .opt, .duo .txt { width: 100%; }
+.opt { height: 26px; }
+.txt { height: 28px; font-size: 9px; letter-spacing: -.3px; }
+#pv { width: 126px; height: 56px; display: block; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); background: #fff; }
+#sizeRange { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; cursor: pointer; }
+#sizeRange::-webkit-slider-runnable-track { height: 10px; background: #fff; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); }
+#sizeRange::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 22px; margin-top: -8px; background: var(--paper); border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 var(--ink); }
+#sizeRange::-moz-range-track { height: 10px; background: #fff; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); }
+#sizeRange::-moz-range-thumb { width: 12px; height: 18px; border-radius: 0; background: var(--paper); border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 var(--ink); }
+#sizeRange:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.swatches { width: 298px; grid-template-columns: repeat(8, 32px); gap: 6px; }
+.sw { width: 32px; height: 32px; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, .55), inset -3px -3px 0 rgba(0, 0, 0, .28), 2px 3px 0 var(--ink); }
+.sw:hover { transform: translate(-1px, -1px); }
+.sw:active { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .28), 0 0 0 var(--ink); }
+.sw.is-on { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .28), 0 0 0 2px var(--paper), 0 0 0 5px var(--ink); }
+.recent { flex: none; width: 164px; display: flex; flex-direction: column; gap: 5px; }
+.rrow { display: flex; gap: 4px; }
+.rc { width: 24px; height: 24px; padding: 0; border: 2px solid var(--ink); cursor: pointer; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, .55), inset -2px -2px 0 rgba(0, 0, 0, .28), 1px 2px 0 var(--ink); }
+.rc:active { transform: translate(1px, 1px); box-shadow: none; }
+.rc:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.rc.empty { border: 2px dashed var(--lo); background: transparent; box-shadow: none; cursor: default; }
+#sGame.viewer .recent { opacity: .35; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -260,7 +298,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <details><summary>Ver palavras do tema</summary><div class="wlist" id="wordList"></div></details>
 </div>
 <div class="g"><label class="flabel" for="selRounds">RODADAS</label><select class="field" id="selRounds"><option value="3">3 rodadas</option><option value="5" selected>5 rodadas</option><option value="8">8 rodadas</option><option value="10">10 rodadas</option></select></div>
-<div class="g"><label class="flabel" for="selTime">TEMPO POR RODADA</label><select class="field" id="selTime"><option value="45">45 segundos</option><option value="60" selected>60 segundos</option><option value="90">90 segundos</option><option value="120">120 segundos</option></select></div>
+<div class="g"><label class="flabel" for="selTime">TEMPO POR RODADA</label><select class="field" id="selTime"><option value="45">45 segundos</option><option value="60">60 segundos</option><option value="90" selected>90 segundos</option><option value="120">2 minutos</option><option value="150">2 min 30 s</option><option value="180">3 minutos</option></select></div>
 <button type="button" class="bigbtn" id="startBtn">INICIAR PARTIDA</button>
 <p class="note" id="lobbyNote">Modo treino: o servidor não está configurado, então você joga sozinho para testar.</p>
 </div>
@@ -300,25 +338,28 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <button type="button" class="btn tool" data-tool="pick" aria-label="Conta-gotas" title="Conta-gotas (I)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M12 4 L16 8"/><path d="M13 3 L17 7"/><path d="M12 5 L15 8 L8 15 L5 15 L5 12 Z"/></svg></button>
 </div>
 <div class="grp">
-<span class="lbl">TAMANHO</span>
-<div class="sgrid" id="sizes">
-<button type="button" class="btn size" data-size="1" aria-label="Tamanho 1" title="Tamanho 1 (tecla 1)"><i style="height:2px"></i></button>
-<button type="button" class="btn size" data-size="2" aria-label="Tamanho 2" title="Tamanho 2 (tecla 2)"><i style="height:4px"></i></button>
-<button type="button" class="btn size" data-size="3" aria-label="Tamanho 3" title="Tamanho 3 (tecla 3)"><i style="height:6px"></i></button>
-<button type="button" class="btn size" data-size="4" aria-label="Tamanho 4" title="Tamanho 4 (tecla 4)"><i style="height:8px"></i></button>
+<span class="lbl">PRÉVIA</span>
+<canvas id="pv" width="126" height="56" aria-hidden="true"></canvas>
 </div>
+<div class="grp">
+<span class="lbl" id="sizeLbl">TAMANHO 2</span>
+<input type="range" id="sizeRange" min="1" max="8" step="1" value="2" aria-label="Tamanho do traço" title="Tamanho do traço (teclas 1 a 8, [ e ])">
 </div>
 <div class="grp">
 <span class="lbl">TRAÇO</span>
+<div class="duo">
 <button type="button" class="btn opt" data-mode="smooth" aria-pressed="true" title="Traço suave (M alterna)">SUAVE</button>
 <button type="button" class="btn opt" data-mode="pixel" aria-pressed="false" title="Traço pixelado (M alterna)">PIXEL</button>
 </div>
+</div>
 <div class="grp">
 <span class="lbl">FORMA</span>
+<div class="duo">
 <button type="button" class="btn opt" data-shape="0" aria-pressed="true" title="Retângulo e círculo só com contorno (G alterna)">VAZIO</button>
 <button type="button" class="btn opt" data-shape="1" aria-pressed="false" title="Retângulo e círculo preenchidos (G alterna)">CHEIO</button>
 </div>
-<div class="grp">
+</div>
+<div class="duo">
 <button type="button" class="btn txt" id="undoBtn" title="Desfazer (Ctrl+Z)">DESFAZER</button>
 <button type="button" class="btn txt" id="clearBtn" title="Limpar tudo (dá para desfazer)">LIMPAR</button>
 </div>
@@ -361,7 +402,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <button type="button" class="sw" data-color="#8A4B1F" aria-label="Marrom" style="background:#8A4B1F"></button>
 <button type="button" class="sw" data-color="#3A2A5A" aria-label="Roxo escuro" style="background:#3A2A5A"></button>
 </div>
-<div class="tip" id="tipText">ATALHOS: P lápis, B pincel, F balde, E borracha, I conta-gotas, L linha, R retângulo, O círculo, S spray, M traço, G forma, 1 a 4 tamanho, Ctrl+Z desfazer.</div>
+<div class="recent"><span class="lbl">RECENTES</span><div class="rrow" id="recent"></div></div>
+<div class="tip" id="tipText">ATALHOS: letras nas ferramentas, 1 a 8 ou [ ] tamanho, M traço, G forma, Ctrl+Z.</div>
 <button type="button" class="skip" id="skipBtn">PULAR<br>PALAVRA</button>
 </div>
 
@@ -406,7 +448,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   var SERVER_URL = 'https://gartic-listening.onrender.com';
   var LOCAL_URL = 'http://localhost:3000';
   var IS_LOCAL = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var API = IS_LOCAL ? LOCAL_URL : SERVER_URL;
+  var API = (IS_LOCAL ? LOCAL_URL : SERVER_URL).replace(/\/+$/, '');
   var MP_READY = IS_LOCAL || SERVER_URL.indexOf('COLE-AQUI') === -1;
 
   var THEMES = {
@@ -876,17 +918,17 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   var sprayTimer = null;
 
   var WIDTHS = {
-    pencil: [1, 2, 4, 6],
-    brush: [4, 8, 14, 22],
-    eraser: [8, 14, 22, 34],
-    shape: [1, 2, 4, 6],
-    spray: [8, 14, 22, 32]
+    pencil: [1, 2, 3, 4, 6, 8, 10, 12],
+    brush: [4, 6, 8, 11, 14, 18, 22, 28],
+    eraser: [8, 12, 16, 22, 28, 36, 46, 58],
+    shape: [1, 2, 3, 4, 6, 8, 10, 12],
+    spray: [8, 12, 16, 20, 26, 32, 40, 50]
   };
   var CELLS = {
-    pencil: [1, 2, 3, 4],
-    brush: [2, 4, 6, 9],
-    eraser: [2, 4, 6, 9],
-    shape: [1, 2, 3, 4]
+    pencil: [1, 2, 3, 4, 5, 6, 8, 10],
+    brush: [2, 3, 4, 6, 8, 10, 12, 15],
+    eraser: [2, 3, 4, 6, 8, 10, 13, 17],
+    shape: [1, 2, 3, 4, 5, 6, 7, 8]
   };
   var NAMES = {
     pencil: 'LÁPIS', brush: 'PINCEL', fill: 'BALDE', eraser: 'BORRACHA', pick: 'CONTA-GOTAS',
@@ -1062,7 +1104,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   /* ---------- interface do canvas ---------- */
 
   var toolBtns = all('[data-tool]');
-  var sizeBtns = all('[data-size]');
+  var sizeRange = $('sizeRange');
+  var pv = $('pv'), pvx = pv.getContext('2d');
   var swatches = all('[data-color]');
   var modeBtns = all('[data-mode]');
   var shapeBtns = all('[data-shape]');
@@ -1080,11 +1123,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       toolBtns[i].classList.toggle('is-on', on);
       toolBtns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
     }
-    for (i = 0; i < sizeBtns.length; i++) {
-      var s = Number(sizeBtns[i].getAttribute('data-size')) === state.size;
-      sizeBtns[i].classList.toggle('is-on', s);
-      sizeBtns[i].setAttribute('aria-pressed', s ? 'true' : 'false');
-    }
+    sizeRange.value = String(state.size);
+    $('sizeLbl').textContent = 'TAMANHO ' + state.size;
     for (i = 0; i < swatches.length; i++) {
       var c = swatches[i].getAttribute('data-color').toLowerCase() === state.color.toLowerCase();
       swatches[i].classList.toggle('is-on', c);
@@ -1107,6 +1147,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     clearBtn.disabled = state.locked;
     stTool.textContent = 'FERRAMENTA: ' + NAMES[state.tool];
     stSize.textContent = 'TAMANHO ' + state.size;
+    drawPreview();
     stMode.textContent = 'TRAÇO ' + (state.px ? 'PIXEL' : 'SUAVE');
     stCount.textContent = 'AÇÕES: ' + actions.length;
     cvHint.hidden = actions.length > 0 || !!cur || state.locked;
@@ -1119,10 +1160,78 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     ui();
   }
   function setSize(n) { state.size = n; ui(); }
-  function setColor(c) {
+  var recent = [];
+  function pushRecent(c) {
+    c = String(c).toLowerCase();
+    recent = recent.filter(function (x) { return x !== c; });
+    recent.unshift(c);
+    if (recent.length > 6) recent.length = 6;
+    renderRecent();
+  }
+  function renderRecent() {
+    var box = $('recent');
+    box.textContent = '';
+    for (var i = 0; i < 6; i++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      if (recent[i]) {
+        b.className = 'rc';
+        b.style.background = recent[i];
+        b.setAttribute('aria-label', 'Cor recente ' + recent[i]);
+        b.title = recent[i].toUpperCase();
+        b.addEventListener('click', (function (c) { return function () { setColor(c, true); }; })(recent[i]));
+      } else {
+        b.className = 'rc empty';
+        b.disabled = true;
+        b.setAttribute('aria-hidden', 'true');
+      }
+      box.appendChild(b);
+    }
+  }
+  function setColor(c, keep) {
     state.color = c;
     if (state.tool === 'eraser') state.tool = 'pencil';
+    if (!keep) pushRecent(c);
     ui();
+  }
+
+  /* prévia do traço: mostra ferramenta, tamanho, cor e modo atuais */
+  function drawPreview() {
+    var w = 126, h = 56, t = state.tool, g = group(t), i, p;
+    pvx.fillStyle = t === 'eraser' ? '#dcdcdc' : '#ffffff';
+    pvx.fillRect(0, 0, w, h);
+    if (t === 'pencil' || t === 'brush' || t === 'eraser') {
+      p = [];
+      for (i = 0; i <= 22; i++) p.push(14 + i * 4.8, 28 + Math.sin(i / 3.2) * 12);
+      drawStroke(pvx, { t: 'stroke', c: t === 'eraser' ? '#ffffff' : state.color, w: Math.min(WIDTHS[g][state.size - 1], 44), n: Math.min(CELLS[g][state.size - 1], 11), px: state.px, p: p });
+    } else if (t === 'spray') {
+      p = [];
+      var seed = 7;
+      for (i = 0; i < 260; i++) {
+        seed = (seed * 16807) % 2147483647;
+        var a = (seed / 2147483647) * Math.PI * 2;
+        seed = (seed * 16807) % 2147483647;
+        var rr = Math.min(WIDTHS.spray[state.size - 1], 24) * Math.sqrt(seed / 2147483647);
+        var cx = 20 + (i % 26) * 3.4;
+        p.push(cx + Math.cos(a) * rr, 28 + Math.sin(i / 8) * 10 + Math.sin(a) * rr);
+      }
+      drawSpray(pvx, { c: state.color, px: state.px, p: p });
+    } else if (t === 'line' || t === 'rect' || t === 'oval') {
+      drawShape(pvx, { t: 'shape', k: t, c: state.color, f: state.filled && t !== 'line', w: Math.min(WIDTHS.shape[state.size - 1], 12), n: Math.min(CELLS.shape[state.size - 1], 8), px: state.px, a: [20, 12, 106, 44] });
+    } else if (t === 'fill') {
+      pvx.strokeStyle = '#232323';
+      pvx.lineWidth = 2;
+      pvx.fillStyle = state.color;
+      pvx.beginPath();
+      pvx.moveTo(18, 14); pvx.lineTo(60, 8); pvx.lineTo(108, 18); pvx.lineTo(100, 46); pvx.lineTo(54, 48); pvx.lineTo(20, 40);
+      pvx.closePath();
+      pvx.fill();
+      pvx.stroke();
+    } else if (t === 'pick') {
+      var cols = swatches.map(function (b) { return b.getAttribute('data-color'); });
+      for (i = 0; i < 8; i++) { pvx.fillStyle = cols[i * 2] || '#ccc'; pvx.fillRect(i * 16, 0, 16, 28); pvx.fillStyle = cols[i * 2 + 1] || '#ccc'; pvx.fillRect(i * 16, 28, 16, 28); }
+      pvx.strokeStyle = '#232323'; pvx.lineWidth = 2; pvx.strokeRect(1, 1, w - 2, h - 2);
+    }
   }
   function setMode(px) { state.px = px; ui(); }
   function setFilled(f) { state.filled = f; ui(); }
@@ -1145,13 +1254,18 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   }
 
   toolBtns.forEach(function (b) { b.addEventListener('click', function () { setTool(b.getAttribute('data-tool')); }); });
-  sizeBtns.forEach(function (b) { b.addEventListener('click', function () { setSize(Number(b.getAttribute('data-size'))); }); });
+  sizeRange.addEventListener('input', function () { setSize(Number(sizeRange.value)); });
   swatches.forEach(function (b) { b.addEventListener('click', function () { setColor(b.getAttribute('data-color')); }); });
+  toolBtns.forEach(function (b) {
+    var tk = b.getAttribute('data-tool');
+    for (var kk in KEYS) if (KEYS[kk] === tk) b.setAttribute('data-k', kk.toUpperCase());
+  });
   modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode') === 'pixel'); }); });
   shapeBtns.forEach(function (b) { b.addEventListener('click', function () { setFilled(b.getAttribute('data-shape') === '1'); }); });
   undoBtn.addEventListener('click', undo);
   clearBtn.addEventListener('click', clearAll);
-  pickInput.addEventListener('input', function () { setColor(pickInput.value); });
+  pickInput.addEventListener('input', function () { setColor(pickInput.value, true); });
+  pickInput.addEventListener('change', function () { pushRecent(pickInput.value); });
 
   document.addEventListener('keydown', function (e) {
     if (current !== 'game') return;
@@ -1163,13 +1277,26 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     if (KEYS[k]) { setTool(KEYS[k]); }
     else if (k === 'm') { setMode(!state.px); }
     else if (k === 'g') { setFilled(!state.filled); }
-    else if (k >= '1' && k <= '4') { setSize(Number(k)); }
+    else if (k >= '1' && k <= '8') { setSize(Number(k)); }
+    else if (k === '[') { setSize(Math.max(1, state.size - 1)); }
+    else if (k === ']') { setSize(Math.min(8, state.size + 1)); }
   });
 
   /* ---------- cursor que mostra o tamanho do traço ---------- */
 
+  function svgCursor(icon) {
+    var cross = 'M8 1V15M1 8H15';
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'><g fill='none' stroke='#fff' stroke-width='4.5' stroke-linejoin='round'><path d='" + cross + "'/><path d='" + icon + "'/></g><g fill='none' stroke='#232323' stroke-width='1.8' stroke-linejoin='round'><path d='" + cross + "'/><path d='" + icon + "'/></g></svg>";
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") 8 8, crosshair';
+  }
+  var CURSORS = {
+    fill: svgCursor('M12 22L19 15L26 22L19 29Z M28 24V29'),
+    pick: svgCursor('M26 14L30 18M27 13L31 17M26 15L29 18L22 25L18 25L18 21Z')
+  };
+
   function updateGhost(p) {
     if (state.locked) { ghost.hidden = true; return; }
+    if (state.tool === 'fill' || state.tool === 'pick') { ghost.hidden = true; ov.style.cursor = CURSORS[state.tool]; return; }
     var t = state.tool, g = group(t), sz, x, y, round = false, cross = false;
     if (t === 'pencil' || t === 'brush' || t === 'eraser') {
       if (state.px) {
@@ -1894,7 +2021,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   function fit() {
     var wide = current === 'game';
     board.classList.toggle('wide', wide);
-    var s = Math.min(1, stage.clientWidth / (wide ? 1166 : BOARD_W));
+    var s = Math.min(1, stage.clientWidth / (wide ? 1202 : BOARD_W));
     board.style.transform = 'scale(' + s + ')';
     stage.style.height = Math.ceil(board.offsetHeight * s) + 'px';
   }
@@ -1903,6 +2030,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   /* ---------- início ---------- */
 
   fillThemes();
+  renderRecent();
   replay();
   ui();
   nickInput.value = loadNick();

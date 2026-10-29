@@ -47,7 +47,7 @@ button, input, select { font-family: inherit; color: inherit; }
 .screen { position: absolute; inset: 0; }
 .win { position: relative; border: 3px solid var(--ink); background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), 6px 6px 0 var(--ink); display: flex; flex-direction: column; }
 .win.big { width: 884px; height: 684px; }
-.win.login { position: absolute; left: 182px; top: 70px; width: 520px; }
+.win.login { position: absolute; left: 6px; top: 6px; width: 884px; }
 .titlebar { height: 28px; flex: none; background: var(--ink); display: flex; align-items: center; justify-content: space-between; padding: 0 6px; font-family: var(--font-pixel); font-size: 10px; color: #fff; }
 .titlebar .ttl { display: flex; align-items: center; gap: 8px; }
 .winbtns { display: flex; gap: 4px; }
@@ -69,11 +69,40 @@ select.field { height: 34px; font-size: 13px; cursor: pointer; padding: 0 6px; }
 .note { margin: 0; font-size: 12px; line-height: 17px; }
 .err { color: var(--err); font-weight: 700; }
 
-/* login */
-.loginbody { display: flex; gap: 18px; align-items: center; padding: 8px 6px 4px; }
-.avbig { width: 104px; height: 104px; flex: none; border: 3px solid var(--ink); background: #fff; box-shadow: 4px 4px 0 var(--ink); }
-.avbig svg { width: 98px; height: 98px; display: block; }
-.lform { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+/* login e editor de avatar */
+.lgrid { display: grid; grid-template-columns: 252px 1fr; gap: 14px; align-items: start; }
+.lleft { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.avbig { width: 176px; height: 176px; align-self: center; border: 3px solid var(--ink); background: #fff; box-shadow: 4px 4px 0 var(--ink); }
+.avbig svg { width: 170px; height: 170px; display: block; }
+.avname { text-align: center; font-family: var(--font-pixel); font-size: 10px; line-height: 14px; min-height: 14px; }
+.txtbtn { height: 30px; font-size: 11px; font-weight: 700; justify-content: center; width: 100%; background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), inset -3px -3px 0 var(--lo), 2px 3px 0 var(--ink); }
+.txtbtn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi), 0 0 0 var(--ink); }
+.lform { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin-top: 4px; }
+.lright { min-width: 0; display: flex; flex-direction: column; }
+.tabs { display: flex; gap: 4px; }
+.tab { height: 34px; padding: 0 14px; border: 2px solid var(--ink); border-bottom: 0; background: #b8b8b8; font-family: var(--font-pixel); font-size: 9px; cursor: pointer; box-shadow: inset 2px 2px 0 var(--hi); }
+.tab.is-on { background: #fff; height: 38px; margin-top: -4px; }
+.tab:focus-visible, .cat:focus-visible, .pcard:focus-visible, .th:focus-visible, .swc:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.pa { height: 506px; overflow-y: auto; background: #fff; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); padding: 10px; }
+.pa[hidden] { display: none; }
+#paPre { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-content: start; }
+.pcard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px 5px; background: var(--paper); border: 2px solid var(--ink); cursor: pointer; font-size: 10px; font-weight: 700; line-height: 12px; text-align: center; box-shadow: inset 2px 2px 0 var(--hi), inset -3px -3px 0 var(--lo), 2px 3px 0 var(--ink); }
+.pcard svg { width: 72px; height: 72px; display: block; border: 2px solid var(--ink); }
+.pcard:active:not(:disabled), .pcard.is-on { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); background: var(--desk); }
+.pcard:disabled { cursor: not-allowed; opacity: .55; }
+.pcard .busy { position: absolute; inset: auto 6px 22px 6px; background: var(--ink); color: #fff; font-size: 9px; padding: 2px 0; }
+.cats { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.cat { height: 28px; padding: 0 10px; border: 2px solid var(--ink); background: var(--paper); font-family: var(--font-pixel); font-size: 8px; cursor: pointer; box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 var(--ink); }
+.cat.is-on { background: var(--desk); transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); }
+.orow { margin-bottom: 12px; }
+.orow .flabel { display: block; margin-bottom: 5px; }
+.ogrid { display: flex; flex-wrap: wrap; gap: 6px; }
+.th { width: 68px; height: 68px; padding: 0; border: 2px solid var(--ink); background: var(--paper); cursor: pointer; display: block; box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 var(--ink); }
+.th svg { width: 60px; height: 60px; display: block; margin: 0 auto; }
+.th:hover { transform: translate(-1px, -1px); }
+.th.is-on, .th:active { transform: translate(2px, 2px); box-shadow: 0 0 0 3px var(--orange); background: var(--desk); }
+.swc { width: 32px; height: 32px; padding: 0; border: 2px solid var(--ink); cursor: pointer; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, .55), inset -3px -3px 0 rgba(0, 0, 0, .28), 2px 3px 0 var(--ink); }
+.swc.is-on { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 rgba(0, 0, 0, .28), 0 0 0 2px #fff, 0 0 0 5px var(--ink); }
 
 /* lobby */
 .who { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); padding: 0 8px; }
@@ -87,8 +116,8 @@ select.field { height: 34px; font-size: 13px; cursor: pointer; padding: 0 6px; }
 .slots { flex: 1; min-height: 0; padding: 8px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 6px; }
 .slot { border: 2px dashed var(--lo); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--mute); min-width: 0; }
 .slot.on { border: 2px solid var(--ink); background: var(--desk); flex-direction: column; justify-content: center; gap: 3px; padding: 2px 4px; color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
-.slotav { width: 40px; height: 40px; flex: none; border: 2px solid var(--ink); background: #fff; }
-.slotav svg { width: 36px; height: 36px; display: block; }
+.slotav { width: 56px; height: 56px; flex: none; border: 2px solid var(--ink); background: #fff; }
+.slotav svg { width: 52px; height: 52px; display: block; }
 .slotnm { min-width: 0; max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; }
 .slotnm b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tag { align-self: center; background: var(--ink); color: var(--desk); font-size: 10px; font-weight: 700; line-height: 12px; padding: 0 4px; }
@@ -166,10 +195,10 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 .side { width: 262px; flex: none; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .side .panel { min-height: 0; }
 .plist { height: 254px; flex: none; overflow-y: auto; }
-.prow { display: flex; align-items: center; gap: 5px; height: 26px; padding: 0 6px; border-bottom: 1px solid #d0d0d0; font-size: 12px; }
+.prow { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 6px; border-bottom: 1px solid #d0d0d0; font-size: 12px; }
 .prow .rk { width: 20px; flex: none; font-size: 10px; color: var(--mute); }
-.prow .pav { width: 22px; height: 22px; flex: none; border: 1px solid var(--ink); background: #fff; }
-.prow .pav svg { width: 20px; height: 20px; display: block; }
+.prow .pav { width: 28px; height: 28px; flex: none; border: 1px solid var(--ink); background: #fff; }
+.prow .pav svg { width: 26px; height: 26px; display: block; }
 .prow b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
 .prow.me b { font-weight: 700; text-decoration: underline; }
 .prow .ptag { flex: none; font-family: var(--font-pixel); font-size: 6px; line-height: 8px; }
@@ -230,9 +259,65 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 .rc:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 .rc.empty { border: 2px dashed var(--lo); background: transparent; box-shadow: none; cursor: default; }
 #sGame.viewer .recent { opacity: .35; pointer-events: none; }
+
+/* som, reações, replay e prêmios */
+.mutebtn { position: fixed; right: 12px; bottom: 12px; z-index: 30; height: 26px; padding: 0 10px; font-family: var(--font-pixel); font-size: 8px; box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 var(--ink); }
+.mutebtn.off { background: var(--desk); }
+.over { background: rgba(255, 255, 255, .88); }
+.ovmain { display: flex; gap: 20px; align-items: center; justify-content: center; width: 100%; padding: 0 14px; }
+.ovinfo { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; flex: 0 1 340px; }
+.ovrp { position: relative; width: 378px; height: 227px; flex: none; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); background: #fff; }
+.ovrp[hidden], .ovawards[hidden] { display: none; }
+.cvwrap .ovrp canvas { position: static; width: 372px; height: 221px; display: block; }
+.rptag { position: absolute; left: 6px; top: 6px; background: var(--ink); color: var(--desk); font-family: var(--font-pixel); font-size: 8px; line-height: 10px; padding: 3px 5px; }
+.ovawards { flex: 0 1 340px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.aw { display: flex; align-items: center; gap: 8px; background: #fff; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); padding: 3px 6px; }
+.aw .awav { width: 36px; height: 36px; flex: none; border: 2px solid var(--ink); }
+.aw .awav svg { width: 32px; height: 32px; display: block; }
+.aw b { display: block; font-family: var(--font-pixel); font-size: 8px; line-height: 11px; color: var(--orange-dk); }
+.aw span { display: block; font-size: 11px; line-height: 14px; }
+.awh { font-family: var(--font-pixel); font-size: 10px; background: var(--ink); color: var(--desk); padding: 5px 8px; }
+.reacts { flex: none; display: flex; gap: 4px; justify-content: space-between; }
+.rb { width: 29px; height: 29px; padding: 0; border: 2px solid var(--ink); background: var(--paper); cursor: pointer; box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 1px 2px 0 var(--ink); display: flex; align-items: center; justify-content: center; }
+.rb svg { width: 20px; height: 20px; display: block; }
+.rb:active:not(:disabled) { transform: translate(1px, 2px); box-shadow: none; }
+.rb:disabled { opacity: .45; cursor: not-allowed; }
+.rb:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.fl { position: absolute; z-index: 5; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 1px; animation: flup 2.8s ease-out forwards; }
+.fl svg { width: 40px; height: 40px; display: block; filter: drop-shadow(2px 2px 0 rgba(35, 35, 35, .55)); }
+.fl small { font-size: 10px; font-weight: 700; background: var(--ink); color: var(--desk); padding: 0 4px; }
+@keyframes flup { 0% { transform: translateY(0) scale(.5); opacity: 0; } 12% { transform: translateY(-14px) scale(1.1); opacity: 1; } 22% { transform: translateY(-26px) scale(1); } 100% { transform: translateY(-330px) scale(1); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .fl { animation: flfade 2.4s linear forwards; } @keyframes flfade { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } } }
+.pulse { animation: pls .5s ease-out; }
+@keyframes pls { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* lobby: sala em pixel art estilo Habbo */
+.roomwrap { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 6px 4px 8px; background: #1d1530; }
+.room { position: relative; width: 540px; height: 410px; flex: none; cursor: pointer; overflow: hidden; }
+.room:focus-visible { outline: 3px solid var(--orange); outline-offset: -3px; }
+.room svg.bgr { position: absolute; left: 0; top: 0; display: block; }
+.rf { position: absolute; pointer-events: none; }
+.rf svg { display: block; }
+.ra { position: absolute; width: 64px; height: 66px; pointer-events: none; }
+.ra .rsh { position: absolute; left: 14px; top: 58px; width: 36px; height: 12px; border-radius: 50%; background: rgba(0, 0, 0, .35); }
+.ra .rav { position: absolute; left: 6px; top: 14px; width: 52px; height: 52px; border: 2px solid var(--ink); background: #fff; box-sizing: content-box; margin: -2px 0 0 -2px; }
+.ra .rav svg { width: 52px; height: 52px; display: block; }
+.ra .rnm { position: absolute; left: 50%; top: -2px; transform: translateX(-50%); font-size: 10px; font-weight: 700; line-height: 14px; background: rgba(35, 35, 35, .88); color: #fff; padding: 0 5px; max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ra.me .rnm { background: var(--orange); }
+.ra.off { opacity: .45; }
+.ra.walk .rav { animation: bob .28s steps(2) infinite; }
+@keyframes bob { 0% { transform: translateY(0); } 100% { transform: translateY(-4px); } }
+.ra .rsay { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 6px; width: max-content; max-width: 150px; background: #fff; border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); padding: 3px 6px; font-size: 11px; line-height: 14px; font-weight: 700; color: var(--ink); text-align: center; word-break: break-word; }
+.ra .rsay::after { content: ''; position: absolute; left: 50%; top: 100%; margin-left: -4px; border: 4px solid transparent; border-top-color: var(--ink); }
+.ra.talk { z-index: 5000 !important; }
+@media (prefers-reduced-motion: reduce) { .ra.walk .rav { animation: none; } }
+.sayform { width: 528px; flex: none; display: flex; gap: 6px; }
+.sayin { height: 34px; font-size: 13px; flex: 1; min-width: 0; }
+.sayb { height: 34px; padding: 0 12px; font-size: 11px; font-weight: 700; justify-content: center; }
 </style>
 </head>
 <body>
+<button type="button" class="btn mutebtn" id="muteBtn" aria-pressed="false" title="Ligar ou desligar os sons">SOM: LIGADO</button>
 <div class="page">
 <div class="stage" id="stage">
 <div class="board" id="board">
@@ -256,20 +341,36 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <div class="ttl"><span>ENTRAR.EXE</span></div>
 <div class="winbtns" aria-hidden="true"><span>_</span><span>X</span></div>
 </div>
-<div class="content" style="padding:14px;gap:14px">
+<div class="content" style="padding:12px;gap:8px">
 <form id="loginForm" novalidate>
-<div class="loginbody">
+<div class="lgrid">
+<div class="lleft">
 <div class="avbig" id="loginAv" aria-hidden="true"></div>
+<div class="avname" id="avName">SEU VISUAL</div>
+<button type="button" class="btn txtbtn" id="diceBtn" title="Sortear um visual novo (um que ninguém esteja usando)">SORTEAR VISUAL</button>
+<p class="note err" id="avHint" hidden></p>
 <div class="lform">
 <label class="flabel" for="nick">SEU APELIDO</label>
 <input class="field" id="nick" name="nick" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="ex: Bia">
 <p class="note" id="nickHint">2 a 14 caracteres. Sem senha, é só escolher.</p>
 </div>
+<button type="submit" class="bigbtn">ENTRAR NA SALA</button>
+<button type="button" class="btn" id="trainBtn" hidden style="height:32px;padding:0 14px;font-size:11px;font-weight:700">JOGAR SOZINHO (TREINO)</button>
 </div>
-<div style="display:flex;justify-content:flex-end;padding:10px 6px 4px"><button type="submit" class="bigbtn">ENTRAR NA SALA</button></div>
+<div class="lright">
+<div class="tabs" role="tablist" aria-label="Como escolher o visual">
+<button type="button" class="tab is-on" role="tab" data-tab="pre" aria-selected="true">PRONTOS ANOS 80</button>
+<button type="button" class="tab" role="tab" data-tab="cri" aria-selected="false">CRIAR DO ZERO</button>
+</div>
+<div class="pa" id="paPre"></div>
+<div class="pa" id="paCri" hidden>
+<div class="cats" id="cats"></div>
+<div id="opts"></div>
+</div>
+</div>
+</div>
 </form>
-<div style="display:flex;justify-content:center"><button type="button" class="btn" id="trainBtn" hidden style="height:32px;padding:0 14px;font-size:11px;font-weight:700">JOGAR SOZINHO (TREINO)</button></div>
-<p class="note" style="border-top:2px solid var(--lo);padding-top:10px">Sala única do time, com 25 vagas. O avatar é sorteado a partir do apelido. A escolha de avatar vem numa próxima etapa.</p>
+<p class="note" style="border-top:2px solid var(--lo);padding-top:6px;font-size:11px;line-height:14px">Sala única do time, 25 vagas. Cada visual é único na sala: se alguém já usa o seu, mude um detalhe.</p>
 </div>
 </div>
 </section>
@@ -291,7 +392,13 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <div class="lobbyrow">
 <div class="panel" style="flex:1;min-width:0">
 <div class="ph"><span>JOGADORES NA SALA</span><span id="slotCount">1/25</span></div>
-<div class="slots" id="slots"></div>
+<div class="roomwrap">
+<div class="room" id="room" tabindex="0" role="application" aria-label="Sala do time. Clique no chão ou use as setas para andar."></div>
+<form class="sayform" id="sayForm" autocomplete="off">
+<input class="field sayin" id="sayInput" maxlength="80" placeholder="Fale com a sala e aperte Enter" aria-label="Mensagem para a sala">
+<button type="submit" class="btn sayb">FALAR</button>
+</form>
+</div>
 </div>
 <div class="config">
 <div class="g"><label class="flabel" for="selTheme">TEMA</label><select class="field" id="selTheme"></select>
@@ -371,12 +478,18 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 <div class="gh" id="ghost" hidden></div>
 <div class="cvhint" id="cvHint"><b>Desenhe a palavra</b>Clique e arraste para desenhar.</div>
 <div class="over" id="over" hidden>
+<div class="ovmain">
+<div class="ovrp" id="ovRp" hidden><canvas id="rpCv" width="744" height="442" role="img" aria-label="Replay do desenho"></canvas><span class="rptag">REPLAY</span></div>
+<div class="ovinfo">
 <div class="big" id="ovTitle">TEMPO ESGOTADO!</div>
 <div class="was" id="ovWas">A palavra era<b id="ovWord"></b></div>
 <p class="note" id="ovNote"></p>
 <div class="acts">
 <button type="button" class="bigbtn" id="ovNext">PRÓXIMA RODADA</button>
 <button type="button" class="bigbtn alt" id="ovLobby">VOLTAR AO LOBBY</button>
+</div>
+</div>
+<div class="ovawards" id="ovAwards" hidden></div>
 </div>
 </div>
 </div>
@@ -419,6 +532,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 </div>
 <aside class="side" aria-label="Placar e palpites">
 <div class="panel"><div class="ph"><span>PLACAR</span><span id="pcount">0</span></div><div class="plist" id="plist"></div></div>
+<div class="reacts" id="reacts" role="group" aria-label="Reações"></div>
 <div class="panel chat"><div class="ph"><span>PALPITES</span></div><div class="clog" id="clog" aria-live="polite"></div>
 <form class="cform" id="cform" autocomplete="off"><input id="guessInput" maxlength="60" autocomplete="off" spellcheck="false" placeholder="Digite seu palpite..." aria-label="Seu palpite" disabled><button type="submit" class="btn" id="guessBtn" disabled>OK</button></form></div>
 </aside>
@@ -722,14 +836,239 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   function $(id) { return document.getElementById(id); }
   function all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
 
-  /* ---------- avatar sorteado a partir do apelido ---------- */
+  /* ---------- avatar: pixel art 16x16 montado por peças ---------- */
 
-  var SKINS = ['#F2C9A0', '#FFDBAC', '#E0AC69', '#C68642', '#8D5524', '#6B3E1D'];
-  var HAIRS = ['#232323', '#5A2E12', '#7A3E1A', '#F5E96B', '#C0392B', '#6C6C6C', '#2B4EC4'];
-  var SHIRTS = ['#F15A1A', '#2B4EC4', '#E85AA0', '#3D9A3D', '#232323', '#7B3FA0', '#D8D82E', '#E63A00'];
-  var BGS = ['#7B3FA0', '#2B4EC4', '#3D9A3D', '#E63A00', '#3A2A5A', '#232323', '#D8D82E', '#6C3FA0'];
-  var HATS = ['none', 'witch', 'horns', 'cap', 'ears', 'pumpkin', 'ghost'];
+  var AV_ORDER = ['s', 'hs', 'hc', 'ey', 'mo', 'ex', 'gl', 'ht', 'co', 'nk', 'er', 'ss', 'sc', 'bc', 'bp'];
+  var SKINS = ['#F8D5B8', '#F2C9A0', '#FFDBAC', '#E0AC69', '#C68642', '#8D5524', '#6B3E1D', '#4A2A14', '#9ACD7A', '#6EA8E8', '#B58AD8'];
+  var HAIRC = ['#232323', '#5A2E12', '#7A3E1A', '#B5651D', '#C0392B', '#E8C86B', '#F5E96B', '#9A9A9A', '#FFFFFF', '#2B4EC4', '#E85AA0', '#3D9A3D', '#7B3FA0', '#2BC4C4'];
+  var SHIRTC = ['#F15A1A', '#E63A00', '#2B4EC4', '#E85AA0', '#3D9A3D', '#232323', '#7B3FA0', '#D8D82E', '#2BC4C4', '#FFFFFF', '#6C6C6C', '#7A3E1A'];
+  var BGC = ['#7B3FA0', '#2B4EC4', '#3D9A3D', '#E63A00', '#3A2A5A', '#232323', '#D8D82E', '#E85AA0', '#2BC4C4', '#F15A1A', '#1F6F6F', '#6C6C6C'];
+  var TOK = { k: '#232323', w: '#FFFFFF', r: '#E63A00', o: '#F15A1A', y: '#D8D82E', Y: '#F5C518', g: '#3D9A3D', G: '#2C6E2C', b: '#2B4EC4', p: '#7B3FA0', m: '#E85AA0', c: '#2BC4C4', n: '#7A3E1A', l: '#C8C8C8', e: '#6C6C6C', z: '#9A9A9A' };
 
+  function L(y, rows) { return { y: y, r: rows }; }
+
+  var HAIRS = [
+    { n: 'Careca' },
+    { n: 'Curto', f: L(2, ['....hhhhhhhh....', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']) },
+    { n: 'Mullet', f: L(2, ['....hhhhhhhh....', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']), b: L(5, ['..hhh......hhh..', '..hhh......hhh..', '..hhh......hhh..', '..hhhh....hhhh..', '..hhh......hhh..', '...hh......hh...']) },
+    { n: 'Black power', f: L(0, ['....hhhhhhhh....', '..hhhhhhhhhhhh..', '.hhhhhhhhhhhhhh.', '.hhhhhhhhhhhhhh.', '.hhhhhhhhhhhhhh.', '..hhh......hhh..', '..hh........hh..']) },
+    { n: 'Moicano', f: L(0, ['......hhhh......', '......hhhh......', '......hhhh......', '.....hhhhhh.....', '.....hhhhhh.....']) },
+    { n: 'Punk', f: L(0, ['.h..h..hh..h..h.', '.hh.hh.hh.hh.hh.', '..hhhhhhhhhhhh..', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']) },
+    { n: 'Longo', f: L(2, ['....hhhhhhhh....', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhh....hhh...', '...hh......hh...', '...hh......hh...', '...hh......hh...', '...hh......hh...', '...hh......hh...']), b: L(5, ['..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..']) },
+    { n: 'Chanel', f: L(2, ['....hhhhhhhh....', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhh....hhh...', '...hh......hh...', '...hh......hh...', '...hh......hh...', '...hhh....hhh...']), b: L(5, ['...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhhhhhhhhh...']) },
+    { n: 'Permanente', f: L(0, ['....hhhhhhhh....', '..hhHhhhhhhHhh..', '.hhhhhhHhhhhhhh.', '.hHhhhhhhhhhhHh.', '.hhhhhhhhhhhhhh.', '.hhhh......hhhh.', '.hhhh......hhhh.', '.hhh........hhh.', '..hh........hh..']), b: L(7, ['.hhh........hhh.', '.hhh........hhh.', '..hh........hh..']) },
+    { n: 'Topete', f: L(0, ['.....hhhhhhh....', '...hhhhhhhhhhh..', '...hhhhhhhhhhh..', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']) },
+    { n: 'Flat top', f: L(1, ['...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']) },
+    { n: 'Rabo lateral', f: L(1, ['..........hhh...', '....hhhhhhhhhh..', '...hhhhhhhhhhhh.', '...hhhhhhhhhhhh.', '...hhhhhhhhhhhh.', '...hh......hhhh.', '...hh.......hhh.', '............hh..']) },
+    { n: 'Maria-chiquinha', f: L(2, ['....hhhhhhhh....', '...hhhhhhhhhh...', '.hh.hhhhhhhh.hh.', '.hhhhh....hhhhh.', '.hhh.hh..hh.hhh.', '.hh..hh..hh..hh.', '.....hh..hh.....']) },
+    { n: 'Coque', f: L(0, ['.....hhhhhh.....', '.....hhhhhh.....', '....hhhhhhhh....', '...hhhhhhhhhh...', '...hhhhhhhhhh...', '...hh......hh...']) },
+    { n: 'Raspado', f: L(3, ['....hhhhhhhh....', '....hh....hh....']) },
+    { n: 'Franja 80s', f: L(0, ['...hhhhhhhhhh...', '..hhhHhhhhHhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhhhhhhhhhhh..', '..hhh.hhhh.hhh..', '..hh........hh..', '..hh........hh..']), b: L(8, ['..hh........hh..', '..hhh......hhh..', '...hh......hh...']) }
+  ];
+
+  var EYES = [
+    { n: 'Pontinhos', r: L(6, ['......k..k......']) },
+    { n: 'Grandes', r: L(6, ['.....wk..kw.....', '.....wk..kw.....']) },
+    { n: 'Sonolentos', r: L(6, ['.....kk..kk.....']) },
+    { n: 'Piscando', r: L(6, ['.....kk..k......']) },
+    { n: 'Felizes', r: L(5, ['......k..k......', '.....k.kk.k.....']) },
+    { n: 'Cílios', r: L(5, ['.....k....k.....', '......k..k......']) },
+    { n: 'Bravo', r: L(5, ['....kk....kk....', '......k..k......']) },
+    { n: 'Estrelas', r: L(5, ['......Y..Y......', '.....YYY.YYY....', '......Y..Y......']) }
+  ];
+
+  var MOUTHS = [
+    { n: 'Sorriso', r: L(8, ['.....k....k.....', '......kkkk......']) },
+    { n: 'Neutra', r: L(9, ['.......kk.......']) },
+    { n: 'Aberta', r: L(8, ['......kkkk......', '......krrk......', '.......kk.......']) },
+    { n: 'Dentes', r: L(8, ['.....kwwwwk.....', '......kkkk......']) },
+    { n: 'Língua', r: L(9, ['......kkkk......', '.......rr.......']) },
+    { n: 'Triste', r: L(9, ['.......kk.......', '......k..k......']) },
+    { n: 'Batom', r: L(9, ['......rrrr......']) },
+    { n: 'Presas', r: L(9, ['......kkkk......', '......w..w......']) },
+    { n: 'Beijinho', r: L(9, ['.......rr.......', '......rrrr......']) }
+  ];
+
+  var EXTRAS = [
+    { n: 'Nada' },
+    { n: 'Sardas', r: L(7, ['.....nn..nn.....']) },
+    { n: 'Bochechas', r: L(8, ['....mm....mm....']) },
+    { n: 'Bigode', r: L(8, ['......hhhh......']) },
+    { n: 'Barba', r: L(8, ['....hh....hh....', '....hhhhhhhh....', '....hhhhhhhh....']) },
+    { n: 'Cavanhaque', r: L(9, ['.......hh.......', '.......hh.......']) },
+    { n: 'Cicatriz', r: L(5, ['.........r......', '.........r......', '.........r......', '.........r......']) },
+    { n: 'Pintinha', r: L(8, ['.........k......']) },
+    { n: 'Lágrima', r: L(7, ['.........c......', '.........c......']) },
+    { n: 'Rubor 80s', r: L(7, ['....mmm..mmm....']) },
+    { n: 'Raio', r: L(4, ['.........Y......', '........Y.......', '.........Y......']) }
+  ];
+
+  var GLASSES = [
+    { n: 'Sem óculos' },
+    { n: 'Redondos', r: L(5, ['.....kkkkkk.....', '.....k.kk.k.....', '.....kkkkkk.....']) },
+    { n: 'Nerd', r: L(5, ['....kkkkkkkk....', '....k..kk..k....', '....kkkkkkkk....']) },
+    { n: 'Escuros', r: L(5, ['....kkkkkkkk....', '....kwkkkkwk....', '.....kk..kk.....']) },
+    { n: 'Neon', r: L(5, ['....mmmmmmmm....', '....mccmmccm....', '.....mm..mm.....']) },
+    { n: 'Aviador', r: L(5, ['....YYYYYYYY....', '....YeeYYeeY....', '.....YY..YY.....']) },
+    { n: '3D', r: L(5, ['....kkkkkkkk....', '....krrkkbbk....', '....kkkkkkkk....']) },
+    { n: 'Monóculo', r: L(5, ['........YYY.....', '........Y.Y.....', '........YYY.....', '...........Y....', '...........Y....']) },
+    { n: 'Pirata', r: L(4, ['....k..k........', '.....kkk........', '.....kkk........', '.....kkk........']) },
+    { n: 'Coração', r: L(5, ['....mm....mm....'.slice(0, 16), '....mmmmmmmm....', '.....mmmmmm.....']) }
+  ];
+
+  var HATS = [
+    { n: 'Sem chapéu' },
+    { n: 'Boné', r: L(2, ['....oooooooo....', '...oooooooooo...', '..oooooooooooo..']) },
+    { n: 'Testeira', r: L(3, ['...mmmmmmmmmm...', '...mmmmmmmmmm...']) },
+    { n: 'Bandana', r: L(3, ['...rrrrrrrrrr...', '...rwrwrwrwrr...', '..........rr....']) },
+    { n: 'Viseira', r: L(3, ['...cccccccccc...', '..cccccccccccc..']) },
+    { n: 'Gorro', r: L(1, ['.....rrrrrr.....', '....rrrrrrrr....', '...rrrrrrrrrr...', '...wwwwwwwwww...']) },
+    { n: 'Cartola', r: L(0, ['.....kkkkkk.....', '.....kkkkkk.....', '.....krrrrk.....', '.....kkkkkk.....', '...kkkkkkkkkk...']) },
+    { n: 'Coroa', r: L(1, ['....Y..YY..Y....', '....YYYYYYYY....', '....YYrYYrYY....']) },
+    { n: 'Festa', r: L(0, ['.......yy.......', '......mmmm......', '.....mcmcmc.....', '....cmcmcmcm....']) },
+    { n: 'Cowboy', r: L(2, ['.....nnnnnn.....', '.....nnnnnn.....', '.nnnnnnnnnnnnnn.']) },
+    { n: 'Orelhas urso', r: L(1, ['...nn......nn...', '..nnnn....nnnn..', '..nnPn....nPnn..'].map(function (s) { return s.replace(/P/g, 'm'); })) },
+    { n: 'Orelhas gato', r: L(1, ['...k........k...', '...kk......kk...', '...kmk....kmk...', '...kkk....kkk...']) },
+    { n: 'Fones', r: L(2, ['....kkkkkkkk....', '...k........k...', '...k........k...', '..kk........kk..', '..kk........kk..']) },
+    { n: 'Auréola', r: L(0, ['.....YYYYYY.....', '....Y......Y....', '.....YYYYYY.....']) },
+    { n: 'Bruxa', r: L(0, ['.......kk.......', '......kkkk......', '.....kkkkkk.....', '.....kppppk.....', '..kkkkkkkkkkkk..']) },
+    { n: 'Chifres', r: L(1, ['..r..........r..', '..rr........rr..', '...rr......rr...', '....r......r....']) },
+    { n: 'Chef', r: L(0, ['....wwwwwwww....', '...wwwwwwwwww...', '....wwwwwwww....', '....wwwwwwww....', '....kkkkkkkk....']) },
+    { n: 'Antena', r: L(0, ['.......rr.......'.slice(0, 16), '.......kk.......', '.......kk.......', '.......kk.......']) }
+  ];
+
+  var NECKS = [
+    { n: 'Nada' },
+    { n: 'Corrente', r: L(12, ['.....Y....Y.....', '......Y..Y......', '.......YY.......']) },
+    { n: 'Medalhão', r: L(12, ['.....Y....Y.....', '......Y..Y......', '.......YY.......', '......YYYY......']) },
+    { n: 'Pérolas', r: L(12, ['.....w....w.....', '......w..w......', '.......ww.......']) },
+    { n: 'Gravata', r: L(12, ['.......rr.......', '.......rr.......', '.......rr.......', '......rrrr......']) },
+    { n: 'Borboleta', r: L(11, ['......r..r......', '.....rrkkrr.....', '......r..r......']) },
+    { n: 'Cachecol', r: L(11, ['....mmmmmmmm....', '....mmmmmmmm....', '....mmwwmm......', '....mm..........']) },
+    { n: 'Lenço', r: L(11, ['....rrrrrrrr....', '.....rrrrrr.....', '......rrrr......', '.......rr.......']) },
+    { n: 'Crachá', r: L(12, ['.....b....b.....', '......b..b......', '.......bb.......', '......wwww......', '......wkkw......']) }
+  ];
+
+  var EARS = [
+    { n: 'Nada' },
+    { n: 'Argolas', r: L(8, ['...Y........Y...']) },
+    { n: 'Brilhantes', r: L(7, ['...c........c...']) },
+    { n: 'Um só', r: L(7, ['...Y............']) },
+    { n: 'Pingentes', r: L(7, ['...m........m...', '...m........m...']) }
+  ];
+
+  var SHIRTS = [
+    { n: 'Camiseta', r: L(11, ['....aa....aa....', '...aaaAAAAaaa...', '..aaaaaaaaaaaa..', '..aaaaaaaaaaaa..', '..aaaaaaaaaaaa..']) },
+    { n: 'Listrada', r: L(11, ['....aa....aa....', '...aaaAAAAaaa...', '..wwwwwwwwwwww..', '..aaaaaaaaaaaa..', '..wwwwwwwwwwww..']) },
+    { n: 'Blazer 80s', r: L(11, ['...aaa....aaa...', '..aaaAwwwwAaaa..', '..aaaAwwwwAaaa..', '..aaaaAwwAaaaa..', '..aaaaaAAaaaaa..']) },
+    { n: 'Jaqueta', r: L(11, ['...aaa....aaa...', '..aalA....Alaa..', '..aaaAl..lAaaa..', '..aaaaAllAaaaa..', '..aalaaAAaalaa..'.slice(0, 16)]) },
+    { n: 'Moletom', r: L(11, ['....AAAAAAAA....', '...AAaaaaaaAA...', '..aaaaw..waaaa..', '..aaaaw..waaaa..', '..aaaaaaaaaaaa..']) },
+    { n: 'Gola alta', r: L(11, ['....AAAAAAAA....', '...aaAAAAAAaa...', '..aaaaaaaaaaaa..', '..aaaaaaaaaaaa..', '..aaaaaaaaaaaa..']) },
+    { n: 'Smoking', r: L(11, ['...kkk....kkk...', '..kkkkwwwwkkkk..', '..kkkkwwwwkkkk..', '..kkkkkwwkkkkk..', '..kkkkkkkkkkkk..']) },
+    { n: 'Regata', r: L(11, ['....aa....aa....', '...aaaaaaaaaa...', '..saaaaaaaaaas..', '..saaaaaaaaaas..', '..saaaaaaaaaas..']) },
+    { n: 'Havaiana', r: L(11, ['....aa....aa....', '...aaasddsaaa...', '..awaaayadaywa..'.slice(0, 16), '..aaayaawaaaya..'.slice(0, 16), '..awaaayyaaawa..'.slice(0, 16)]) },
+    { n: 'Memphis', r: L(11, ['....aa....aa....', '...aaaAAAAaaa...', '..cacacacacaca..', '..acacacacacac..', '..yayayayayaya..']) },
+    { n: 'Social', r: L(11, ['....ww....ww....', '...awwAAAAwwa...', '..aaaawkkwaaaa..'.slice(0, 16), '..aaaaakwaaaaa..'.slice(0, 16), '..aaaaawkaaaaa..'.slice(0, 16)]) },
+    { n: 'Colete', r: L(11, ['....ww....ww....', '...awwwwwwwwa...', '..aawwwwwwwwaa..', '..aawwwwwwwwaa..', '..aawwwwwwwwaa..']) }
+  ];
+
+  var COSTUMES = [
+    { n: 'Nenhuma' },
+    { n: 'Fantasma', head: L(2, ['.....wwwwww.....', '...wwwwwwwwww...', '..wwwwwwwwwwww..', '..wwkkwwwwkkww..', '..wwkkwwwwkkww..', '..wwwwwwwwwwww..', '..wwwwkkkkwwww..', '..wwwwkkkkwwww..', '..wwwwwwwwwwww..', '..ww.ww.ww.www..'.slice(0, 16)]), noBody: 1 },
+    { n: 'Abóbora', head: L(0, ['.......GG.......', '....oooooooo....', '...oooooooooo...', '..oooooooooooo..', '..oooooooooooo..', '..oookooookooo..', '..ookkkookkkoo..', '..oooookkooooo..', '..okokokokokok..', '..ookkkkkkkkoo..', '...oooooooooo...', '....oooooooo....']) },
+    { n: 'Caveira', head: L(3, ['....wwwwwwww....', '...wwwwwwwwww...', '...wwwwwwwwww...', '...wkkwwwwkkw...', '...wkkwwwwkkw...', '...wwwwkkwwww...', '....wwwwwwww....', '....wkwkwkwk....', '.....wwwwww.....']) },
+    { n: 'Múmia', head: L(2, ['....llllllll....', '...wwwwwwwwww...', '...llllllllll...', '...wwkkwwkkww...', '...llllllllll...', '...wwwwwwwwww...', '...llllllllll...', '....wwwwwwww....', '....llllllll....']) },
+    { n: 'Robô', head: L(0, ['.......r........', '.......k........', '....eeeeeeee....', '...eeeeeeeeee...', '...ecceeeecce...', '...ecceeeecce...', '...eeeeeeeeee...', '...ekkkkkkkke...', '...ekwkwkwkke...', '....eeeeeeee....', '.......ee.......']), noBody: 0 },
+    { n: 'Alien', head: L(2, ['....gggggggg....', '...gggggggggg...', '..gggggggggggg..', '..gkkkgggkkkgg..'.slice(0, 16), '..gkkkgggkkkgg..'.slice(0, 16), '...gkkggggkkg...'.slice(0, 16), '...gggggggggg...', '....gggkkggg....', '.....gggggg.....']) },
+    { n: 'Vampiro', over: 'vamp' },
+    { n: 'Frankenstein', over: 'frank' }
+  ];
+
+  var AV_LIMITS = [SKINS.length, HAIRS.length, HAIRC.length, EYES.length, MOUTHS.length, EXTRAS.length, GLASSES.length, HATS.length, COSTUMES.length, NECKS.length, EARS.length, SHIRTS.length, SHIRTC.length, BGC.length, 7];
+
+  var BASE_HEAD = L(3, ['....ssssssss....', '....ssssssss....', '....ssssssss....', '...dssssssssd...', '...dssssssssd...', '....ssssssss....', '....ssssssss....', '.....ssssss.....']);
+  var NECK = L(11, ['......dddd......', '.......dd.......']);
+
+  function shade(hex, f) {
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    function c(v) { return Math.max(0, Math.min(255, Math.round(v * f))); }
+    return '#' + ((1 << 24) | (c(r) << 16) | (c(g) << 8) | c(b)).toString(16).slice(1);
+  }
+
+  function avKey(cfg) { return cfg.join('.'); }
+  function avFromKey(key) {
+    if (typeof key !== 'string' || !/^\d+(\.\d+){14}$/.test(key)) return null;
+    var a = key.split('.').map(Number);
+    for (var i = 0; i < 15; i++) if (a[i] < 0 || a[i] >= AV_LIMITS[i]) return null;
+    return a;
+  }
+
+  function avatarSvg(cfg, px, vb) {
+    if (typeof cfg === 'string') cfg = avFromKey(cfg) || defaultCfg(cfg);
+    var skin = SKINS[cfg[0]], hair = HAIRC[cfg[2]], shirt = SHIRTC[cfg[12]], bg = BGC[cfg[13]];
+    var costume = COSTUMES[cfg[8]];
+    var C = { h: hair, H: shade(hair, 0.72), s: skin, d: shade(skin, 0.82), a: shirt, A: shade(shirt, 0.7), P: '#E85AA0' };
+    var out = '';
+    function col(ch) { return C[ch] || TOK[ch] || null; }
+    function R(x, y, w, h, f) { out += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + f + '"/>'; }
+    function layer(l) {
+      if (!l || !l.r) return;
+      for (var j = 0; j < l.r.length; j++) {
+        var row = l.r[j], y = l.y + j, x = 0;
+        while (x < 16) {
+          var ch = row.charAt(x), f = ch === '.' ? null : col(ch);
+          if (!f) { x++; continue; }
+          var x2 = x + 1;
+          while (x2 < 16 && row.charAt(x2) === ch) x2++;
+          R(x, y, x2 - x, 1, f);
+          x = x2;
+        }
+      }
+    }
+    /* fundo */
+    R(0, 0, 16, 16, bg);
+    var dk = shade(bg, 0.78), lt = shade(bg, 1.28), pat = cfg[14], i, j;
+    if (pat === 1) { for (i = 0; i < 8; i++) for (j = 0; j < 8; j++) if ((i + j) % 2) R(i * 2, j * 2, 2, 2, dk); }
+    else if (pat === 2) { for (i = 0; i < 16; i += 2) R(i, 0, 1, 16, dk); }
+    else if (pat === 3) { for (i = 0; i < 16; i += 4) for (j = 0; j < 16; j += 4) R(i + (j % 8 ? 2 : 0), j, 1, 1, lt); }
+    else if (pat === 4) { for (i = 0; i < 16; i += 4) { R(i, 0, 1, 16, lt); R(0, i, 16, 1, lt); } }
+    else if (pat === 5) { R(0, 8, 16, 2, lt); R(0, 11, 16, 2, dk); R(0, 14, 16, 2, shade(bg, 0.6)); R(0, 0, 16, 2, dk); }
+    else if (pat === 6) { var st = [[1, 1], [13, 2], [3, 6], [14, 7], [1, 11], [12, 12], [8, 1], [15, 14]]; for (i = 0; i < st.length; i++) R(st[i][0], st[i][1], 1, 1, '#FFFFFF'); }
+    /* cabelo de trás */
+    var hs = HAIRS[cfg[1]];
+    if (!costume.head) layer(hs.b);
+    /* corpo */
+    if (!costume.noBody) {
+      layer(NECK);
+      layer(SHIRTS[cfg[11]].r);
+      if (cfg[11] !== 5 && cfg[11] !== 4) layer(NECK);
+    }
+    /* cabeça */
+    if (costume.head) {
+      layer(costume.head);
+    } else {
+      layer(BASE_HEAD);
+      layer(EXTRAS[cfg[5]].r);
+      layer(EYES[cfg[3]].r);
+      layer(MOUTHS[cfg[4]].r);
+      layer(EARS[cfg[10]].r);
+      layer(hs.f);
+      layer(GLASSES[cfg[6]].r);
+    }
+    if (costume.over === 'vamp') {
+      layer(L(11, ['..kk........kk..', '.kkrr......rrkk.', '.kkrrr....rrrkk.']));
+      if (!costume.head) layer(L(9, ['......w..w......']));
+    } else if (costume.over === 'frank') {
+      layer(L(1, ['...kkkkkkkkkk...', '...kkkkkkkkkk...', '...kkkkkkkkkk...']));
+      layer(L(6, ['..ee........ee..', '..ee........ee..']));
+      layer(L(4, ['....k..k.k.k....'.slice(0, 16)]));
+    }
+    layer(NECKS[cfg[9]].r);
+    layer(HATS[cfg[7]].r);
+    return '<svg width="' + px + '" height="' + px + '" viewBox="' + (vb || '0 0 16 16') + '" shape-rendering="crispEdges" aria-hidden="true">' + out + '</svg>';
+  }
+
+  /* avatar padrão sorteado a partir do apelido (só para quem ainda não escolheu) */
   function hashStr(s) {
     var h = 2166136261;
     for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -744,31 +1083,43 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-
-  function avatarSvg(nick, px) {
-    var r = rng(hashStr(String(nick).toLowerCase()));
-    function pick(a) { return a[Math.floor(r() * a.length)]; }
-    var skin = pick(SKINS), hair = pick(HAIRS), shirt = pick(SHIRTS), bg = pick(BGS), hat = pick(HATS);
-    if (bg === shirt) bg = '#3A2A5A';
-    if (hair === bg) hair = '#232323';
-    if (hat === 'pumpkin') { skin = '#F15A1A'; hair = '#2C6E2C'; shirt = '#232323'; if (bg === '#232323') bg = '#6C3FA0'; }
-    if (hat === 'ghost') { skin = '#F4F4F4'; hair = '#F4F4F4'; shirt = '#F4F4F4'; bg = '#3A2A5A'; }
-    var s = '<svg width="' + px + '" height="' + px + '" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">';
-    function R(x, y, w, h, f) { s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + f + '"/>'; }
-    R(0, 0, 12, 12, bg);
-    R(2, 8, 8, 4, shirt);
-    R(5, 7, 2, 1, skin);
-    R(3, 3, 6, 4, skin);
-    R(3, 2, 6, 1, hair); R(2, 3, 1, 3, hair); R(9, 3, 1, 3, hair);
-    R(4, 4, 1, 1, '#232323'); R(7, 4, 1, 1, '#232323'); R(5, 6, 2, 1, '#232323');
-    if (hat === 'witch') { R(1, 2, 10, 1, '#232323'); R(4, 1, 4, 1, '#232323'); R(5, 0, 2, 1, '#232323'); }
-    else if (hat === 'horns') { R(2, 0, 1, 2, '#E63A00'); R(9, 0, 1, 2, '#E63A00'); R(3, 1, 1, 1, '#E63A00'); R(8, 1, 1, 1, '#E63A00'); }
-    else if (hat === 'cap') { R(3, 1, 6, 2, '#F15A1A'); R(2, 3, 8, 1, '#F15A1A'); }
-    else if (hat === 'ears') { R(3, 0, 2, 2, '#232323'); R(7, 0, 2, 2, '#232323'); }
-    else if (hat === 'pumpkin') { R(5, 1, 2, 1, '#2C6E2C'); }
-    else if (hat === 'ghost') { R(4, 11, 1, 1, bg); R(7, 11, 1, 1, bg); }
-    return s + '</svg>';
+  function randomCfg(r) {
+    r = r || Math.random;
+    var cfg = AV_LIMITS.map(function (m) { return Math.floor(r() * m); });
+    cfg[0] = Math.floor(r() * 8);   /* pele natural */
+    if (r() < 0.55) cfg[6] = 0;
+    if (r() < 0.55) cfg[7] = 0;
+    if (r() < 0.8) cfg[8] = 0;
+    if (r() < 0.5) cfg[5] = 0;
+    if (r() < 0.5) cfg[9] = 0;
+    if (r() < 0.5) cfg[10] = 0;
+    if (cfg[12] === cfg[13] % SHIRTC.length && SHIRTC[cfg[12]] === BGC[cfg[13]]) cfg[13] = (cfg[13] + 1) % BGC.length;
+    return cfg;
   }
+  function defaultCfg(nick) { return randomCfg(rng(hashStr(String(nick).toLowerCase()))); }
+
+  /* personagens prontos, anos 80 */
+  /* ordem: pele, estilo cabelo, cor cabelo, olhos, boca, extra, óculos, chapéu, fantasia, pescoço, brinco, camisa, cor camisa, fundo cor, fundo padrão */
+  var PRESETS = [
+    { n: 'Roqueiro', c: [2, 2, 0, 2, 3, 0, 3, 0, 0, 1, 0, 3, 5, 0, 4] },
+    { n: 'Breaker', c: [5, 14, 0, 0, 0, 0, 0, 2, 0, 2, 0, 4, 1, 8, 1] },
+    { n: 'Aeróbica', c: [1, 12, 10, 4, 0, 0, 0, 2, 0, 0, 1, 7, 3, 3, 5] },
+    { n: 'Yuppie', c: [0, 8, 5, 0, 0, 0, 0, 0, 0, 4, 0, 6, 5, 4, 0] },
+    { n: 'Nerd de fliperama', c: [1, 1, 2, 0, 1, 0, 2, 0, 0, 8, 0, 10, 2, 1, 4] },
+    { n: 'Punk', c: [2, 5, 10, 6, 5, 0, 0, 0, 0, 0, 4, 3, 5, 5, 0] },
+    { n: 'Detetive de Miami', c: [3, 8, 0, 0, 0, 3, 3, 0, 0, 0, 0, 8, 8, 8, 5] },
+    { n: 'Patricinha', c: [0, 15, 5, 5, 6, 0, 0, 2, 0, 3, 1, 7, 3, 7, 3] },
+    { n: 'Cowboy', c: [3, 1, 2, 2, 0, 4, 0, 9, 0, 7, 0, 10, 2, 9, 5] },
+    { n: 'Ciborgue', c: [1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 10, 4, 4] },
+    { n: 'Cantora pop', c: [1, 7, 9, 1, 6, 9, 0, 2, 0, 1, 1, 9, 1, 0, 6] },
+    { n: 'Skatista', c: [2, 11, 5, 0, 3, 1, 0, 1, 0, 0, 0, 0, 2, 10, 2] },
+    { n: 'Mago do arcade', c: [4, 6, 7, 5, 0, 0, 0, 14, 0, 0, 0, 10, 6, 0, 6] },
+    { n: 'DJ', c: [6, 9, 0, 0, 3, 0, 5, 12, 0, 1, 2, 4, 5, 5, 1] },
+    { n: 'Galã de novela', c: [1, 9, 1, 1, 3, 3, 0, 0, 0, 2, 0, 2, 2, 1, 0] },
+    { n: 'Vilão de filme B', c: [0, 0, 0, 6, 7, 0, 0, 0, 8, 0, 0, 0, 5, 3, 5] },
+    { n: 'Garota radical', c: [4, 3, 0, 4, 0, 2, 4, 4, 0, 2, 4, 9, 3, 8, 4] },
+    { n: 'Surfista', c: [2, 10, 5, 2, 3, 1, 5, 0, 0, 3, 3, 8, 8, 8, 1] }
+  ];
 
   /* ---------- telas ---------- */
 
@@ -785,6 +1136,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     else sticker.textContent = (game.themeName || THEMES[game.theme].nome).toUpperCase();
     fit();
     if (name === 'login') $('nick').focus();
+    if (name === 'lobby' && typeof ensureRoomLoop === 'function') ensureRoomLoop();
   }
 
   /* ---------- login ---------- */
@@ -802,14 +1154,150 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   function loadNick() { try { return localStorage.getItem(NICK_KEY) || ''; } catch (e) { return ''; } }
   function saveNick(n) { try { localStorage.setItem(NICK_KEY, n); } catch (e) { /* sem armazenamento, segue */ } }
 
+  /* ---------- editor de avatar ---------- */
+
+  var AV_KEY = 'gartic-listening-avatar';
+  var AV_IDX = {};
+  AV_ORDER.forEach(function (k, i) { AV_IDX[k] = i; });
+  var PATS = [{ n: 'Liso' }, { n: 'Xadrez' }, { n: 'Listras' }, { n: 'Bolinhas' }, { n: 'Grade neon' }, { n: 'Pôr do sol' }, { n: 'Estrelas' }];
+  var HEAD_VB = '2 0 12 12', BODY_VB = '2 4 12 12';
+  var CATS = [
+    { id: 'rosto', t: 'ROSTO', rows: [['PELE', 's', SKINS], ['OLHOS', 'ey', EYES, HEAD_VB], ['BOCA', 'mo', MOUTHS, HEAD_VB], ['MARCAS NO ROSTO', 'ex', EXTRAS, HEAD_VB]] },
+    { id: 'cabelo', t: 'CABELO', rows: [['ESTILO', 'hs', HAIRS, HEAD_VB], ['COR', 'hc', HAIRC]] },
+    { id: 'roupa', t: 'ROUPA', rows: [['CAMISA', 'ss', SHIRTS, BODY_VB], ['COR DA CAMISA', 'sc', SHIRTC], ['PESCOÇO', 'nk', NECKS, BODY_VB]] },
+    { id: 'acess', t: 'ACESSÓRIOS', rows: [['ÓCULOS', 'gl', GLASSES, HEAD_VB], ['CHAPÉU E ENFEITES', 'ht', HATS, HEAD_VB], ['BRINCOS', 'er', EARS, HEAD_VB]] },
+    { id: 'fantasia', t: 'FANTASIA', rows: [['FANTASIAS (HALLOWEEN E MAIS)', 'co', COSTUMES]] },
+    { id: 'fundo', t: 'FUNDO', rows: [['COR DO FUNDO', 'bc', BGC], ['PADRÃO', 'bp', PATS]] }
+  ];
+  var catNow = 'rosto';
+  var takenAv = [];
+  var myAv = (function () {
+    try { var a = avFromKey(localStorage.getItem(AV_KEY) || ''); if (a) return a; } catch (e) { /* segue */ }
+    return randomCfg();
+  })();
+  var paPre = $('paPre'), paCri = $('paCri'), catsEl = $('cats'), optsEl = $('opts'), avHint = $('avHint'), avName = $('avName');
+
+  function saveAv() { try { localStorage.setItem(AV_KEY, avKey(myAv)); } catch (e) { /* segue */ } }
+  function isTaken(key) {
+    var mine = cleanNick(nickInput.value).toLowerCase();
+    return takenAv.some(function (t) { return t.k === key && String(t.n).toLowerCase() !== mine; });
+  }
+  function presetNameOf(key) {
+    for (var i = 0; i < PRESETS.length; i++) if (avKey(PRESETS[i].c) === key) return PRESETS[i].n;
+    return '';
+  }
+  function swapped(idx, val) { var c = myAv.slice(); c[idx] = val; return c; }
+
+  function renderPresets() {
+    paPre.textContent = '';
+    var mine = avKey(myAv);
+    PRESETS.forEach(function (p) {
+      var k = avKey(p.c), busy = isTaken(k);
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pcard' + (k === mine ? ' is-on' : '');
+      b.disabled = busy;
+      b.setAttribute('aria-pressed', k === mine ? 'true' : 'false');
+      b.setAttribute('aria-label', p.n + (busy ? ' (em uso)' : ''));
+      b.innerHTML = avatarSvg(p.c, 72) + '<span>' + p.n + '</span>' + (busy ? '<span class="busy">EM USO</span>' : '');
+      b.addEventListener('click', function () { myAv = p.c.slice(); avChanged(); });
+      paPre.appendChild(b);
+    });
+  }
+
+  function renderCats() {
+    catsEl.textContent = '';
+    CATS.forEach(function (c) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cat' + (c.id === catNow ? ' is-on' : '');
+      b.textContent = c.t;
+      b.setAttribute('aria-pressed', c.id === catNow ? 'true' : 'false');
+      b.addEventListener('click', function () { catNow = c.id; renderCats(); renderOpts(); });
+      catsEl.appendChild(b);
+    });
+  }
+
+  function renderOpts() {
+    optsEl.textContent = '';
+    var cat = CATS.filter(function (c) { return c.id === catNow; })[0];
+    cat.rows.forEach(function (row) {
+      var idx = AV_IDX[row[1]], list = row[2], isColor = typeof list[0] === 'string';
+      var box = document.createElement('div');
+      box.className = 'orow';
+      var lb = document.createElement('span');
+      lb.className = 'flabel';
+      lb.textContent = row[0];
+      var grid = document.createElement('div');
+      grid.className = 'ogrid';
+      for (var i = 0; i < list.length; i++) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        var on = myAv[idx] === i;
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (isColor) {
+          b.className = 'swc' + (on ? ' is-on' : '');
+          b.style.background = list[i];
+          b.setAttribute('aria-label', row[0] + ' ' + (i + 1));
+        } else {
+          b.className = 'th' + (on ? ' is-on' : '');
+          b.innerHTML = avatarSvg(swapped(idx, i), 60, row[3]);
+          b.title = list[i].n;
+          b.setAttribute('aria-label', row[0] + ': ' + list[i].n);
+        }
+        b.addEventListener('click', (function (ix, v) { return function () { myAv[ix] = v; avChanged(); }; })(idx, i));
+        grid.appendChild(b);
+      }
+      box.appendChild(lb);
+      box.appendChild(grid);
+      optsEl.appendChild(box);
+    });
+  }
+
+  function avCheck() {
+    var k = avKey(myAv), busy = isTaken(k);
+    avHint.hidden = !busy;
+    avHint.textContent = busy ? 'Alguém já está com esse visual. Mude um detalhe ou clique em SORTEAR.' : '';
+  }
+
   function previewAvatar() {
-    var n = cleanNick(nickInput.value);
-    loginAv.innerHTML = avatarSvg(n || '?', 98);
+    loginAv.innerHTML = avatarSvg(myAv, 170);
+    var pn = presetNameOf(avKey(myAv));
+    avName.textContent = pn ? pn.toUpperCase() : 'VISUAL PERSONALIZADO';
+    avCheck();
+  }
+  function avChanged() {
+    saveAv();
+    previewAvatar();
+    renderPresets();
+    renderOpts();
+  }
+  function setTab(t) {
+    all('.tab').forEach(function (b) { var on = b.getAttribute('data-tab') === t; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    paPre.hidden = t !== 'pre';
+    paCri.hidden = t !== 'cri';
+  }
+  all('.tab').forEach(function (b) { b.addEventListener('click', function () { setTab(b.getAttribute('data-tab')); }); });
+  $('diceBtn').addEventListener('click', function () {
+    var c = randomCfg(), n = 0;
+    while (isTaken(avKey(c)) && n++ < 60) c = randomCfg();
+    myAv = c;
+    avChanged();
+  });
+  function setTaken(list) {
+    takenAv = Array.isArray(list) ? list : [];
+    if (current === 'login') { renderPresets(); avCheck(); }
+  }
+  var takenTimer = null;
+  function pollTaken() {
+    if (!MP_READY || current !== 'login' || typeof fetch !== 'function') return;
+    fetch(API + '/avatars', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.taken) setTaken(j.taken); }).catch(function () { /* servidor dormindo, segue */ });
   }
   nickInput.addEventListener('input', function () {
     nickHint.textContent = NICK_HELP;
     nickHint.classList.remove('err');
-    previewAvatar();
+    renderPresets();
+    avCheck();
   });
   $('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -821,15 +1309,15 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       nickInput.focus();
       return;
     }
+    if (isTaken(avKey(myAv))) { avCheck(); $('diceBtn').focus(); return; }
     saveNick(n);
-    if (!MP_READY) { me = { nick: n }; players = [{ nick: n, me: true }]; enterLobby(); lobbyNote(); return; }
+    if (!MP_READY) { me = { nick: n, av: avKey(myAv) }; players = [{ nick: n, me: true, av: avKey(myAv) }]; enterLobby(); lobbyNote(); return; }
     mpConnect(n);
   });
 
   /* ---------- lobby ---------- */
 
   var players = [];
-  var slotsEl = $('slots');
   var selTheme = $('selTheme'), selRounds = $('selRounds'), selTime = $('selTime');
 
   function themeKeys() { return Object.keys(THEMES); }
@@ -856,41 +1344,182 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
   }
   selTheme.addEventListener('change', showWords);
 
-  function renderSlots() {
-    slotsEl.textContent = '';
-    for (var i = 0; i < MAX_PLAYERS; i++) {
-      var d = document.createElement('div');
-      if (i < players.length) {
-        d.className = 'slot on' + (players[i].online === false ? ' off' : '');
-        var av = document.createElement('div');
-        av.className = 'slotav';
-        av.innerHTML = avatarSvg(players[i].nick, 36);
-        var nm = document.createElement('div');
-        nm.className = 'slotnm';
-        var b = document.createElement('b');
-        b.textContent = players[i].nick;
-        nm.appendChild(b);
-        if (players[i].me) {
-          var t = document.createElement('span');
-          t.className = 'tag';
-          t.textContent = 'VOCÊ';
-          nm.appendChild(t);
-        }
-        d.appendChild(av);
-        d.appendChild(nm);
-      } else {
-        d.className = 'slot';
-        d.textContent = 'vaga livre';
-      }
-      slotsEl.appendChild(d);
+  /* sala do lobby: avatares andam, falam e dão boas-vindas */
+
+  var ROOM = { W: 8, H: 8, TW: 64, TH: 32, OX: 270, OY: 130, WALL: 110 };
+  var BLOCKED = [[2, 0], [5, 0], [0, 5]];
+  var ARCADE = ['..kkkkkkkkkk..', '.kppyppyppypk.', '.kkkkkkkkkkkk.', '.kcccccccccck.', '.kcwwcccccrck.', '.kccwccccrrck.', '.kcccccccYcck.', '.kccbbbccccck.', '.kcccccccccck.', '.kkkkkkkkkkkk.', '.kppppppppppk.', '.kpkkpYYprppk.', '.kppppppppppk.', '.kkkkkkkkkkkk.', '.kppppppppppk.', '.kppppppppppk.', '.kppppppppppk.', '.kkkkkkkkkkkk.', '.kk........kk.'];
+  var CAULDRON = ['...g..g.g...', '..gggggggg..', '.kkkkkkkkkk.', '.keeeeeeeek.', 'keeeeeeeeeek', 'keeeeeeeeeek', 'keeeeeeeeeek', '.keeeeeeeek.', '..kkkkkkkk..', '.kk......kk.'];
+  var roomEl = $('room'), vis = {}, roomRaf = 0, roomT = 0, lastWalkAt = 0, roomFirst = true;
+
+  function tileC(x, y) { return { x: ROOM.OX + (x - y) * ROOM.TW / 2, y: ROOM.OY + (x + y) * ROOM.TH / 2 + ROOM.TH / 2 }; }
+  function isBlocked(x, y) { return BLOCKED.some(function (t) { return t[0] === x && t[1] === y; }); }
+  function sprSvg(rows, px) {
+    var out = '';
+    for (var y = 0; y < rows.length; y++) for (var x = 0; x < rows[y].length; x++) {
+      var c = SPR2[rows[y].charAt(x)];
+      if (c) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>';
     }
+    return '<svg width="' + (rows[0].length * px) + '" height="' + (rows.length * px) + '" viewBox="0 0 ' + rows[0].length + ' ' + rows.length + '" shape-rendering="crispEdges" aria-hidden="true">' + out + '</svg>';
+  }
+  var SPR2 = { k: '#232323', w: '#FFFFFF', r: '#E63A00', o: '#F15A1A', y: '#D8D82E', Y: '#F5C518', G: '#2C6E2C', g: '#5FD35F', p: '#7B3FA0', c: '#2BC4C4', b: '#2B4EC4', e: '#6C6C6C' };
+
+  function buildRoom() {
+    var R = ROOM, i, j, svg = '';
+    var hw = R.W * R.TW / 2;
+    svg += '<polygon points="' + R.OX + ',' + R.OY + ' ' + (R.OX - hw) + ',' + (R.OY + R.H * R.TH / 2) + ' ' + (R.OX - hw) + ',' + (R.OY + R.H * R.TH / 2 - R.WALL) + ' ' + R.OX + ',' + (R.OY - R.WALL) + '" fill="#3A2A5A"/>';
+    svg += '<polygon points="' + R.OX + ',' + R.OY + ' ' + (R.OX + hw) + ',' + (R.OY + R.W * R.TH / 2) + ' ' + (R.OX + hw) + ',' + (R.OY + R.W * R.TH / 2 - R.WALL) + ' ' + R.OX + ',' + (R.OY - R.WALL) + '" fill="#2D1F4D"/>';
+    /* rodapé e friso */
+    svg += '<polygon points="' + R.OX + ',' + R.OY + ' ' + (R.OX - hw) + ',' + (R.OY + R.H * R.TH / 2) + ' ' + (R.OX - hw) + ',' + (R.OY + R.H * R.TH / 2 - 10) + ' ' + R.OX + ',' + (R.OY - 10) + '" fill="#241840"/>';
+    svg += '<polygon points="' + R.OX + ',' + R.OY + ' ' + (R.OX + hw) + ',' + (R.OY + R.W * R.TH / 2) + ' ' + (R.OX + hw) + ',' + (R.OY + R.W * R.TH / 2 - 10) + ' ' + R.OX + ',' + (R.OY - 10) + '" fill="#1B1236"/>';
+    /* decoração da parede direita (texto e pôster) */
+    svg += '<g transform="matrix(1,0.5,0,1,' + R.OX + ',' + (R.OY - R.WALL) + ')">';
+    svg += '<text x="98" y="44" style="font-family:var(--font-pixel)" font-size="11" fill="#F15A1A">GARTIC</text>';
+    svg += '<text x="98" y="62" style="font-family:var(--font-pixel)" font-size="7" fill="#D8D82E">+ LISTENING</text>';
+    svg += '<rect x="196" y="16" width="52" height="64" fill="#fff" stroke="#232323" stroke-width="3"/><polygon points="204,70 222,30 240,70" fill="#F15A1A"/><rect x="206" y="24" width="12" height="12" fill="#2B4EC4"/><circle cx="232" cy="32" r="6" fill="#D8D82E"/>';
+    svg += '</g>';
+    /* janela com lua na parede esquerda */
+    svg += '<g transform="matrix(-1,0.5,0,1,' + R.OX + ',' + (R.OY - R.WALL) + ')">';
+    svg += '<rect x="70" y="14" width="84" height="66" fill="#232323"/><rect x="76" y="20" width="72" height="54" fill="#1a1a5e"/><circle cx="128" cy="38" r="11" fill="#F5E96B"/><circle cx="133" cy="34" r="9" fill="#1a1a5e"/>';
+    svg += '<rect x="90" y="30" width="3" height="3" fill="#fff"/><rect x="104" y="52" width="3" height="3" fill="#fff"/><rect x="84" y="58" width="3" height="3" fill="#fff"/><rect x="140" y="60" width="3" height="3" fill="#fff"/>';
+    svg += '<rect x="110" y="20" width="4" height="54" fill="#232323"/><rect x="76" y="45" width="72" height="4" fill="#232323"/>';
+    svg += '</g>';
+    /* chão */
+    for (i = 0; i < R.W; i++) for (j = 0; j < R.H; j++) {
+      var sx = R.OX + (i - j) * R.TW / 2, sy = R.OY + (i + j) * R.TH / 2;
+      var rug = i >= 2 && i <= 5 && j >= 2 && j <= 5;
+      var edge = rug && (i === 2 || i === 5 || j === 2 || j === 5);
+      var fill = rug ? (edge ? '#C9400A' : ((i + j) % 2 ? '#F15A1A' : '#E04E10')) : ((i + j) % 2 ? '#5B3A86' : '#6D46A0');
+      svg += '<polygon points="' + sx + ',' + sy + ' ' + (sx + R.TW / 2) + ',' + (sy + R.TH / 2) + ' ' + sx + ',' + (sy + R.TH) + ' ' + (sx - R.TW / 2) + ',' + (sy + R.TH / 2) + '" fill="' + fill + '" stroke="rgba(0,0,0,.22)" stroke-width="1"/>';
+    }
+    roomEl.innerHTML = '<svg class="bgr" width="540" height="410" viewBox="0 0 540 410" aria-hidden="true">' + svg + '</svg>';
+    /* móveis (ocupam quadrados bloqueados) */
+    function furn(svgStr, w, h, tx, ty) {
+      var c = tileC(tx, ty), d = document.createElement('div');
+      d.className = 'rf';
+      d.style.left = Math.round(c.x - w / 2) + 'px';
+      d.style.top = Math.round(c.y + 8 - h) + 'px';
+      d.style.zIndex = String(10 + Math.round((tx + ty) * 10));
+      d.innerHTML = svgStr;
+      roomEl.appendChild(d);
+    }
+    furn(sprSvg(ARCADE, 4), 56, 76, 2, 0);
+    furn(spriteSvg(6, 40), 40, 40, 5, 0);
+    furn(sprSvg(CAULDRON, 4), 48, 40, 0, 5);
+  }
+
+  function placeActor(v) {
+    var c = tileC(v.x, v.y);
+    v.el.style.left = Math.round(c.x - 32) + 'px';
+    v.el.style.top = Math.round(c.y - 58) + 'px';
+    v.el.style.zIndex = String(10 + Math.round((v.x + v.y) * 10));
+  }
+  function makeActor(p, x, y) {
+    var el = document.createElement('div');
+    el.className = 'ra';
+    el.innerHTML = '<span class="rsh"></span><div class="rav"></div><div class="rnm"></div>';
+    roomEl.appendChild(el);
+    var v = { el: el, x: x, y: y, tx: x, ty: y, av: null, say: null, sayT: 0 };
+    placeActor(v);
+    return v;
+  }
+  function syncRoom() {
+    var seen = {};
+    players.forEach(function (p, idx) {
+      var k = String(p.nick).toLowerCase();
+      seen[k] = 1;
+      var px = typeof p.x === 'number' ? p.x : 3 + (idx % 3), py = typeof p.y === 'number' ? p.y : 4;
+      var v = vis[k];
+      if (!v) {
+        v = vis[k] = makeActor(p, px, py);
+        if (!roomFirst && !p.me && current === 'lobby') playSound('join');
+      }
+      var key = p.av || p.nick;
+      if (v.av !== key) { v.av = key; v.el.querySelector('.rav').innerHTML = avatarSvg(key, 52); }
+      v.el.querySelector('.rnm').textContent = p.nick;
+      v.el.classList.toggle('me', !!p.me);
+      v.el.classList.toggle('off', p.online === false);
+      if (!(p.me && Date.now() - lastWalkAt < 1500)) { v.tx = px; v.ty = py; }
+    });
+    Object.keys(vis).forEach(function (k) {
+      if (!seen[k]) { if (vis[k].el.parentNode) vis[k].el.parentNode.removeChild(vis[k].el); delete vis[k]; }
+    });
+    roomFirst = false;
+    ensureRoomLoop();
+  }
+  function roomLoop(ts) {
+    roomRaf = 0;
+    if (current !== 'lobby') return;
+    var dt = roomT ? Math.min(0.06, (ts - roomT) / 1000) : 0.016;
+    roomT = ts;
+    Object.keys(vis).forEach(function (k) {
+      var v = vis[k], dx = v.tx - v.x, dy = v.ty - v.y, d = Math.sqrt(dx * dx + dy * dy);
+      if (d > 0.02) {
+        var st = 3.4 * dt;
+        if (st >= d) { v.x = v.tx; v.y = v.ty; } else { v.x += dx / d * st; v.y += dy / d * st; }
+        v.el.classList.add('walk');
+        placeActor(v);
+      } else if (v.el.classList.contains('walk')) { v.el.classList.remove('walk'); }
+    });
+    roomRaf = requestAnimationFrame(roomLoop);
+  }
+  function ensureRoomLoop() { if (!roomRaf && current === 'lobby') { roomT = 0; roomRaf = requestAnimationFrame(roomLoop); } }
+  function myActor() { return me ? vis[String(me.nick).toLowerCase()] : null; }
+  function walkTo(i, j) {
+    var v = myActor();
+    if (!v || i < 0 || j < 0 || i >= ROOM.W || j >= ROOM.H || isBlocked(i, j)) return;
+    v.tx = i; v.ty = j;
+    lastWalkAt = Date.now();
+    ensureRoomLoop();
+    if (mp.sock && mp.joined) mp.sock.emit('walk', { x: i, y: j });
+  }
+  roomEl.addEventListener('click', function (e) {
+    var r = roomEl.getBoundingClientRect(), sc = r.width / roomEl.offsetWidth || 1;
+    var px = (e.clientX - r.left) / sc, py = (e.clientY - r.top) / sc;
+    var a = (px - ROOM.OX) / (ROOM.TW / 2), b = (py - ROOM.OY - ROOM.TH / 2) / (ROOM.TH / 2);
+    var i = Math.round((a + b) / 2), j = Math.round((b - a) / 2);
+    if (Math.abs(a - (i - j)) + Math.abs(b - (i + j)) > 1) return;
+    walkTo(i, j);
+  });
+  roomEl.addEventListener('keydown', function (e) {
+    var v = myActor();
+    if (!v) return;
+    var i = Math.round(v.tx), j = Math.round(v.ty), k = e.key;
+    if (k === 'ArrowLeft') i--; else if (k === 'ArrowRight') i++; else if (k === 'ArrowUp') j--; else if (k === 'ArrowDown') j++; else return;
+    e.preventDefault();
+    walkTo(i, j);
+  });
+  function showSay(m) {
+    var v = vis[String(m.nick).toLowerCase()];
+    if (!v) return;
+    if (v.say && v.say.parentNode) v.say.parentNode.removeChild(v.say);
+    var b = document.createElement('div');
+    b.className = 'rsay';
+    b.textContent = m.text;
+    v.el.appendChild(b);
+    v.say = b;
+    v.el.classList.add('talk');
+    clearTimeout(v.sayT);
+    v.sayT = setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); v.el.classList.remove('talk'); }, 6000);
+    if (!(me && sameNick(m.nick, me.nick))) playSound('say');
+  }
+  $('sayForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var inp = $('sayInput'), t = inp.value.replace(/\s+/g, ' ').trim();
+    if (!t) return;
+    inp.value = '';
+    if (mp.sock && mp.joined) mp.sock.emit('say', t);
+    else showSay({ nick: me ? me.nick : '', text: t });
+  });
+  function renderSlots() {
+    syncRoom();
     $('slotCount').textContent = players.length + '/' + MAX_PLAYERS;
   }
 
   function enterLobby() {
-    if (!mp.joined) players = [{ nick: me.nick, me: true }];
+    if (!mp.joined) players = [{ nick: me.nick, me: true, av: me.av }];
     $('whoNick').textContent = me.nick;
-    $('whoAv').innerHTML = avatarSvg(me.nick, 28);
+    $('whoAv').innerHTML = avatarSvg(me.av || me.nick, 28);
     renderSlots();
     show('lobby');
     $('startBtn').focus();
@@ -1485,6 +2114,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     var left = Math.max(0, Math.ceil((game.endAt - Date.now()) / 1000));
     gTime.textContent = fmt(left);
     gTime.classList.toggle('warn', left <= 10);
+    if (left <= 10 && left > 0 && left !== game.lastTick && over.hidden) playSound('tick');
+    game.lastTick = left;
     var lit = Math.ceil(segEls.length * left / game.seconds);
     for (var i = 0; i < segEls.length; i++) segEls[i].classList.toggle('off', i >= lit);
     if (left <= 0 && !game.mp) endRound();
@@ -1523,7 +2154,11 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     $('ovNote').textContent = '';
     $('ovLobby').hidden = false;
     $('ovWas').hidden = false;
+    $('ovAwards').hidden = true;
+    $('ovRp').hidden = !actions.length;
     over.hidden = false;
+    if (actions.length) startReplay(actions.slice()); else stopReplay();
+    playSound(last ? 'end' : 'timeup');
     ui();
     (last ? $('ovLobby') : $('ovNext')).focus();
   }
@@ -1687,7 +2322,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 
   function setPlayers(list) {
     players = list.map(function (p) {
-      return { nick: p.nick, score: p.score, online: p.online, drawing: p.drawing, guessed: p.guessed, me: me ? sameNick(p.nick, me.nick) : false };
+      return { nick: p.nick, av: p.av, x: p.x, y: p.y, score: p.score, online: p.online, drawing: p.drawing, guessed: p.guessed, me: me ? sameNick(p.nick, me.nick) : false };
     });
     renderSlots();
     renderScore();
@@ -1702,7 +2337,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       var row = document.createElement('div');
       row.className = 'prow' + (p.me ? ' me' : '') + (p.drawing ? ' drawing' : '') + (p.guessed ? ' ok' : '') + (p.online === false ? ' off' : '');
       var rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = (idx + 1) + '.';
-      var av = document.createElement('span'); av.className = 'pav'; av.innerHTML = avatarSvg(p.nick, 20);
+      var av = document.createElement('span'); av.className = 'pav'; av.innerHTML = avatarSvg(p.av || p.nick, 26);
       var nm = document.createElement('b'); nm.textContent = p.nick;
       var tg = document.createElement('span'); tg.className = 'ptag'; tg.textContent = p.drawing ? 'DESENHA' : (p.guessed ? 'ACERTOU' : '');
       var pt = document.createElement('span'); pt.className = 'pts'; pt.textContent = String(p.score || 0);
@@ -1721,6 +2356,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       d.appendChild(b);
       d.appendChild(document.createTextNode((m.priv ? '(entre quem sabe) ' : '') + m.text));
     } else d.textContent = m.text;
+    if (m.k === 'ok' && !(me && m.text.indexOf(me.nick + ' ') === 0)) playSound('other');
     var stick = clog.scrollTop + clog.clientHeight >= clog.scrollHeight - 30;
     clog.appendChild(d);
     while (clog.children.length > 150) clog.removeChild(clog.firstChild);
@@ -1811,10 +2447,13 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     rcur = null;
     me = null;
     players = [];
+    roomFirst = true;
     nickInput.value = loadNick();
     previewAvatar();
+    renderPresets();
     setBusy(false);
     show('login');
+    pollTaken();
   }
 
   function loadClient(cb) {
@@ -1851,13 +2490,13 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     if (mp.sock) { try { mp.sock.close(); } catch (e) { /* segue */ } }
     var sock = window.io(API, { reconnection: true, reconnectionDelay: 1000, reconnectionDelayMax: 5000, timeout: 20000 });
     mp.sock = sock;
-    sock.on('connect', function () { sock.emit('join', { nick: mp.nick }); });
+    sock.on('connect', function () { sock.emit('join', { nick: mp.nick, av: avKey(myAv) }); });
     sock.on('connect_error', function () { if (!mp.joined) setBusy(true, 'Servidor acordando, aguarde...'); });
     sock.on('disconnect', function (why) {
       if (why === 'io server disconnect') sock.connect();
       if (mp.joined) addChat({ k: 'warn', text: 'Conexão perdida. Tentando reconectar...' });
     });
-    sock.on('join_error', function (m) { mpFail((m && m.msg) || 'Não foi possível entrar.'); });
+    sock.on('join_error', function (m) { if (m && m.taken) setTaken(m.taken); mpFail((m && m.msg) || 'Não foi possível entrar.'); if (m && m.code === 'av') { setTab('pre'); $('diceBtn').focus(); } });
     sock.on('joined', onJoined);
     sock.on('players', setPlayers);
     sock.on('chat', addChat);
@@ -1868,12 +2507,14 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     sock.on('snapshot', onSnapshot);
     sock.on('draw', onDraw);
     sock.on('round_end', onRoundEnd);
+    sock.on('react', showReact);
+    sock.on('say', showSay);
   }
 
   function onJoined(m) {
     var first = !mp.joined;
     mp.joined = true;
-    me = { nick: m.nick };
+    me = { nick: m.nick, av: m.av };
     setPlayers(m.players);
     setBusy(false);
     if (current === 'login') { enterLobby(); lobbyNote(); }
@@ -1945,6 +2586,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     octx.clearRect(0, 0, W, H);
     replay();
     over.hidden = true;
+    playSound('start');
     state.locked = !game.isDrawer;
     setViewer(!game.isDrawer);
     game.word = '';
@@ -1963,6 +2605,7 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     game.word = m.word;
     game.knows = true;
     $('gWordLbl').textContent = game.isDrawer ? 'SUA PALAVRA (só você vê)' : 'VOCÊ ACERTOU! A PALAVRA É:';
+    if (!game.isDrawer) playSound('ok');
     renderWord(m.word);
     setGuessState();
   }
@@ -1994,6 +2637,13 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       lines.push('Ninguém pontuou.');
     }
     var base = lines.join('\n');
+    var hasRp = !m.last && m.reason !== 'few' && m.actions && m.actions.length;
+    $('ovRp').hidden = !hasRp;
+    var hasAw = m.last && m.awards && m.awards.length;
+    $('ovAwards').hidden = !hasAw;
+    if (hasAw) renderAwards(m.awards);
+    if (hasRp) startReplay(m.actions); else stopReplay();
+    if (m.last && m.reason !== 'few') playSound('end'); else if (m.reason === 'time') playSound('timeup');
     var note = $('ovNote');
     note.textContent = base;
     $('ovNext').hidden = true;
@@ -2014,6 +2664,192 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     ui();
   }
 
+
+  /* ---------- sons retrô (sintetizados na hora, sem arquivos) ---------- */
+
+  var SND_KEY = 'gartic-listening-som';
+  var snd = { on: true, ac: null };
+  try { snd.on = localStorage.getItem(SND_KEY) !== '0'; } catch (e) { /* segue */ }
+  function audioCtx() {
+    if (!snd.ac) {
+      try { var C = window.AudioContext || window.webkitAudioContext; if (C) snd.ac = new C(); } catch (e) { /* sem áudio */ }
+    }
+    if (snd.ac && snd.ac.state === 'suspended') { try { snd.ac.resume(); } catch (e) { /* segue */ } }
+    return snd.ac;
+  }
+  /* cada nota: [frequência, atraso em s, duração em s, onda, volume] */
+  var SOUNDS = {
+    ok: [[523, 0, .09, 'square', .07], [659, .09, .09, 'square', .07], [784, .18, .09, 'square', .07], [1047, .27, .22, 'square', .07]],
+    other: [[880, 0, .07, 'square', .04], [1175, .07, .09, 'square', .04]],
+    start: [[392, 0, .1, 'triangle', .12], [523, .1, .1, 'triangle', .12], [659, .2, .18, 'triangle', .12]],
+    tick: [[1200, 0, .03, 'square', .035]],
+    timeup: [[440, 0, .14, 'sawtooth', .06], [330, .14, .14, 'sawtooth', .06], [220, .28, .3, 'sawtooth', .06]],
+    end: [[523, 0, .12, 'square', .07], [523, .14, .12, 'square', .07], [523, .28, .12, 'square', .07], [659, .42, .12, 'square', .07], [784, .56, .3, 'square', .07], [659, .88, .12, 'square', .07], [1047, 1.02, .5, 'square', .07]],
+    react: [[620, 0, .05, 'sine', .12], [930, .05, .08, 'sine', .12]],
+    join: [[523, 0, .07, 'triangle', .1], [784, .07, .1, 'triangle', .1]],
+    say: [[700, 0, .04, 'square', .03]],
+    click: [[900, 0, .03, 'square', .04]]
+  };
+  function playSound(name) {
+    if (!snd.on) return;
+    var ac = audioCtx();
+    if (!ac || !SOUNDS[name]) return;
+    var t0 = ac.currentTime + 0.01;
+    SOUNDS[name].forEach(function (n) {
+      try {
+        var o = ac.createOscillator(), g = ac.createGain();
+        o.type = n[3];
+        o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, t0 + n[1]);
+        g.gain.exponentialRampToValueAtTime(n[4], t0 + n[1] + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + n[1] + n[2]);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t0 + n[1]);
+        o.stop(t0 + n[1] + n[2] + 0.02);
+      } catch (e) { /* segue */ }
+    });
+  }
+  function paintMute() {
+    var b = $('muteBtn');
+    b.textContent = snd.on ? 'SOM: LIGADO' : 'SOM: MUDO';
+    b.classList.toggle('off', !snd.on);
+    b.setAttribute('aria-pressed', snd.on ? 'false' : 'true');
+  }
+  $('muteBtn').addEventListener('click', function () {
+    snd.on = !snd.on;
+    try { localStorage.setItem(SND_KEY, snd.on ? '1' : '0'); } catch (e) { /* segue */ }
+    paintMute();
+    if (snd.on) playSound('click');
+  });
+  paintMute();
+
+  /* ---------- reações: ícones em pixel art ---------- */
+
+  var REACTS = [
+    { n: 'Coração', r: ['.rr..rr.', 'rrrrrrrr', 'rwrrrrrr', 'rrrrrrrr', '.rrrrrr.', '..rrrr..', '...rr...', '........'] },
+    { n: 'Fogo', r: ['...o....', '..oo.o..', '.ooyoo..', '.oyyyoo.', 'ooyyyyoo', 'ooyyyyoo', '.oyyyyo.', '..oooo..'] },
+    { n: 'Risada', r: ['..YYYY..', '.YYYYYY.', 'YkkYYkkY', 'YYYYYYYY', 'YkkkkkkY', 'YYkwwkYY', '.YYkkYY.', '..YYYY..'] },
+    { n: 'Estrela', r: ['...YY...', '...YY...', 'YYYYYYYY', '.YYYYYY.', '..YYYY..', '.YYYYYY.', '.YY..YY.', 'YY....YY'] },
+    { n: 'Caveira', r: ['.wwwwww.', 'wwwwwwww', 'wkkwwkkw', 'wkkwwkkw', 'wwwkkwww', '.wwwwww.', '.wkwkwk.', '..wwww..'] },
+    { n: 'Fantasma', r: ['..wwww..', '.wwwwww.', 'wwkwwkww', 'wwkwwkww', 'wwwwwwww', 'wwwwwwww', 'wwwwwwww', 'w.ww.ww.'] },
+    { n: 'Abóbora', r: ['...GG...', '.oooooo.', 'oooooooo', 'okoooko.'.slice(0, 8), 'oooooooo', 'okokokoo', '.oooooo.', '..oooo..'] },
+    { n: 'Uau', r: ['...rr...', '...rr...', '...rr...', '...rr...', '...rr...', '........', '...rr...', '...rr...'] }
+  ];
+  var SPR = { k: '#232323', w: '#FFFFFF', r: '#E63A00', o: '#F15A1A', y: '#D8D82E', Y: '#F5C518', G: '#2C6E2C' };
+  function spriteSvg(idx, px) {
+    var rows = REACTS[idx].r, out = '';
+    for (var y = 0; y < rows.length; y++) for (var x = 0; x < rows[y].length; x++) {
+      var c = SPR[rows[y].charAt(x)];
+      if (c) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>';
+    }
+    return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">' + out + '</svg>';
+  }
+  var reactsEl = $('reacts');
+  var lastReactAt = 0;
+  REACTS.forEach(function (rc, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'rb';
+    b.title = rc.n;
+    b.setAttribute('aria-label', 'Reagir: ' + rc.n);
+    b.innerHTML = spriteSvg(i, 20);
+    b.addEventListener('click', function () {
+      var now = Date.now();
+      if (now - lastReactAt < 600) return;
+      lastReactAt = now;
+      if (game.mp && mp.sock) mp.sock.emit('react', { e: i });
+      else showReact({ nick: me ? me.nick : '', e: i });
+    });
+    reactsEl.appendChild(b);
+  });
+  function showReact(m) {
+    if (typeof m.e !== 'number' || !REACTS[m.e]) return;
+    var wrap = $('cvwrap');
+    var d = document.createElement('div');
+    d.className = 'fl';
+    d.style.left = (30 + Math.random() * 640) + 'px';
+    d.style.bottom = (10 + Math.random() * 40) + 'px';
+    d.innerHTML = spriteSvg(m.e, 40);
+    var sm = document.createElement('small');
+    sm.textContent = m.nick || '';
+    if (m.nick) d.appendChild(sm);
+    wrap.appendChild(d);
+    var live = wrap.querySelectorAll('.fl');
+    if (live.length > 28) wrap.removeChild(live[0]);
+    d.addEventListener('animationend', function () { if (d.parentNode) d.parentNode.removeChild(d); });
+    playSound('react');
+  }
+
+  /* ---------- replay do desenho ---------- */
+
+  var rpTimer = 0;
+  function stopReplay() { if (rpTimer) { cancelAnimationFrame(rpTimer); rpTimer = 0; } }
+  function startReplay(list) {
+    stopReplay();
+    var rp = $('rpCv'), g = rp.getContext('2d');
+    var base = document.createElement('canvas');
+    base.width = W; base.height = H;
+    var bg = base.getContext('2d', { willReadFrequently: true });
+    function blank() { bg.fillStyle = '#ffffff'; bg.fillRect(0, 0, W, H); g.drawImage(base, 0, 0); }
+    blank();
+    if (!list || !list.length) return;
+    var items = list.map(function (a) {
+      var inst = a.t === 'fill' || a.t === 'clear';
+      var w = inst ? 0.35 : 1 + (a.p ? a.p.length / 8 : 1.5);
+      return { a: a, w: w, inst: inst };
+    });
+    var sum = items.reduce(function (t, it) { return t + it.w; }, 0);
+    var total = Math.max(2200, Math.min(6500, 1500 + items.length * 420));
+    var acc = 0;
+    items.forEach(function (it) { it.t0 = acc; acc += it.w / sum * total; it.t1 = acc; });
+    var done = 0, t0 = 0;
+    function frame(ts) {
+      if (over.hidden) { rpTimer = 0; return; }
+      if (!t0) t0 = ts;
+      var t = ts - t0;
+      if (t > total + 1400) { t0 = ts; t = 0; done = 0; blank(); }
+      var idx = 0;
+      while (idx < items.length && t >= items[idx].t1) idx++;
+      while (done < idx) { drawAction(bg, items[done].a); done++; }
+      g.drawImage(base, 0, 0);
+      if (idx < items.length) {
+        var it = items[idx], a = it.a, f = Math.max(0, Math.min(1, (t - it.t0) / Math.max(1, it.t1 - it.t0)));
+        if (it.inst) { drawAction(bg, a); done = idx + 1; g.drawImage(base, 0, 0); }
+        else if (a.t === 'shape') {
+          var q = a.a;
+          drawShape(g, Object.assign({}, a, { a: [q[0], q[1], q[0] + (q[2] - q[0]) * f, q[1] + (q[3] - q[1]) * f] }));
+        } else if (a.p) {
+          var n = Math.max(1, Math.ceil(a.p.length / 2 * f));
+          drawAction(g, Object.assign({}, a, { p: a.p.slice(0, n * 2) }));
+        }
+      }
+      rpTimer = requestAnimationFrame(frame);
+    }
+    rpTimer = requestAnimationFrame(frame);
+  }
+
+  function renderAwards(list) {
+    var box = $('ovAwards');
+    box.textContent = '';
+    var h = document.createElement('div');
+    h.className = 'awh';
+    h.textContent = 'PRÊMIOS DA PARTIDA';
+    box.appendChild(h);
+    list.forEach(function (a) {
+      var row = document.createElement('div');
+      row.className = 'aw';
+      var av = document.createElement('div');
+      av.className = 'awav';
+      av.innerHTML = avatarSvg(a.av || a.nick, 32);
+      var tx = document.createElement('div');
+      var b = document.createElement('b'); b.textContent = a.title;
+      var sp = document.createElement('span'); sp.textContent = a.nick + ': ' + a.detail;
+      tx.appendChild(b); tx.appendChild(sp);
+      row.appendChild(av); row.appendChild(tx);
+      box.appendChild(row);
+    });
+  }
+
   /* ---------- escala para telas pequenas ---------- */
 
   var stage = $('stage');
@@ -2029,12 +2865,18 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 
   /* ---------- início ---------- */
 
+  buildRoom();
   fillThemes();
   renderRecent();
   replay();
   ui();
   nickInput.value = loadNick();
   previewAvatar();
+  renderPresets();
+  renderCats();
+  renderOpts();
+  pollTaken();
+  takenTimer = setInterval(pollTaken, 8000);
   show('login');
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();

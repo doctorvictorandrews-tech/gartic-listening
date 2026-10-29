@@ -1,0 +1,1405 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Gartic Listening</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Press+Start+2P&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap">
+<style>
+/* Layout: uma janela retrô por tela (apelido, lobby, jogo) sobre fundo Memphis em cores Listening. O conjunto escala para caber em telas pequenas. */
+:root {
+  --desk: #D8D82E;
+  --ink: #232323;
+  --paper: #D4D4D4;
+  --hi: #ffffff;
+  --lo: #8a8a8a;
+  --orange: #F15A1A;
+  --orange-dk: #C9400A;
+  --mute: #5a5a5a;
+  --err: #A32A00;
+  --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+  --font-mono: 'Roboto Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-display: Anton, Impact, 'Arial Narrow Bold', sans-serif;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--desk); }
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  padding-block: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input, select { font-family: inherit; color: inherit; }
+[hidden] { display: none !important; }
+.page { position: relative; overflow-x: hidden; }
+.stage { position: relative; width: 100%; height: 780px; }
+.board { position: absolute; left: 50%; top: 0; width: 896px; margin-left: -448px; transform-origin: 50% 0; }
+
+.banner { position: relative; height: 84px; }
+.banner h1 { position: absolute; left: 0; top: 12px; margin: 0; font-family: var(--font-display); font-weight: 400; line-height: 1; text-transform: uppercase; color: var(--ink); }
+.banner h1 .l1 { display: block; font-size: 46px; letter-spacing: 1px; }
+.banner h1 .l1 b { color: var(--orange); font-weight: 400; }
+.banner h1 .l2 { display: block; font-size: 28px; font-style: italic; margin-left: 34px; margin-top: -2px; letter-spacing: 1px; }
+.deco { position: absolute; }
+.sticker { position: absolute; right: 12px; top: 20px; transform: rotate(-3deg); background: var(--orange); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); padding: 10px 14px; font-family: var(--font-pixel); font-size: 12px; line-height: 1; }
+
+.area { position: relative; height: 684px; }
+.screen { position: absolute; inset: 0; }
+.win { position: relative; border: 3px solid var(--ink); background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), 6px 6px 0 var(--ink); display: flex; flex-direction: column; }
+.win.big { width: 884px; height: 684px; }
+.win.login { position: absolute; left: 182px; top: 70px; width: 520px; }
+.titlebar { height: 28px; flex: none; background: var(--ink); display: flex; align-items: center; justify-content: space-between; padding: 0 6px; font-family: var(--font-pixel); font-size: 10px; color: #fff; }
+.titlebar .ttl { display: flex; align-items: center; gap: 8px; }
+.winbtns { display: flex; gap: 4px; }
+.winbtns span { width: 18px; height: 18px; background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--ink); }
+.content { flex: 1; min-height: 0; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+.btn { padding: 0; background: var(--paper); border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.btn.is-on { background: var(--desk); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); }
+.btn:active:not(:disabled) { box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); }
+.btn:disabled { color: var(--mute); cursor: not-allowed; }
+.btn:disabled svg { opacity: .45; }
+.btn:focus-visible, .sw:focus-visible, .pick:focus-within, .bigbtn:focus-visible, .field:focus-visible, summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.bigbtn { height: 48px; padding: 0 16px; background: var(--orange); border: 3px solid var(--ink); box-shadow: inset 2px 2px 0 #FF9A62, inset -2px -2px 0 var(--orange-dk), 4px 4px 0 var(--ink); font-family: var(--font-pixel); font-size: 11px; color: var(--ink); cursor: pointer; }
+.bigbtn:active { transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 #FF9A62, inset -2px -2px 0 var(--orange-dk), 2px 2px 0 var(--ink); }
+.bigbtn.alt { background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 4px 4px 0 var(--ink); }
+.field { width: 100%; height: 40px; border: 3px solid var(--ink); background: #fff; box-shadow: inset 2px 2px 0 var(--lo); padding: 0 10px; font-size: 16px; font-weight: 700; color: var(--ink); }
+select.field { height: 34px; font-size: 13px; cursor: pointer; padding: 0 6px; }
+.flabel { font-size: 11px; font-weight: 700; line-height: 14px; }
+.note { margin: 0; font-size: 12px; line-height: 17px; }
+.err { color: var(--err); font-weight: 700; }
+
+/* login */
+.loginbody { display: flex; gap: 18px; align-items: center; padding: 8px 6px 4px; }
+.avbig { width: 104px; height: 104px; flex: none; border: 3px solid var(--ink); background: #fff; box-shadow: 4px 4px 0 var(--ink); }
+.avbig svg { width: 98px; height: 98px; display: block; }
+.lform { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+/* lobby */
+.who { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; border: 2px solid var(--ink); box-shadow: inset 2px 2px 0 var(--lo); padding: 0 8px; }
+.who .me { display: flex; align-items: center; gap: 10px; font-size: 13px; min-width: 0; }
+.who .me b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avsm { width: 32px; height: 32px; flex: none; border: 2px solid var(--ink); }
+.avsm svg { width: 28px; height: 28px; display: block; }
+.lobbyrow { flex: 1; min-height: 0; display: flex; gap: 8px; }
+.panel { background: #fff; border: 2px solid var(--ink); display: flex; flex-direction: column; min-height: 0; }
+.panel .ph { height: 22px; flex: none; background: var(--ink); color: var(--desk); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 10px; font-weight: 700; }
+.slots { flex: 1; min-height: 0; padding: 8px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 8px; }
+.slot { border: 2px dashed var(--lo); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--mute); }
+.slot.on { border: 2px solid var(--ink); background: var(--desk); justify-content: flex-start; gap: 10px; padding: 0 10px; color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+.slotav { width: 60px; height: 60px; flex: none; border: 2px solid var(--ink); background: #fff; }
+.slotav svg { width: 56px; height: 56px; display: block; }
+.slotnm { min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.slotnm b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag { align-self: flex-start; background: var(--ink); color: var(--desk); font-size: 10px; font-weight: 700; line-height: 12px; padding: 0 4px; }
+.config { width: 300px; flex: none; background: var(--paper); border: 3px solid var(--ink); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); padding: 10px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.config .g { display: flex; flex-direction: column; gap: 4px; }
+.wlist { margin-top: 6px; max-height: 120px; overflow-y: auto; background: #fff; border: 2px solid var(--ink); padding: 6px 8px; font-size: 12px; line-height: 17px; }
+details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
+
+/* jogo */
+.strip { height: 60px; flex: none; display: flex; gap: 8px; }
+.sbox { background: #fff; border: 3px solid var(--ink); display: flex; }
+.sa { width: 220px; flex: none; padding: 2px 10px; flex-direction: column; justify-content: center; gap: 2px; }
+.sa .tema { font-family: var(--font-display); font-style: italic; font-size: 24px; line-height: 26px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb { flex: 1; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.letters { display: flex; gap: 4px; justify-content: center; }
+.lt { background: var(--desk); border: 3px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-pixel); line-height: 1; }
+.lt.gap { background: transparent; border: none; }
+.sc { width: 176px; flex: none; background: var(--ink); padding: 0 10px; align-items: center; justify-content: space-between; color: var(--desk); }
+.sc .rd { font-size: 10px; font-weight: 700; line-height: 12px; }
+.segs { display: flex; gap: 2px; margin-top: 5px; }
+.segs span { width: 9px; height: 8px; background: var(--orange); }
+.segs span.off { background: var(--mute); }
+.time { font-family: var(--font-pixel); font-size: 20px; }
+.time.warn { color: var(--orange); }
+
+.work { height: 448px; flex: none; display: flex; gap: 8px; }
+.tools { width: 104px; flex: none; border: 3px solid var(--ink); padding: 3px; box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); display: flex; flex-direction: column; justify-content: space-between; }
+.tgrid { display: grid; grid-template-columns: repeat(3, 28px); gap: 4px; }
+.sgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.grp { display: flex; flex-direction: column; gap: 4px; }
+.lbl { text-align: center; font-size: 10px; font-weight: 700; line-height: 12px; }
+.tool { width: 28px; height: 28px; }
+.tool svg { width: 16px; height: 16px; fill: none; stroke: var(--ink); stroke-width: 2; }
+.size { width: 100%; height: 24px; }
+.size i { display: block; width: 16px; background: var(--ink); }
+.opt { width: 100%; height: 24px; font-family: var(--font-pixel); font-size: 8px; }
+.txt { width: 100%; height: 28px; font-size: 10px; font-weight: 700; }
+
+.cvwrap { position: relative; width: 750px; height: 448px; flex: none; border: 3px solid var(--ink); background: #fff; overflow: hidden; }
+.cvwrap canvas { position: absolute; left: 0; top: 0; width: 744px; height: 442px; display: block; }
+#ov { cursor: crosshair; touch-action: none; user-select: none; -webkit-user-select: none; }
+.gh { position: absolute; pointer-events: none; border: 1px solid var(--ink); box-shadow: 0 0 0 1px #fff; }
+.gh.round { border-radius: 50%; }
+.gh.cross { border: none; box-shadow: none; background: linear-gradient(var(--ink), var(--ink)) center / 14px 2px no-repeat, linear-gradient(var(--ink), var(--ink)) center / 2px 14px no-repeat, linear-gradient(#fff, #fff) center / 14px 4px no-repeat, linear-gradient(#fff, #fff) center / 4px 14px no-repeat; }
+.cvhint { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; pointer-events: none; color: #6b6b6b; font-size: 13px; line-height: 20px; }
+.cvhint b { display: block; font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 34px; line-height: 40px; color: #b5b5b5; letter-spacing: 1px; text-transform: uppercase; }
+.over { position: absolute; inset: 0; background: rgba(255, 255, 255, .62); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.over .big { background: var(--orange); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); padding: 12px 18px; transform: rotate(-3deg); font-family: var(--font-pixel); font-size: 16px; line-height: 1; }
+.over .was { font-size: 13px; font-weight: 700; }
+.over .was b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 46px; text-transform: uppercase; letter-spacing: 1px; }
+.over .acts { display: flex; gap: 12px; }
+
+.palette { height: 78px; flex: none; display: flex; align-items: center; gap: 10px; }
+.cur { position: relative; width: 56px; height: 56px; flex: none; }
+.cur .back { position: absolute; left: 20px; top: 20px; width: 36px; height: 36px; background: #fff; border: 2px solid var(--ink); }
+.pick { position: absolute; left: 0; top: 0; width: 36px; height: 36px; border: 2px solid var(--ink); background: var(--ink); cursor: pointer; display: block; }
+.pick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.swatches { width: 266px; flex: none; display: grid; grid-template-columns: repeat(8, 28px); gap: 6px; }
+.sw { width: 28px; height: 28px; padding: 0; border: 2px solid var(--ink); cursor: pointer; }
+.sw.is-on { box-shadow: 0 0 0 2px var(--paper), 0 0 0 5px var(--ink); }
+.tip { flex: 1; min-width: 0; height: 62px; background: var(--desk); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 3px 10px; display: flex; align-items: center; font-size: 11px; line-height: 14px; font-weight: 700; }
+.skip { width: 110px; height: 62px; flex: none; background: var(--ink); color: var(--desk); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--orange); font-family: var(--font-pixel); font-size: 9px; line-height: 1.6; cursor: pointer; }
+.skip:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+.status { height: 24px; flex: none; display: flex; gap: 4px; font-size: 11px; line-height: 16px; }
+.status span { background: var(--paper); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); padding: 2px 8px; white-space: nowrap; }
+.status .grow { flex: 1; }
+.status .btn { height: 24px; padding: 0 10px; font-size: 10px; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="stage" id="stage">
+<div class="board" id="board">
+
+<div class="banner">
+<div class="deco" aria-hidden="true" style="left:236px;top:14px;width:40px;height:40px;background:var(--orange)"></div>
+<div class="deco" aria-hidden="true" style="left:262px;top:34px;width:34px;height:34px;background:var(--ink)"></div>
+<div class="deco" aria-hidden="true" style="left:250px;top:46px;width:16px;height:16px;background:#fff"></div>
+<svg class="deco" aria-hidden="true" width="208" height="44" viewBox="-4 0 208 44" style="left:330px;top:28px" fill="none" stroke="#232323" stroke-width="5"><polyline points="0,38 20,6 40,38 60,6 80,38 100,6 120,38 140,6 160,38 180,6 200,38"/></svg>
+<svg class="deco" aria-hidden="true" width="66" height="30" viewBox="0 0 55 25" shape-rendering="crispEdges" style="left:564px;top:26px"><rect x="0" y="0" width="5" height="5" fill="#232323"/><rect x="20" y="0" width="5" height="5" fill="#232323"/><rect x="30" y="0" width="5" height="5" fill="#232323"/><rect x="50" y="0" width="5" height="5" fill="#232323"/><rect x="0" y="5" width="10" height="5" fill="#232323"/><rect x="15" y="5" width="25" height="5" fill="#232323"/><rect x="45" y="5" width="10" height="5" fill="#232323"/><rect x="20" y="5" width="5" height="5" fill="#F15A1A"/><rect x="30" y="5" width="5" height="5" fill="#F15A1A"/><rect x="0" y="10" width="55" height="5" fill="#232323"/><rect x="5" y="15" width="10" height="5" fill="#232323"/><rect x="20" y="15" width="15" height="5" fill="#232323"/><rect x="40" y="15" width="10" height="5" fill="#232323"/><rect x="10" y="20" width="5" height="5" fill="#232323"/><rect x="25" y="20" width="5" height="5" fill="#232323"/><rect x="40" y="20" width="5" height="5" fill="#232323"/></svg>
+<div class="deco" aria-hidden="true" style="right:-20px;top:-12px;width:190px;height:60px;background:var(--orange)"></div>
+<h1><span class="l1"><b>*</b>Gartic</span><span class="l2">+ Listening</span></h1>
+<div class="sticker" id="sticker">ENTRAR</div>
+</div>
+
+<div class="area">
+
+<section class="screen" id="sLogin" aria-label="Entrar na sala">
+<div class="win login">
+<div class="titlebar">
+<div class="ttl"><span>ENTRAR.EXE</span></div>
+<div class="winbtns" aria-hidden="true"><span>_</span><span>X</span></div>
+</div>
+<div class="content" style="padding:14px;gap:14px">
+<form id="loginForm" novalidate>
+<div class="loginbody">
+<div class="avbig" id="loginAv" aria-hidden="true"></div>
+<div class="lform">
+<label class="flabel" for="nick">SEU APELIDO</label>
+<input class="field" id="nick" name="nick" type="text" maxlength="14" autocomplete="off" spellcheck="false" placeholder="ex: Bia">
+<p class="note" id="nickHint">2 a 14 caracteres. Sem senha, é só escolher.</p>
+</div>
+</div>
+<div style="display:flex;justify-content:flex-end;padding:10px 6px 4px"><button type="submit" class="bigbtn">ENTRAR NA SALA</button></div>
+</form>
+<p class="note" style="border-top:2px solid var(--lo);padding-top:10px">Sala única do time, com 15 vagas. O avatar é sorteado a partir do apelido. A escolha de avatar vem numa próxima etapa.</p>
+</div>
+</div>
+</section>
+
+<section class="screen" id="sLobby" aria-label="Lobby" hidden>
+<div class="win big">
+<div class="titlebar">
+<div class="ttl">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" shape-rendering="crispEdges"><rect x="2" y="4" width="10" height="9" fill="#F15A1A"/><rect x="6" y="1" width="2" height="3" fill="#3D9A3D"/></svg>
+<span>SALA_DO_TIME.EXE</span>
+</div>
+<div class="winbtns" aria-hidden="true"><span>_</span><span>X</span></div>
+</div>
+<div class="content">
+<div class="who">
+<div class="me"><div class="avsm" id="whoAv" aria-hidden="true"></div><span>Você entrou como <b id="whoNick"></b></span></div>
+<button type="button" class="btn" id="logoutBtn" style="height:28px;padding:0 12px;font-size:11px;font-weight:700">SAIR</button>
+</div>
+<div class="lobbyrow">
+<div class="panel" style="flex:1;min-width:0">
+<div class="ph"><span>JOGADORES NA SALA</span><span id="slotCount">1/15</span></div>
+<div class="slots" id="slots"></div>
+</div>
+<div class="config">
+<div class="g"><label class="flabel" for="selTheme">TEMA</label><select class="field" id="selTheme"></select>
+<details><summary>Ver palavras do tema</summary><div class="wlist" id="wordList"></div></details>
+</div>
+<div class="g"><label class="flabel" for="selRounds">RODADAS</label><select class="field" id="selRounds"><option value="3">3 rodadas</option><option value="5" selected>5 rodadas</option><option value="8">8 rodadas</option><option value="10">10 rodadas</option></select></div>
+<div class="g"><label class="flabel" for="selTime">TEMPO POR RODADA</label><select class="field" id="selTime"><option value="45">45 segundos</option><option value="60" selected>60 segundos</option><option value="90">90 segundos</option><option value="120">120 segundos</option></select></div>
+<button type="button" class="bigbtn" id="startBtn">INICIAR PARTIDA</button>
+<p class="note">Modo treino: ainda não há servidor, então por enquanto você joga sozinho para testar. Os outros jogadores aparecem na lista quando o multiplayer entrar.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="screen" id="sGame" aria-label="Jogo" hidden>
+<div class="win big">
+<div class="titlebar">
+<div class="ttl">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" shape-rendering="crispEdges"><rect x="2" y="4" width="10" height="9" fill="#F15A1A"/><rect x="6" y="1" width="2" height="3" fill="#3D9A3D"/></svg>
+<span>GARTIC_LISTENING.EXE</span>
+</div>
+<div class="winbtns" aria-hidden="true"><span>_</span><span>X</span></div>
+</div>
+<div class="content">
+
+<div class="strip">
+<div class="sbox sa"><span class="tag">TEMA</span><span class="tema" id="gTema">HALLOWEEN</span></div>
+<div class="sbox sb"><span class="flabel" style="font-size:10px;line-height:12px">SUA PALAVRA (só você vê)</span><div class="letters" id="gWord"></div></div>
+<div class="sbox sc"><div><span class="rd" id="gRound">RODADA 1/5</span><div class="segs" id="gSegs" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div><span class="time" id="gTime">1:00</span></div>
+</div>
+
+<div class="work">
+<div class="tools">
+<div class="tgrid" id="tools">
+<button type="button" class="btn tool" data-tool="pencil" aria-label="Lápis" title="Lápis (P)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 17 L4 13 L13 4 L16 7 L7 16 Z"/><path d="M11 6 L14 9"/></svg></button>
+<button type="button" class="btn tool" data-tool="brush" aria-label="Pincel" title="Pincel (B)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M9 11 L17 3" stroke-width="3"/><circle cx="6" cy="14" r="3" fill="#F15A1A"/></svg></button>
+<button type="button" class="btn tool" data-tool="fill" aria-label="Balde de tinta" title="Balde (F)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 11 L9 5 L15 11 L9 17 Z"/><path d="M17 13 L17 16"/></svg></button>
+<button type="button" class="btn tool" data-tool="eraser" aria-label="Borracha" title="Borracha (E)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 12 L11 4 L17 9 L10 17 L6 17 Z"/><path d="M8 8 L14 13"/></svg></button>
+<button type="button" class="btn tool" data-tool="line" aria-label="Linha" title="Linha (L)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 17 L17 3"/></svg></button>
+<button type="button" class="btn tool" data-tool="rect" aria-label="Retângulo" title="Retângulo (R)"><svg aria-hidden="true" viewBox="0 0 20 20"><rect x="4" y="5" width="12" height="10"/></svg></button>
+<button type="button" class="btn tool" data-tool="oval" aria-label="Círculo" title="Círculo (O)"><svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/></svg></button>
+<button type="button" class="btn tool" data-tool="spray" aria-label="Spray" title="Spray (S)"><svg aria-hidden="true" viewBox="0 0 20 20" style="fill:#232323;stroke:none"><circle cx="5" cy="5" r="1.6"/><circle cx="11" cy="4" r="1.6"/><circle cx="16" cy="8" r="1.6"/><circle cx="8" cy="9" r="1.6"/><circle cx="14" cy="14" r="1.6"/><circle cx="4" cy="14" r="1.6"/><circle cx="10" cy="16" r="1.6"/></svg></button>
+<button type="button" class="btn tool" data-tool="pick" aria-label="Conta-gotas" title="Conta-gotas (I)"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M12 4 L16 8"/><path d="M13 3 L17 7"/><path d="M12 5 L15 8 L8 15 L5 15 L5 12 Z"/></svg></button>
+</div>
+<div class="grp">
+<span class="lbl">TAMANHO</span>
+<div class="sgrid" id="sizes">
+<button type="button" class="btn size" data-size="1" aria-label="Tamanho 1" title="Tamanho 1 (tecla 1)"><i style="height:2px"></i></button>
+<button type="button" class="btn size" data-size="2" aria-label="Tamanho 2" title="Tamanho 2 (tecla 2)"><i style="height:4px"></i></button>
+<button type="button" class="btn size" data-size="3" aria-label="Tamanho 3" title="Tamanho 3 (tecla 3)"><i style="height:6px"></i></button>
+<button type="button" class="btn size" data-size="4" aria-label="Tamanho 4" title="Tamanho 4 (tecla 4)"><i style="height:8px"></i></button>
+</div>
+</div>
+<div class="grp">
+<span class="lbl">TRAÇO</span>
+<button type="button" class="btn opt" data-mode="smooth" aria-pressed="true" title="Traço suave (M alterna)">SUAVE</button>
+<button type="button" class="btn opt" data-mode="pixel" aria-pressed="false" title="Traço pixelado (M alterna)">PIXEL</button>
+</div>
+<div class="grp">
+<span class="lbl">FORMA</span>
+<button type="button" class="btn opt" data-shape="0" aria-pressed="true" title="Retângulo e círculo só com contorno (G alterna)">VAZIO</button>
+<button type="button" class="btn opt" data-shape="1" aria-pressed="false" title="Retângulo e círculo preenchidos (G alterna)">CHEIO</button>
+</div>
+<div class="grp">
+<button type="button" class="btn txt" id="undoBtn" title="Desfazer (Ctrl+Z)">DESFAZER</button>
+<button type="button" class="btn txt" id="clearBtn" title="Limpar tudo (dá para desfazer)">LIMPAR</button>
+</div>
+</div>
+
+<div class="cvwrap" id="cvwrap">
+<canvas id="cv" width="744" height="442" aria-hidden="true"></canvas>
+<canvas id="ov" width="744" height="442" role="img" aria-label="Área de desenho"></canvas>
+<div class="gh" id="ghost" hidden></div>
+<div class="cvhint" id="cvHint"><b>Desenhe a palavra</b>Clique e arraste para desenhar.</div>
+<div class="over" id="over" hidden>
+<div class="big" id="ovTitle">TEMPO ESGOTADO!</div>
+<div class="was">A palavra era<b id="ovWord"></b></div>
+<div class="acts">
+<button type="button" class="bigbtn" id="ovNext">PRÓXIMA RODADA</button>
+<button type="button" class="bigbtn alt" id="ovLobby">VOLTAR AO LOBBY</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="palette">
+<div class="cur"><span class="back" aria-hidden="true"></span><label class="pick" id="pickLabel" title="Escolher outra cor"><input type="color" id="pickInput" value="#232323" aria-label="Escolher outra cor"></label></div>
+<div class="swatches" id="swatches">
+<button type="button" class="sw" data-color="#232323" aria-label="Grafite" style="background:#232323"></button>
+<button type="button" class="sw" data-color="#6C6C6C" aria-label="Cinza escuro" style="background:#6C6C6C"></button>
+<button type="button" class="sw" data-color="#E63A00" aria-label="Vermelho" style="background:#E63A00"></button>
+<button type="button" class="sw" data-color="#F15A1A" aria-label="Laranja" style="background:#F15A1A"></button>
+<button type="button" class="sw" data-color="#D8D82E" aria-label="Amarelo ácido" style="background:#D8D82E"></button>
+<button type="button" class="sw" data-color="#3D9A3D" aria-label="Verde" style="background:#3D9A3D"></button>
+<button type="button" class="sw" data-color="#2B4EC4" aria-label="Azul" style="background:#2B4EC4"></button>
+<button type="button" class="sw" data-color="#7B3FA0" aria-label="Roxo" style="background:#7B3FA0"></button>
+<button type="button" class="sw" data-color="#FFFFFF" aria-label="Branco" style="background:#FFFFFF"></button>
+<button type="button" class="sw" data-color="#B5B5B5" aria-label="Cinza claro" style="background:#B5B5B5"></button>
+<button type="button" class="sw" data-color="#F5E96B" aria-label="Creme" style="background:#F5E96B"></button>
+<button type="button" class="sw" data-color="#FF9A62" aria-label="Laranja claro" style="background:#FF9A62"></button>
+<button type="button" class="sw" data-color="#E85AA0" aria-label="Rosa" style="background:#E85AA0"></button>
+<button type="button" class="sw" data-color="#2C6E2C" aria-label="Verde escuro" style="background:#2C6E2C"></button>
+<button type="button" class="sw" data-color="#8A4B1F" aria-label="Marrom" style="background:#8A4B1F"></button>
+<button type="button" class="sw" data-color="#3A2A5A" aria-label="Roxo escuro" style="background:#3A2A5A"></button>
+</div>
+<div class="tip">ATALHOS: P lápis, B pincel, F balde, E borracha, I conta-gotas, L linha, R retângulo, O círculo, S spray, M traço, G forma, 1 a 4 tamanho, Ctrl+Z desfazer.</div>
+<button type="button" class="skip" id="skipBtn">PULAR<br>PALAVRA</button>
+</div>
+
+<div class="status">
+<span id="stTool" class="grow">FERRAMENTA: LÁPIS</span>
+<span id="stSize">TAMANHO 2</span>
+<span id="stMode">TRAÇO SUAVE</span>
+<span id="stCount">AÇÕES: 0</span>
+<span id="stPos">X 0 Y 0</span>
+<button type="button" class="btn" id="leaveBtn">SAIR DA RODADA</button>
+</div>
+
+</div>
+</div>
+</section>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =====================================================================
+     CONFIGURAÇÃO
+     Para criar ou editar temas, mexa só na lista THEMES abaixo.
+     Cada tema tem nome, grupo (aparece como seção na lista) e palavras entre aspas.
+     O tema "Mix geral" é montado sozinho no fim com todas as palavras.
+     ===================================================================== */
+  var MAX_PLAYERS = 15;
+  var NICK_KEY = 'gartic-listening-nick';
+
+  var THEMES = {
+
+    /* ---------- TERROR ---------- */
+    halloween: {
+      nome: 'Halloween', grupo: 'Terror',
+      palavras: [
+        'abóbora', 'fantasma', 'morcego', 'bruxa', 'vassoura', 'caldeirão', 'caveira', 'esqueleto',
+        'vampiro', 'múmia', 'zumbi', 'aranha', 'teia de aranha', 'gato preto', 'cemitério', 'lápide',
+        'caixão', 'lobisomem', 'monstro', 'poção', 'chapéu de bruxa', 'lua cheia', 'doces ou travessuras',
+        'balde de doces', 'casa assombrada', 'corvo', 'fogueira', 'vela', 'olho', 'dentes de vampiro',
+        'Frankenstein', 'coruja', 'cobra', 'sapo', 'espantalho', 'pirulito', 'máscara', 'capa', 'castelo',
+        'livro de feitiços'
+      ]
+    },
+    terror_monstros: {
+      nome: 'Terror: Monstros', grupo: 'Terror',
+      palavras: [
+        'Drácula', 'Frankenstein', 'múmia', 'lobisomem', 'zumbi', 'fantasma', 'demônio', 'vampiro',
+        'bruxa', 'ogro', 'troll', 'gárgula', 'sereia', 'kraken', 'Godzilla', 'King Kong', 'alienígena',
+        'Predador', 'ciclope', 'minotauro', 'hidra', 'medusa', 'yeti', 'Pé Grande', 'chupa-cabra',
+        'Monstro do Lago Ness', 'Slender Man', 'palhaço assassino', 'boneco assassino', 'mutante',
+        'Gollum', 'dragão', 'basilisco', 'harpia', 'verme gigante', 'aranha gigante', 'Cthulhu', 'Nosferatu'
+      ]
+    },
+    terror_folclore: {
+      nome: 'Terror: Folclore', grupo: 'Terror',
+      palavras: [
+        'Saci', 'Curupira', 'Mula sem cabeça', 'Boitatá', 'Cuca', 'Loira do banheiro', 'Lobisomem',
+        'Bicho-papão', 'Iara', 'Boto cor-de-rosa', 'Mapinguari', 'Homem do saco', 'Papa-figo',
+        'Corpo-seco', 'Comadre Fulozinha', 'Negrinho do Pastoreio', 'Alma penada', 'Chupa-cabra',
+        'Zé do Caixão', 'Caipora', 'Anhangá', 'Capelobo', 'Boiúna', 'Cobra Grande', 'Matinta Perera',
+        'Pisadeira', 'Tutu Marambá', 'Mãe-d’água', 'Mão-pelada', 'Cabeça de cuia', 'Mãe do ouro', 'Visagem'
+      ]
+    },
+    terror_filmes: {
+      nome: 'Terror: Filmes', grupo: 'Terror',
+      palavras: [
+        'O Exorcista', 'Tubarão', 'Psicose', 'O Iluminado', 'Sexta-feira 13', 'A Hora do Pesadelo',
+        'Pânico', 'Invocação do Mal', 'Annabelle', 'O Chamado', 'Atividade Paranormal', 'Jogos Mortais',
+        'O Bebê de Rosemary', 'Os Pássaros', 'Alien', 'It: A Coisa', 'A Bruxa de Blair', 'Corra!',
+        'Um Lugar Silencioso', 'Hereditário', 'Midsommar', 'Babadook', 'Beetlejuice', 'Poltergeist',
+        'Brinquedo Assassino', 'Os Outros', 'A Múmia', 'Gremlins', 'Os Caça-Fantasmas', 'Zumbilândia',
+        'Resident Evil', 'O Sexto Sentido', 'Cemitério Maldito', 'A Casa de Cera', 'Sobrenatural', 'O Grito',
+        'Halloween', 'Drácula', 'Nosferatu', 'Frankenstein'
+      ]
+    },
+    terror_cenarios: {
+      nome: 'Terror: Cenários', grupo: 'Terror',
+      palavras: [
+        'casa abandonada', 'porão', 'sótão', 'corredor escuro', 'espelho quebrado', 'boneca assombrada',
+        'caixa de música', 'cadeira de balanço', 'vela acesa', 'lanterna', 'corda', 'motosserra', 'machado',
+        'facão', 'máscara de hóquei', 'porta rangendo', 'escada escura', 'relâmpago', 'névoa',
+        'floresta escura', 'hospital abandonado', 'manicômio', 'cabana na floresta', 'ponte velha', 'túnel',
+        'lua de sangue', 'teia de aranha', 'ossos', 'cova', 'tocha', 'correntes', 'jaula', 'armadilha',
+        'túmulo', 'mausoléu', 'igreja abandonada', 'navio fantasma', 'trem fantasma', 'elevador', 'banheiro',
+        'circo sinistro', 'parque abandonado'
+      ]
+    },
+    terror_ocultismo: {
+      nome: 'Terror: Ocultismo', grupo: 'Terror',
+      palavras: [
+        'tábua ouija', 'exorcismo', 'possessão', 'poltergeist', 'médium', 'bola de cristal', 'tarô',
+        'maldição', 'feitiço', 'pentagrama', 'círculo de sal', 'crucifixo', 'água benta', 'alho',
+        'estaca de madeira', 'bala de prata', 'sessão espírita', 'boneco de vodu', 'grimório', 'altar',
+        'ritual', 'amuleto', 'pé de coelho', 'espelho mágico', 'eclipse', 'pesadelo', 'sonambulismo',
+        'assombração', 'aparição', 'vela preta', 'vassoura voadora', 'poção mágica', 'olho de gato',
+        'corvo', 'lua cheia', 'cartas de tarô'
+      ]
+    },
+
+    /* ---------- IMAGEM E AÇÃO ---------- */
+    animais: {
+      nome: 'Animais', grupo: 'Imagem e ação',
+      palavras: [
+        'cachorro', 'gato', 'elefante', 'girafa', 'leão', 'tigre', 'zebra', 'macaco', 'gorila', 'urso',
+        'panda', 'canguru', 'coala', 'pinguim', 'golfinho', 'baleia', 'tubarão', 'polvo', 'caranguejo',
+        'tartaruga', 'jacaré', 'cobra', 'sapo', 'borboleta', 'abelha', 'formiga', 'aranha', 'coruja',
+        'águia', 'papagaio', 'tucano', 'flamingo', 'pavão', 'galinha', 'pato', 'cavalo', 'vaca', 'porco',
+        'ovelha', 'coelho', 'esquilo', 'morcego', 'camelo', 'hipopótamo', 'rinoceronte', 'lagosta',
+        'estrela-do-mar', 'cavalo-marinho', 'camaleão', 'lhama', 'capivara', 'tamanduá', 'tatu', 'onça',
+        'arara', 'caracol', 'minhoca', 'peixe-palhaço'
+      ]
+    },
+    comidas: {
+      nome: 'Comidas e bebidas', grupo: 'Imagem e ação',
+      palavras: [
+        'pizza', 'hambúrguer', 'cachorro-quente', 'pastel', 'coxinha', 'feijoada', 'churrasco',
+        'brigadeiro', 'sorvete', 'bolo', 'pão de queijo', 'macarrão', 'sushi', 'taco', 'batata frita',
+        'ovo frito', 'salada', 'sopa', 'pipoca', 'chocolate', 'café', 'suco de laranja', 'cerveja',
+        'caipirinha', 'água de coco', 'melancia', 'banana', 'abacaxi', 'maçã', 'uva', 'morango',
+        'cenoura', 'tomate', 'milho', 'queijo', 'presunto', 'sanduíche', 'panqueca', 'churros', 'donut',
+        'algodão-doce', 'pudim', 'açaí', 'tapioca', 'cuscuz', 'acarajé', 'farofa', 'omelete', 'torrada'
+      ]
+    },
+    objetos: {
+      nome: 'Objetos', grupo: 'Imagem e ação',
+      palavras: [
+        'guarda-chuva', 'óculos', 'relógio', 'chave', 'celular', 'computador', 'teclado', 'mouse',
+        'fone de ouvido', 'câmera', 'televisão', 'controle remoto', 'geladeira', 'fogão', 'micro-ondas',
+        'liquidificador', 'ventilador', 'ferro de passar', 'vassoura', 'balde', 'escova de dentes',
+        'pente', 'tesoura', 'martelo', 'chave de fenda', 'serra', 'furadeira', 'lâmpada', 'vela',
+        'despertador', 'cadeira', 'sofá', 'cama', 'travesseiro', 'espelho', 'janela', 'porta', 'tapete',
+        'vaso', 'garrafa', 'copo', 'prato', 'garfo', 'faca', 'colher', 'panela', 'mochila', 'carteira',
+        'balão', 'bola', 'cadeado'
+      ]
+    },
+    profissoes: {
+      nome: 'Profissões', grupo: 'Imagem e ação',
+      palavras: [
+        'médico', 'enfermeira', 'professor', 'bombeiro', 'policial', 'piloto', 'cozinheiro', 'padeiro',
+        'garçom', 'dentista', 'advogado', 'juiz', 'engenheiro', 'arquiteto', 'pintor', 'pedreiro',
+        'eletricista', 'encanador', 'mecânico', 'jardineiro', 'fazendeiro', 'pescador', 'astronauta',
+        'cientista', 'jornalista', 'fotógrafo', 'músico', 'cantor', 'palhaço', 'mágico', 'motorista',
+        'carteiro', 'faxineiro', 'barbeiro', 'veterinário', 'detetive', 'programador', 'designer',
+        'analista de dados', 'costureira', 'salva-vidas'
+      ]
+    },
+    esportes: {
+      nome: 'Esportes', grupo: 'Imagem e ação',
+      palavras: [
+        'futebol', 'basquete', 'vôlei', 'tênis', 'natação', 'surfe', 'skate', 'ciclismo', 'corrida',
+        'boxe', 'judô', 'karatê', 'capoeira', 'ginástica', 'balé', 'golfe', 'beisebol', 'handebol',
+        'rúgbi', 'esqui', 'patinação', 'escalada', 'pesca', 'xadrez', 'sinuca', 'boliche',
+        'arco e flecha', 'ioga', 'musculação', 'salto com vara', 'maratona', 'tênis de mesa', 'remo',
+        'mergulho', 'paraquedismo', 'hóquei'
+      ]
+    },
+    acoes: {
+      nome: 'Ações', grupo: 'Imagem e ação',
+      palavras: [
+        'pular corda', 'escovar os dentes', 'tomar banho', 'dirigir', 'cozinhar', 'dançar', 'cantar',
+        'correr', 'nadar', 'dormir', 'espirrar', 'chorar', 'rir', 'abraçar', 'beijar', 'aplaudir', 'cavar',
+        'pescar', 'varrer', 'lavar louça', 'passar roupa', 'tirar foto', 'ler um livro', 'escrever',
+        'digitar', 'falar ao telefone', 'assistir TV', 'andar de bicicleta', 'jogar bola', 'empurrar',
+        'puxar', 'carregar peso', 'subir escada', 'escalar', 'cair', 'tropeçar', 'piscar', 'assobiar',
+        'bocejar', 'pedir carona', 'atravessar a rua', 'plantar', 'regar plantas', 'tocar violão',
+        'pintar parede', 'fazer careta', 'abrir presente', 'tomar café'
+      ]
+    },
+    lugares: {
+      nome: 'Lugares', grupo: 'Imagem e ação',
+      palavras: [
+        'Cristo Redentor', 'Pão de Açúcar', 'Cataratas do Iguaçu', 'Amazônia', 'Pantanal', 'Copacabana',
+        'Torre Eiffel', 'Big Ben', 'Coliseu', 'Pirâmides do Egito', 'Muralha da China',
+        'Estátua da Liberdade', 'Taj Mahal', 'Machu Picchu', 'Torre de Pisa', 'Grand Canyon',
+        'Monte Everest', 'Ópera de Sydney', 'Arco do Triunfo', 'Times Square', 'Veneza', 'Japão', 'Egito',
+        'Brasil', 'Austrália', 'Alasca', 'Antártida', 'Saara', 'praia', 'deserto', 'montanha',
+        'ilha deserta', 'cachoeira', 'vulcão', 'caverna', 'floresta', 'fazenda', 'castelo', 'aeroporto',
+        'shopping', 'estádio', 'praça', 'ponte', 'farol', 'igreja'
+      ]
+    },
+    filmes_series: {
+      nome: 'Filmes e séries', grupo: 'Imagem e ação',
+      palavras: [
+        'Titanic', 'Toy Story', 'Shrek', 'Harry Potter', 'Star Wars', 'Matrix', 'O Rei Leão',
+        'Procurando Nemo', 'Vingadores', 'Jurassic Park', 'Stranger Things', 'Round 6',
+        'Game of Thrones', 'Friends', 'Breaking Bad', 'A Casa de Papel', 'Frozen', 'Moana', 'Avatar',
+        'Senhor dos Anéis', 'Piratas do Caribe', 'De Volta para o Futuro', 'Forrest Gump',
+        'Divertidamente', 'Carros', 'Os Incríveis', 'Madagascar', 'Kung Fu Panda', 'Chaves',
+        'Os Simpsons', 'Pica-Pau', 'Tom e Jerry', 'Bob Esponja', 'Pokémon', 'Dragon Ball', 'Naruto',
+        'Turma da Mônica', 'Rei Leão', 'Wandinha', 'Barbie'
+      ]
+    },
+    personagens: {
+      nome: 'Personagens', grupo: 'Imagem e ação',
+      palavras: [
+        'Super-Homem', 'Mulher-Maravilha', 'Homem de Ferro', 'Hulk', 'Thor', 'Capitão América', 'Coringa',
+        'Batman', 'Homem-Aranha', 'Mickey Mouse', 'Pato Donald', 'Pikachu', 'Mario', 'Sonic', 'Link',
+        'Homer Simpson', 'Chapolin', 'Mônica', 'Cebolinha', 'Sherlock Holmes', 'Darth Vader', 'Yoda',
+        'Gandalf', 'Jack Sparrow', 'Papai Noel', 'Coelho da Páscoa', 'Fada do Dente', 'Peter Pan',
+        'Cinderela', 'Branca de Neve', 'Pinóquio', 'Chapeuzinho Vermelho', 'Lobo Mau',
+        'Três Porquinhos', 'Alice no País', 'Rei Arthur', 'Robin Hood', 'Ariel', 'Shrek', 'Bob Esponja'
+      ]
+    },
+    natureza: {
+      nome: 'Natureza', grupo: 'Imagem e ação',
+      palavras: [
+        'sol', 'lua', 'estrela', 'nuvem', 'chuva', 'arco-íris', 'relâmpago', 'neve', 'tornado',
+        'furacão', 'terremoto', 'vulcão', 'rio', 'mar', 'onda', 'montanha', 'floresta', 'árvore', 'flor',
+        'folha', 'grama', 'cacto', 'girassol', 'rosa', 'semente', 'raiz', 'cachoeira', 'lago', 'oceano',
+        'ilha', 'deserto', 'eclipse', 'cometa', 'planeta', 'galáxia', 'foguete', 'vento', 'geada',
+        'fogueira', 'pedra', 'areia', 'concha'
+      ]
+    },
+    transportes: {
+      nome: 'Transportes', grupo: 'Imagem e ação',
+      palavras: [
+        'carro', 'ônibus', 'trem', 'metrô', 'avião', 'helicóptero', 'navio', 'barco', 'bicicleta', 'moto',
+        'patinete', 'skate', 'caminhão', 'trator', 'ambulância', 'carro de bombeiro', 'viatura', 'táxi',
+        'balão de ar quente', 'foguete', 'submarino', 'canoa', 'jangada', 'teleférico', 'carroça',
+        'trenó', 'carrinho de compras', 'monociclo', 'lancha', 'jet ski', 'caminhonete', 'ônibus espacial'
+      ]
+    },
+    roupas: {
+      nome: 'Roupas', grupo: 'Imagem e ação',
+      palavras: [
+        'camisa', 'calça', 'bermuda', 'vestido', 'saia', 'casaco', 'jaqueta', 'gravata', 'boné', 'chapéu',
+        'gorro', 'cachecol', 'luvas', 'meias', 'tênis', 'sandália', 'chinelo', 'bota', 'sapato de salto',
+        'óculos de sol', 'relógio de pulso', 'cinto', 'bolsa', 'biquíni', 'sunga', 'pijama', 'jaleco',
+        'fantasia', 'capa de chuva', 'avental', 'uniforme', 'colar', 'anel', 'brinco', 'pulseira', 'coroa',
+        'capacete', 'roupão', 'camiseta', 'moletom', 'terno', 'smoking'
+      ]
+    },
+    musica: {
+      nome: 'Música', grupo: 'Imagem e ação',
+      palavras: [
+        'violão', 'guitarra', 'baixo', 'bateria', 'piano', 'teclado', 'violino', 'flauta', 'saxofone',
+        'trompete', 'trombone', 'tambor', 'pandeiro', 'cavaquinho', 'sanfona', 'harpa', 'microfone',
+        'caixa de som', 'disco de vinil', 'DJ', 'maestro', 'orquestra', 'banda', 'show', 'karaokê',
+        'ópera', 'samba', 'rock', 'funk', 'sertanejo', 'forró', 'pagode', 'reggae', 'rap', 'nota musical',
+        'clave de sol', 'partitura', 'berimbau', 'ukulele', 'gaita', 'xilofone', 'triângulo'
+      ]
+    },
+    escritorio: {
+      nome: 'Escritório', grupo: 'Imagem e ação',
+      palavras: [
+        'reunião', 'café', 'planilha', 'e-mail', 'impressora', 'home office', 'videochamada', 'prazo',
+        'crachá', 'happy hour', 'apresentação', 'slide', 'quadro branco', 'post-it', 'agenda', 'calendário',
+        'notebook', 'cadeira de escritório', 'mesa de trabalho', 'grampeador', 'clipe', 'caneta',
+        'elevador', 'feedback', 'promoção', 'férias', 'banco de horas', 'trânsito', 'almoço', 'fila do café',
+        'wi-fi caiu', 'senha esquecida', 'sexta-feira', 'segunda-feira', 'salário', 'décimo terceiro'
+      ]
+    },
+    dificil: {
+      nome: 'Difícil', grupo: 'Imagem e ação',
+      palavras: [
+        'democracia', 'inflação', 'saudade', 'gravidade', 'ironia', 'fofoca', 'procrastinação', 'déjà vu',
+        'internet', 'liberdade', 'justiça', 'tempo', 'sonho', 'memória', 'cheiro', 'eco', 'silêncio',
+        'velocidade', 'equilíbrio', 'estresse', 'sorte', 'azar', 'destino', 'tradução', 'fronteira',
+        'imposto', 'economia', 'eleição', 'herança', 'lógica', 'paradoxo', 'átomo', 'fuso horário',
+        'efeito borboleta', 'algoritmo', 'chatbot', 'realidade virtual', 'metaverso', 'criptomoeda'
+      ]
+    },
+
+    /* ---------- LISTENING ---------- */
+    listening: {
+      nome: 'Listening', grupo: 'Listening',
+      palavras: [
+        'hashtag', 'viral', 'crise de reputação', 'nuvem de palavras', 'influenciador', 'booleana',
+        'sentimento', 'menção', 'dashboard', 'relatório', 'alerta', 'tendência', 'engajamento', 'boletim',
+        'clipping', 'pesquisa', 'gráfico de pizza', 'monitoramento', 'fake news', 'cancelamento',
+        'trending topics', 'ranking', 'termômetro', 'lupa', 'megafone', 'sentimento positivo',
+        'sentimento negativo', 'palavra-chave', 'sazonalidade', 'alcance', 'impressões', 'curtidas',
+        'compartilhamento', 'comentários', 'perfil oficial', 'portal de notícias', 'assessoria de imprensa',
+        'release', 'entrevista', 'coletiva de imprensa', 'manchete', 'capa de jornal', 'rádio', 'TV aberta',
+        'podcast', 'newsletter', 'reputação', 'tom de voz', 'insight', 'cluster', 'amostra', 'questionário',
+        'entrevistado', 'grupo focal', 'mapa de calor', 'gráfico de barras', 'linha do tempo', 'briefing',
+        'pauta', 'relatório mensal'
+      ]
+    }
+  };
+
+  /* Mix geral: junta as palavras de todos os temas acima, sem repetir. Não precisa editar. */
+  (function () {
+    var seen = {}, mix = [];
+    Object.keys(THEMES).forEach(function (k) {
+      THEMES[k].palavras.forEach(function (w) {
+        var key = w.toLowerCase();
+        if (!seen[key]) { seen[key] = 1; mix.push(w); }
+      });
+    });
+    THEMES.mix = { nome: 'Mix geral', grupo: 'Mix', palavras: mix };
+  })();
+
+  /* ===================================================================== */
+
+  var W = 744, H = 442, CELL = 4, BOARD_W = 896;
+
+  function $(id) { return document.getElementById(id); }
+  function all(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+
+  /* ---------- avatar sorteado a partir do apelido ---------- */
+
+  var SKINS = ['#F2C9A0', '#FFDBAC', '#E0AC69', '#C68642', '#8D5524', '#6B3E1D'];
+  var HAIRS = ['#232323', '#5A2E12', '#7A3E1A', '#F5E96B', '#C0392B', '#6C6C6C', '#2B4EC4'];
+  var SHIRTS = ['#F15A1A', '#2B4EC4', '#E85AA0', '#3D9A3D', '#232323', '#7B3FA0', '#D8D82E', '#E63A00'];
+  var BGS = ['#7B3FA0', '#2B4EC4', '#3D9A3D', '#E63A00', '#3A2A5A', '#232323', '#D8D82E', '#6C3FA0'];
+  var HATS = ['none', 'witch', 'horns', 'cap', 'ears', 'pumpkin', 'ghost'];
+
+  function hashStr(s) {
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return h >>> 0;
+  }
+  function rng(seed) {
+    var a = seed;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function avatarSvg(nick, px) {
+    var r = rng(hashStr(String(nick).toLowerCase()));
+    function pick(a) { return a[Math.floor(r() * a.length)]; }
+    var skin = pick(SKINS), hair = pick(HAIRS), shirt = pick(SHIRTS), bg = pick(BGS), hat = pick(HATS);
+    if (bg === shirt) bg = '#3A2A5A';
+    if (hair === bg) hair = '#232323';
+    if (hat === 'pumpkin') { skin = '#F15A1A'; hair = '#2C6E2C'; shirt = '#232323'; if (bg === '#232323') bg = '#6C3FA0'; }
+    if (hat === 'ghost') { skin = '#F4F4F4'; hair = '#F4F4F4'; shirt = '#F4F4F4'; bg = '#3A2A5A'; }
+    var s = '<svg width="' + px + '" height="' + px + '" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">';
+    function R(x, y, w, h, f) { s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + f + '"/>'; }
+    R(0, 0, 12, 12, bg);
+    R(2, 8, 8, 4, shirt);
+    R(5, 7, 2, 1, skin);
+    R(3, 3, 6, 4, skin);
+    R(3, 2, 6, 1, hair); R(2, 3, 1, 3, hair); R(9, 3, 1, 3, hair);
+    R(4, 4, 1, 1, '#232323'); R(7, 4, 1, 1, '#232323'); R(5, 6, 2, 1, '#232323');
+    if (hat === 'witch') { R(1, 2, 10, 1, '#232323'); R(4, 1, 4, 1, '#232323'); R(5, 0, 2, 1, '#232323'); }
+    else if (hat === 'horns') { R(2, 0, 1, 2, '#E63A00'); R(9, 0, 1, 2, '#E63A00'); R(3, 1, 1, 1, '#E63A00'); R(8, 1, 1, 1, '#E63A00'); }
+    else if (hat === 'cap') { R(3, 1, 6, 2, '#F15A1A'); R(2, 3, 8, 1, '#F15A1A'); }
+    else if (hat === 'ears') { R(3, 0, 2, 2, '#232323'); R(7, 0, 2, 2, '#232323'); }
+    else if (hat === 'pumpkin') { R(5, 1, 2, 1, '#2C6E2C'); }
+    else if (hat === 'ghost') { R(4, 11, 1, 1, bg); R(7, 11, 1, 1, bg); }
+    return s + '</svg>';
+  }
+
+  /* ---------- telas ---------- */
+
+  var screens = { login: $('sLogin'), lobby: $('sLobby'), game: $('sGame') };
+  var current = 'login';
+  var sticker = $('sticker');
+  var me = null;
+
+  function show(name) {
+    current = name;
+    for (var k in screens) screens[k].hidden = (k !== name);
+    if (name === 'login') sticker.textContent = 'ENTRAR';
+    else if (name === 'lobby') sticker.textContent = 'LOBBY';
+    else sticker.textContent = THEMES[game.theme].nome.toUpperCase();
+    fit();
+    if (name === 'login') $('nick').focus();
+  }
+
+  /* ---------- login ---------- */
+
+  var nickInput = $('nick'), nickHint = $('nickHint'), loginAv = $('loginAv');
+  var NICK_HELP = '2 a 14 caracteres. Sem senha, é só escolher.';
+
+  function cleanNick(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
+  function nickError(n) {
+    if (n.length < 2) return 'Escolha um apelido com pelo menos 2 caracteres.';
+    if (n.length > 14) return 'Use no máximo 14 caracteres.';
+    if (!/^[\p{L}\p{N} _.\-]+$/u.test(n)) return 'Use só letras, números, espaço, ponto, hífen ou sublinhado.';
+    return '';
+  }
+  function loadNick() { try { return localStorage.getItem(NICK_KEY) || ''; } catch (e) { return ''; } }
+  function saveNick(n) { try { localStorage.setItem(NICK_KEY, n); } catch (e) { /* sem armazenamento, segue */ } }
+
+  function previewAvatar() {
+    var n = cleanNick(nickInput.value);
+    loginAv.innerHTML = avatarSvg(n || '?', 98);
+  }
+  nickInput.addEventListener('input', function () {
+    nickHint.textContent = NICK_HELP;
+    nickHint.classList.remove('err');
+    previewAvatar();
+  });
+  $('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = cleanNick(nickInput.value);
+    var err = nickError(n);
+    if (err) {
+      nickHint.textContent = err;
+      nickHint.classList.add('err');
+      nickInput.focus();
+      return;
+    }
+    saveNick(n);
+    me = { nick: n };
+    enterLobby();
+  });
+
+  /* ---------- lobby ---------- */
+
+  var players = [];
+  var slotsEl = $('slots');
+  var selTheme = $('selTheme'), selRounds = $('selRounds'), selTime = $('selTime');
+
+  function themeKeys() { return Object.keys(THEMES); }
+
+  function fillThemes() {
+    selTheme.textContent = '';
+    var groups = {};
+    themeKeys().forEach(function (k) {
+      var gname = THEMES[k].grupo || 'Outros';
+      if (!groups[gname]) {
+        groups[gname] = document.createElement('optgroup');
+        groups[gname].label = gname;
+        selTheme.appendChild(groups[gname]);
+      }
+      var o = document.createElement('option');
+      o.value = k;
+      o.textContent = THEMES[k].nome + ' (' + THEMES[k].palavras.length + ' palavras)';
+      groups[gname].appendChild(o);
+    });
+    showWords();
+  }
+  function showWords() {
+    $('wordList').textContent = THEMES[selTheme.value].palavras.join(', ');
+  }
+  selTheme.addEventListener('change', showWords);
+
+  function renderSlots() {
+    slotsEl.textContent = '';
+    for (var i = 0; i < MAX_PLAYERS; i++) {
+      var d = document.createElement('div');
+      if (i < players.length) {
+        d.className = 'slot on';
+        var av = document.createElement('div');
+        av.className = 'slotav';
+        av.innerHTML = avatarSvg(players[i].nick, 56);
+        var nm = document.createElement('div');
+        nm.className = 'slotnm';
+        var b = document.createElement('b');
+        b.textContent = players[i].nick;
+        nm.appendChild(b);
+        if (players[i].me) {
+          var t = document.createElement('span');
+          t.className = 'tag';
+          t.textContent = 'VOCÊ';
+          nm.appendChild(t);
+        }
+        d.appendChild(av);
+        d.appendChild(nm);
+      } else {
+        d.className = 'slot';
+        d.textContent = 'vaga livre';
+      }
+      slotsEl.appendChild(d);
+    }
+    $('slotCount').textContent = players.length + '/' + MAX_PLAYERS;
+  }
+
+  function enterLobby() {
+    players = [{ nick: me.nick, me: true }];
+    $('whoNick').textContent = me.nick;
+    $('whoAv').innerHTML = avatarSvg(me.nick, 28);
+    renderSlots();
+    show('lobby');
+    $('startBtn').focus();
+  }
+
+  $('logoutBtn').addEventListener('click', function () {
+    me = null;
+    nickInput.value = loadNick();
+    previewAvatar();
+    show('login');
+  });
+
+  /* =====================================================================
+     CANVAS
+     ===================================================================== */
+
+  var cv = $('cv');
+  var ctx = cv.getContext('2d', { willReadFrequently: true });
+  var ov = $('ov');
+  var octx = ov.getContext('2d');
+  var ghost = $('ghost');
+
+  var state = { tool: 'pencil', prevTool: 'pencil', size: 2, color: '#232323', px: false, filled: false, locked: false };
+
+  /* Lista de ações: o canvas é redesenhado a partir dela (desfazer) e é isto que o multiplayer vai enviar pela rede. */
+  var actions = [];
+  var cur = null;
+  var last = [0, 0];
+  var mouse = null;
+  var sprayTimer = null;
+
+  var WIDTHS = {
+    pencil: [1, 2, 4, 6],
+    brush: [4, 8, 14, 22],
+    eraser: [8, 14, 22, 34],
+    shape: [1, 2, 4, 6],
+    spray: [8, 14, 22, 32]
+  };
+  var CELLS = {
+    pencil: [1, 2, 3, 4],
+    brush: [2, 4, 6, 9],
+    eraser: [2, 4, 6, 9],
+    shape: [1, 2, 3, 4]
+  };
+  var NAMES = {
+    pencil: 'LÁPIS', brush: 'PINCEL', fill: 'BALDE', eraser: 'BORRACHA', pick: 'CONTA-GOTAS',
+    line: 'LINHA', rect: 'RETÂNGULO', oval: 'CÍRCULO', spray: 'SPRAY'
+  };
+  var KEYS = { p: 'pencil', b: 'brush', f: 'fill', e: 'eraser', i: 'pick', l: 'line', r: 'rect', o: 'oval', s: 'spray' };
+
+  function group(tool) {
+    return (tool === 'line' || tool === 'rect' || tool === 'oval') ? 'shape' : tool;
+  }
+
+  /* ---------- desenho (canvas principal, camada de prévia e replay) ---------- */
+
+  function cellLine(g, x0, y0, x1, y1, n) {
+    var dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+    var sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    var err = dx + dy, off = Math.floor(n / 2);
+    while (true) {
+      g.fillRect((x0 - off) * CELL, (y0 - off) * CELL, n * CELL, n * CELL);
+      if (x0 === x1 && y0 === y1) break;
+      var e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  }
+
+  function seg(g, a, x0, y0, x1, y1) {
+    if (a.px) {
+      g.fillStyle = a.c;
+      cellLine(g, Math.floor(x0 / CELL), Math.floor(y0 / CELL), Math.floor(x1 / CELL), Math.floor(y1 / CELL), a.n);
+      return;
+    }
+    g.strokeStyle = a.c; g.fillStyle = a.c; g.lineWidth = a.w;
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath();
+    if (x0 === x1 && y0 === y1) {
+      g.arc(x0, y0, a.w / 2, 0, Math.PI * 2);
+      g.fill();
+    } else {
+      g.moveTo(x0, y0); g.lineTo(x1, y1);
+      g.stroke();
+    }
+  }
+
+  function drawStroke(g, a) {
+    var p = a.p;
+    if (p.length < 2) return;
+    if (p.length === 2) { seg(g, a, p[0], p[1], p[0], p[1]); return; }
+    for (var i = 2; i < p.length; i += 2) seg(g, a, p[i - 2], p[i - 1], p[i], p[i + 1]);
+  }
+
+  function drawShape(g, a) {
+    var x1 = a.a[0], y1 = a.a[1], x2 = a.a[2], y2 = a.a[3];
+    if (a.px) {
+      g.fillStyle = a.c;
+      var c1 = Math.floor(x1 / CELL), d1 = Math.floor(y1 / CELL);
+      var c2 = Math.floor(x2 / CELL), d2 = Math.floor(y2 / CELL);
+      var minC = Math.min(c1, c2), maxC = Math.max(c1, c2), minD = Math.min(d1, d2), maxD = Math.max(d1, d2);
+      if (a.k === 'line') {
+        cellLine(g, c1, d1, c2, d2, a.n);
+      } else if (a.k === 'rect') {
+        if (a.f) g.fillRect(minC * CELL, minD * CELL, (maxC - minC + 1) * CELL, (maxD - minD + 1) * CELL);
+        cellLine(g, c1, d1, c2, d1, a.n); cellLine(g, c2, d1, c2, d2, a.n);
+        cellLine(g, c2, d2, c1, d2, a.n); cellLine(g, c1, d2, c1, d1, a.n);
+      } else {
+        var cx = (c1 + c2) / 2, cy = (d1 + d2) / 2;
+        var rx = Math.abs(c2 - c1) / 2, ry = Math.abs(d2 - d1) / 2;
+        if (a.f) {
+          for (var yy = minD; yy <= maxD; yy++) {
+            var t0 = ry === 0 ? 0 : (yy - cy) / ry;
+            var half = rx * Math.sqrt(Math.max(0, 1 - t0 * t0));
+            var xa = Math.round(cx - half), xb = Math.round(cx + half);
+            g.fillRect(xa * CELL, yy * CELL, (xb - xa + 1) * CELL, CELL);
+          }
+        }
+        var steps = Math.max(16, Math.ceil((rx + ry) * 6));
+        var pc = null, pd = null;
+        for (var i = 0; i <= steps; i++) {
+          var t = i / steps * Math.PI * 2;
+          var qc = Math.round(cx + Math.cos(t) * rx), qd = Math.round(cy + Math.sin(t) * ry);
+          if (pc === null) { pc = qc; pd = qd; }
+          cellLine(g, pc, pd, qc, qd, a.n);
+          pc = qc; pd = qd;
+        }
+      }
+      return;
+    }
+    g.strokeStyle = a.c; g.fillStyle = a.c; g.lineWidth = a.w; g.lineCap = 'round';
+    g.lineJoin = a.k === 'rect' ? 'miter' : 'round';
+    g.beginPath();
+    if (a.k === 'line') {
+      g.moveTo(x1, y1); g.lineTo(x2, y2);
+    } else if (a.k === 'rect') {
+      g.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+    } else {
+      g.ellipse((x1 + x2) / 2, (y1 + y2) / 2, Math.abs(x2 - x1) / 2, Math.abs(y2 - y1) / 2, 0, 0, Math.PI * 2);
+    }
+    if (a.f && a.k !== 'line') g.fill();
+    g.stroke();
+  }
+
+  function drawSpray(g, a) {
+    g.fillStyle = a.c;
+    var d = a.px ? CELL : 2, p = a.p;
+    for (var i = 0; i < p.length; i += 2) {
+      var x = a.px ? Math.floor(p[i] / d) * d : Math.round(p[i]);
+      var y = a.px ? Math.floor(p[i + 1] / d) * d : Math.round(p[i + 1]);
+      g.fillRect(x, y, d, d);
+    }
+  }
+
+  function hexToRgb(h) {
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function floodFill(g, sx, sy, hex) {
+    sx = Math.floor(sx); sy = Math.floor(sy);
+    if (sx < 0 || sy < 0 || sx >= W || sy >= H) return;
+    var img = g.getImageData(0, 0, W, H), d = img.data;
+    var fc = hexToRgb(hex);
+    var i0 = (sy * W + sx) * 4;
+    var tr = d[i0], tg = d[i0 + 1], tb = d[i0 + 2];
+    if (Math.abs(tr - fc[0]) + Math.abs(tg - fc[1]) + Math.abs(tb - fc[2]) <= 4) return;
+    var TOL = 120;
+    var seen = new Uint8Array(W * H);
+    function ok(p) {
+      var i = p * 4;
+      return Math.abs(d[i] - tr) + Math.abs(d[i + 1] - tg) + Math.abs(d[i + 2] - tb) <= TOL;
+    }
+    var stack = [sx, sy];
+    while (stack.length) {
+      var y = stack.pop(), x = stack.pop();
+      var p = y * W + x;
+      if (seen[p] || !ok(p)) continue;
+      var l = x, r = x;
+      while (l > 0 && !seen[y * W + l - 1] && ok(y * W + l - 1)) l--;
+      while (r < W - 1 && !seen[y * W + r + 1] && ok(y * W + r + 1)) r++;
+      for (var i = l; i <= r; i++) {
+        var q = y * W + i;
+        seen[q] = 1;
+        d[q * 4] = fc[0]; d[q * 4 + 1] = fc[1]; d[q * 4 + 2] = fc[2]; d[q * 4 + 3] = 255;
+      }
+      for (var dir = -1; dir <= 1; dir += 2) {
+        var ny = y + dir;
+        if (ny < 0 || ny >= H) continue;
+        var inSpan = false;
+        for (var k = l; k <= r; k++) {
+          var qq = ny * W + k;
+          var can = !seen[qq] && ok(qq);
+          if (can && !inSpan) { stack.push(k, ny); inSpan = true; }
+          else if (!can) inSpan = false;
+        }
+      }
+    }
+    g.putImageData(img, 0, 0);
+  }
+
+  function drawAction(g, a) {
+    if (a.t === 'clear') { g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H); }
+    else if (a.t === 'stroke') drawStroke(g, a);
+    else if (a.t === 'shape') drawShape(g, a);
+    else if (a.t === 'spray') drawSpray(g, a);
+    else if (a.t === 'fill') floodFill(g, a.x, a.y, a.c);
+  }
+
+  function replay() {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+    for (var i = 0; i < actions.length; i++) drawAction(ctx, actions[i]);
+  }
+
+  /* ---------- interface do canvas ---------- */
+
+  var toolBtns = all('[data-tool]');
+  var sizeBtns = all('[data-size]');
+  var swatches = all('[data-color]');
+  var modeBtns = all('[data-mode]');
+  var shapeBtns = all('[data-shape]');
+  var undoBtn = $('undoBtn');
+  var clearBtn = $('clearBtn');
+  var pickInput = $('pickInput');
+  var pickLabel = $('pickLabel');
+  var cvHint = $('cvHint');
+  var stTool = $('stTool'), stSize = $('stSize'), stMode = $('stMode'), stCount = $('stCount'), stPos = $('stPos');
+
+  function ui() {
+    var i;
+    for (i = 0; i < toolBtns.length; i++) {
+      var on = toolBtns[i].getAttribute('data-tool') === state.tool;
+      toolBtns[i].classList.toggle('is-on', on);
+      toolBtns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    for (i = 0; i < sizeBtns.length; i++) {
+      var s = Number(sizeBtns[i].getAttribute('data-size')) === state.size;
+      sizeBtns[i].classList.toggle('is-on', s);
+      sizeBtns[i].setAttribute('aria-pressed', s ? 'true' : 'false');
+    }
+    for (i = 0; i < swatches.length; i++) {
+      var c = swatches[i].getAttribute('data-color').toLowerCase() === state.color.toLowerCase();
+      swatches[i].classList.toggle('is-on', c);
+    }
+    pickLabel.style.background = state.color;
+    pickInput.value = state.color.toLowerCase();
+    for (i = 0; i < modeBtns.length; i++) {
+      var m = (modeBtns[i].getAttribute('data-mode') === 'pixel') === state.px;
+      modeBtns[i].classList.toggle('is-on', m);
+      modeBtns[i].setAttribute('aria-pressed', m ? 'true' : 'false');
+    }
+    var canFill = state.tool === 'rect' || state.tool === 'oval';
+    for (i = 0; i < shapeBtns.length; i++) {
+      var f = (shapeBtns[i].getAttribute('data-shape') === '1') === state.filled;
+      shapeBtns[i].classList.toggle('is-on', f);
+      shapeBtns[i].setAttribute('aria-pressed', f ? 'true' : 'false');
+      shapeBtns[i].disabled = !canFill;
+    }
+    undoBtn.disabled = actions.length === 0 || state.locked;
+    clearBtn.disabled = state.locked;
+    stTool.textContent = 'FERRAMENTA: ' + NAMES[state.tool];
+    stSize.textContent = 'TAMANHO ' + state.size;
+    stMode.textContent = 'TRAÇO ' + (state.px ? 'PIXEL' : 'SUAVE');
+    stCount.textContent = 'AÇÕES: ' + actions.length;
+    cvHint.hidden = actions.length > 0 || !!cur || state.locked;
+    if (!ghost.hidden && mouse) updateGhost(mouse);
+  }
+
+  function setTool(t) {
+    if (t === 'pick' && state.tool !== 'pick') state.prevTool = state.tool;
+    state.tool = t;
+    ui();
+  }
+  function setSize(n) { state.size = n; ui(); }
+  function setColor(c) {
+    state.color = c;
+    if (state.tool === 'eraser') state.tool = 'pencil';
+    ui();
+  }
+  function setMode(px) { state.px = px; ui(); }
+  function setFilled(f) { state.filled = f; ui(); }
+
+  function undo() {
+    if (cur || state.locked || !actions.length) return;
+    actions.pop();
+    replay();
+    ui();
+  }
+
+  function clearAll() {
+    if (cur || state.locked) return;
+    var a = { t: 'clear' };
+    actions.push(a);
+    drawAction(ctx, a);
+    ui();
+  }
+
+  toolBtns.forEach(function (b) { b.addEventListener('click', function () { setTool(b.getAttribute('data-tool')); }); });
+  sizeBtns.forEach(function (b) { b.addEventListener('click', function () { setSize(Number(b.getAttribute('data-size'))); }); });
+  swatches.forEach(function (b) { b.addEventListener('click', function () { setColor(b.getAttribute('data-color')); }); });
+  modeBtns.forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode') === 'pixel'); }); });
+  shapeBtns.forEach(function (b) { b.addEventListener('click', function () { setFilled(b.getAttribute('data-shape') === '1'); }); });
+  undoBtn.addEventListener('click', undo);
+  clearBtn.addEventListener('click', clearAll);
+  pickInput.addEventListener('input', function () { setColor(pickInput.value); });
+
+  document.addEventListener('keydown', function (e) {
+    if (current !== 'game') return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    var k = (e.key || '').toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); undo(); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (KEYS[k]) { setTool(KEYS[k]); }
+    else if (k === 'm') { setMode(!state.px); }
+    else if (k === 'g') { setFilled(!state.filled); }
+    else if (k >= '1' && k <= '4') { setSize(Number(k)); }
+  });
+
+  /* ---------- cursor que mostra o tamanho do traço ---------- */
+
+  function updateGhost(p) {
+    if (state.locked) { ghost.hidden = true; return; }
+    var t = state.tool, g = group(t), sz, x, y, round = false, cross = false;
+    if (t === 'pencil' || t === 'brush' || t === 'eraser') {
+      if (state.px) {
+        var n = CELLS[g][state.size - 1];
+        sz = n * CELL;
+        x = (Math.floor(p[0] / CELL) - Math.floor(n / 2)) * CELL;
+        y = (Math.floor(p[1] / CELL) - Math.floor(n / 2)) * CELL;
+      } else {
+        sz = Math.max(WIDTHS[g][state.size - 1], 5);
+        x = p[0] - sz / 2; y = p[1] - sz / 2; round = true;
+      }
+    } else if (t === 'spray') {
+      sz = WIDTHS.spray[state.size - 1] * 2;
+      x = p[0] - sz / 2; y = p[1] - sz / 2; round = true;
+    } else {
+      cross = true; sz = 14; x = p[0] - 7; y = p[1] - 7;
+    }
+    ghost.className = 'gh' + (round ? ' round' : '') + (cross ? ' cross' : '');
+    ghost.style.width = sz + 'px';
+    ghost.style.height = sz + 'px';
+    ghost.style.left = x + 'px';
+    ghost.style.top = y + 'px';
+    ghost.style.background = cross ? '' : (t === 'eraser' ? 'rgba(255,255,255,.7)' : state.color + '59');
+    ghost.hidden = false;
+    ov.style.cursor = cross ? 'crosshair' : 'none';
+  }
+
+  /* ---------- ponteiro ---------- */
+
+  function pos(e) {
+    var r = ov.getBoundingClientRect();
+    var x = (e.clientX - r.left) * W / r.width;
+    var y = (e.clientY - r.top) * H / r.height;
+    return [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
+  }
+
+  function emitSpray() {
+    if (!cur || cur.t !== 'spray') return;
+    var add = [];
+    for (var i = 0; i < 12; i++) {
+      var ang = Math.random() * Math.PI * 2;
+      var rad = cur.r * Math.sqrt(Math.random());
+      add.push(last[0] + Math.cos(ang) * rad, last[1] + Math.sin(ang) * rad);
+    }
+    for (var k = 0; k < add.length; k++) cur.p.push(add[k]);
+    drawSpray(octx, { c: cur.c, px: cur.px, p: add });
+  }
+
+  function commit() {
+    if (!cur) return;
+    if (sprayTimer) { clearInterval(sprayTimer); sprayTimer = null; }
+    drawAction(ctx, cur);
+    octx.clearRect(0, 0, W, H);
+    actions.push(cur);
+    cur = null;
+    ui();
+  }
+
+  function sampleColor(p) {
+    var d = ctx.getImageData(Math.floor(p[0]), Math.floor(p[1]), 1, 1).data;
+    var hx = function (v) { return ('0' + v.toString(16)).slice(-2); };
+    return '#' + hx(d[0]) + hx(d[1]) + hx(d[2]);
+  }
+
+  ov.addEventListener('pointerdown', function (e) {
+    if (state.locked) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    if (cur) commit();
+    var p = pos(e);
+    last = p; mouse = p;
+    var tool = state.tool, g = group(tool);
+    if (tool === 'pick') {
+      var hex = sampleColor(p);
+      state.tool = (state.prevTool && state.prevTool !== 'pick' && state.prevTool !== 'eraser') ? state.prevTool : 'pencil';
+      setColor(hex);
+      return;
+    }
+    if (tool === 'fill') {
+      var f = { t: 'fill', c: state.color, x: Math.floor(p[0]), y: Math.floor(p[1]) };
+      drawAction(ctx, f);
+      actions.push(f);
+      ui();
+      return;
+    }
+    try { ov.setPointerCapture(e.pointerId); } catch (err) { /* sem captura, segue */ }
+    if (tool === 'pencil' || tool === 'brush' || tool === 'eraser') {
+      cur = {
+        t: 'stroke', c: tool === 'eraser' ? '#ffffff' : state.color,
+        w: WIDTHS[g][state.size - 1], n: CELLS[g][state.size - 1], px: state.px, p: [p[0], p[1]]
+      };
+      seg(octx, cur, p[0], p[1], p[0], p[1]);
+    } else if (g === 'shape') {
+      cur = {
+        t: 'shape', k: tool, c: state.color, f: state.filled && tool !== 'line',
+        w: WIDTHS.shape[state.size - 1], n: CELLS.shape[state.size - 1], px: state.px, a: [p[0], p[1], p[0], p[1]]
+      };
+      drawShape(octx, cur);
+    } else if (tool === 'spray') {
+      cur = { t: 'spray', c: state.color, r: WIDTHS.spray[state.size - 1], px: state.px, p: [] };
+      emitSpray();
+      sprayTimer = setInterval(emitSpray, 28);
+    }
+    ui();
+  });
+
+  ov.addEventListener('pointermove', function (e) {
+    var p = pos(e);
+    mouse = p;
+    stPos.textContent = 'X ' + Math.round(p[0]) + ' Y ' + Math.round(p[1]);
+    if (e.pointerType === 'touch') ghost.hidden = true; else updateGhost(p);
+    if (!cur) return;
+    var evs = (e.getCoalescedEvents && e.getCoalescedEvents()) || [];
+    if (!evs.length) evs = [e];
+    for (var i = 0; i < evs.length; i++) {
+      var q = pos(evs[i]);
+      if (cur.t === 'stroke') {
+        var px = cur.p[cur.p.length - 2], py = cur.p[cur.p.length - 1];
+        cur.p.push(q[0], q[1]);
+        seg(octx, cur, px, py, q[0], q[1]);
+      } else if (cur.t === 'shape') {
+        cur.a[2] = q[0]; cur.a[3] = q[1];
+      }
+      last = q;
+    }
+    if (cur.t === 'shape') {
+      octx.clearRect(0, 0, W, H);
+      drawShape(octx, cur);
+    }
+  });
+
+  ov.addEventListener('pointerleave', function () { ghost.hidden = true; });
+  ov.addEventListener('pointerup', commit);
+  ov.addEventListener('pointercancel', commit);
+
+  /* =====================================================================
+     PARTIDA (modo treino, sem servidor)
+     ===================================================================== */
+
+  var game = { theme: 'halloween', total: 5, seconds: 60, round: 0, word: '', endAt: 0, timer: null, bag: [] };
+  var gWord = $('gWord'), gTime = $('gTime'), gRound = $('gRound'), over = $('over');
+  var segEls = all('#gSegs span');
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function renderWord() {
+    gWord.textContent = '';
+    var w = game.word, n = w.length;
+    var size = Math.max(14, Math.min(30, Math.floor((420 - (n - 1) * 4) / n)));
+    for (var i = 0; i < n; i++) {
+      var ch = w.charAt(i);
+      var d = document.createElement('div');
+      if (ch === ' ') {
+        d.className = 'lt gap';
+        d.style.width = Math.round(size / 2) + 'px';
+      } else {
+        d.className = 'lt';
+        d.style.width = size + 'px';
+        d.style.height = size + 'px';
+        d.style.fontSize = Math.max(7, Math.round(size * 0.46)) + 'px';
+        d.textContent = ch.toUpperCase();
+      }
+      gWord.appendChild(d);
+    }
+  }
+
+  function newWord() {
+    if (!game.bag.length) game.bag = shuffle(THEMES[game.theme].palavras.slice());
+    game.word = game.bag.pop();
+    renderWord();
+  }
+
+  function fmt(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+  function tick() {
+    var left = Math.max(0, Math.ceil((game.endAt - Date.now()) / 1000));
+    gTime.textContent = fmt(left);
+    gTime.classList.toggle('warn', left <= 10);
+    var lit = Math.ceil(segEls.length * left / game.seconds);
+    for (var i = 0; i < segEls.length; i++) segEls[i].classList.toggle('off', i >= lit);
+    if (left <= 0) endRound();
+  }
+
+  function stopTimer() {
+    if (game.timer) { clearInterval(game.timer); game.timer = null; }
+  }
+
+  function startRound() {
+    stopTimer();
+    game.round++;
+    gRound.textContent = 'RODADA ' + game.round + '/' + game.total;
+    newWord();
+    actions = [];
+    cur = null;
+    octx.clearRect(0, 0, W, H);
+    replay();
+    state.locked = false;
+    over.hidden = true;
+    game.endAt = Date.now() + game.seconds * 1000;
+    tick();
+    game.timer = setInterval(tick, 250);
+    ui();
+  }
+
+  function endRound() {
+    stopTimer();
+    if (cur) commit();
+    state.locked = true;
+    ghost.hidden = true;
+    $('ovWord').textContent = game.word;
+    var last = game.round >= game.total;
+    $('ovTitle').textContent = last ? 'FIM DA PARTIDA!' : 'TEMPO ESGOTADO!';
+    $('ovNext').hidden = last;
+    over.hidden = false;
+    ui();
+    (last ? $('ovLobby') : $('ovNext')).focus();
+  }
+
+  function startGame() {
+    game.theme = selTheme.value;
+    game.total = Number(selRounds.value);
+    game.seconds = Number(selTime.value);
+    game.round = 0;
+    game.bag = shuffle(THEMES[game.theme].palavras.slice());
+    $('gTema').textContent = THEMES[game.theme].nome;
+    show('game');
+    startRound();
+  }
+
+  function leaveGame() {
+    stopTimer();
+    if (cur) commit();
+    state.locked = false;
+    ghost.hidden = true;
+    show('lobby');
+  }
+
+  $('startBtn').addEventListener('click', startGame);
+  $('ovNext').addEventListener('click', startRound);
+  $('ovLobby').addEventListener('click', leaveGame);
+  $('leaveBtn').addEventListener('click', leaveGame);
+  $('skipBtn').addEventListener('click', function () {
+    if (state.locked) return;
+    if (cur) commit();
+    newWord();
+    actions = [];
+    replay();
+    ui();
+  });
+
+  /* ---------- escala para telas pequenas ---------- */
+
+  var stage = $('stage');
+  var board = $('board');
+  function fit() {
+    var s = Math.min(1, stage.clientWidth / BOARD_W);
+    board.style.transform = 'scale(' + s + ')';
+    stage.style.height = Math.ceil(board.offsetHeight * s) + 'px';
+  }
+  window.addEventListener('resize', fit);
+
+  /* ---------- início ---------- */
+
+  fillThemes();
+  replay();
+  ui();
+  nickInput.value = loadNick();
+  previewAvatar();
+  show('login');
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+
+</body></html>

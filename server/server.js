@@ -15,9 +15,16 @@ const { Server } = require('socket.io');
 const PORT = Number(process.env.PORT) || 3000;
 const MAX_PLAYERS = 25;
 const GRACE_MS = 20000;   // tempo para quem caiu voltar com o mesmo apelido sem perder pontos
-const ROOM_W = 8, ROOM_H = 8;   // tamanho da sala do lobby, em quadrados
-const BLOCKED = [[2, 0], [5, 0], [0, 5]];   // quadrados ocupados por móveis
-function isBlocked(x, y) { return BLOCKED.some(function (t) { return t[0] === x && t[1] === y; }); }
+// Salão de fliperama: mesmo mapa do cliente (gerado a partir dele).
+const HALL = {"W":22,"H":16,"blocked":[[3,0],[4,0],[6,0],[7,0],[9,0],[10,0],[12,0],[13,0],[18,0],[0,2],[21,2],[0,3],[16,3],[17,3],[0,4],[16,4],[17,4],[0,5],[0,6],[10,6],[11,6],[12,6],[0,7],[10,7],[11,7],[12,7],[0,8],[10,8],[11,8],[12,8],[0,9],[16,10],[17,10],[4,11],[5,11],[16,11],[17,11],[4,12],[5,12],[21,13],[2,15]],"spots":[[1,2,"pinball"],[1,3,"breakout"],[1,4,"cobrinha"],[1,5,"invasores"],[1,6,"blocos"],[1,7,"asteroides"],[1,8,"corrida"],[1,9,"memoria"],[3,1,"pong"],[4,1,"pong"],[6,1,"hoquei"],[7,1,"hoquei"],[9,1,"ligue4"],[10,1,"ligue4"],[12,1,"naval"],[13,1,"naval"],[9,6,"gartic"],[13,6,"gartic"],[9,7,"gartic"],[13,7,"gartic"],[9,8,"gartic"],[13,8,"gartic"],[9,9,"gartic"],[10,9,"gartic"],[11,9,"gartic"],[12,9,"gartic"],[13,9,"gartic"],[15,5,"quiz"],[16,5,"quiz"],[17,5,"quiz"],[18,5,"quiz"],[15,6,"quiz"],[16,6,"quiz"],[17,6,"quiz"],[18,6,"quiz"],[15,7,"quiz"],[16,7,"quiz"],[17,7,"quiz"],[18,7,"quiz"],[15,9,"batata"],[16,9,"batata"],[17,9,"batata"],[18,9,"batata"],[15,10,"batata"],[18,10,"batata"],[15,11,"batata"],[18,11,"batata"],[15,12,"batata"],[16,12,"batata"],[17,12,"batata"],[18,12,"batata"],[3,10,"arena"],[4,10,"arena"],[5,10,"arena"],[6,10,"arena"],[3,11,"arena"],[6,11,"arena"],[3,12,"arena"],[6,12,"arena"],[3,13,"arena"],[4,13,"arena"],[5,13,"arena"],[6,13,"arena"],[18,1,"jukebox"]],"spawn":[[8,12],[9,12],[10,12],[11,12],[12,12],[13,12],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[8,14],[9,14],[10,14],[11,14],[12,14],[13,14],[8,15],[9,15],[10,15],[11,15],[12,15],[13,15]]};
+const ROOM_W = HALL.W, ROOM_H = HALL.H;
+const BLOCKSET = new Set(HALL.blocked.map(function (t) { return t[0] + ',' + t[1]; }));
+const SPOTSET = new Set(HALL.spots.map(function (t) { return t[0] + ',' + t[1]; }));
+function isBlocked(x, y) { return BLOCKSET.has(x + ',' + y); }
+// vagas (frente dos fliperamas e ao redor das mesas) só cabem uma pessoa
+function spotTaken(x, y, except) {
+  return SPOTSET.has(x + ',' + y) && room.players.some(function (q) { return q !== except && q.x === x && q.y === y; });
+}
 const REACTS = 8;         // quantidade de reações disponíveis
 const BETWEEN_S = 8;      // pausa entre rodadas
 const ALLOWED = (process.env.ALLOWED_ORIGIN || '')
@@ -119,11 +126,13 @@ function takenList() { return room.players.filter(function (p) { return p.av; })
 
 function newStats() { return { hits: 0, misses: 0, fast: null, drawnHits: 0, mystery: 0, reacts: 0 }; }
 function freeTile() {
-  for (let i = 0; i < 40; i++) {
-    const x = Math.floor(Math.random() * ROOM_W), y = Math.floor(Math.random() * ROOM_H);
-    if (!isBlocked(x, y) && !room.players.some(function (q) { return q.x === x && q.y === y; })) return { x: x, y: y };
+  const free = HALL.spawn.filter(function (t) { return !room.players.some(function (q) { return q.x === t[0] && q.y === t[1]; }); });
+  if (free.length) { const t = free[Math.floor(Math.random() * free.length)]; return { x: t[0], y: t[1] }; }
+  for (let i = 0; i < 60; i++) {
+    const x = 8 + Math.floor(Math.random() * 6), y = 12 + Math.floor(Math.random() * 4);
+    if (!isBlocked(x, y) && !SPOTSET.has(x + ',' + y)) return { x: x, y: y };
   }
-  return { x: 4, y: 4 };
+  return { x: 11, y: 14 };
 }
 
 function playerByKey(key) { return room.players.find(function (p) { return p.key === key; }) || null; }
@@ -584,6 +593,7 @@ io.on('connection', function (socket) {
       p.lastWalk = now;
       const x = Math.floor(Number(m.x)), y = Math.floor(Number(m.y));
       if (!(x >= 0 && x < ROOM_W && y >= 0 && y < ROOM_H) || isBlocked(x, y)) return;
+      if (spotTaken(x, y, p)) { socket.emit('walk_no', { x: p.x, y: p.y }); return; }
       p.x = x; p.y = y;
       sendPlayers();
     } catch (e) { console.error('walk', e); }

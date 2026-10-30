@@ -455,6 +455,174 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
 #sLobby .arcwrap::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .13) 0 1px, transparent 1px 3px); }
 #sLobby .arcfoot { padding: 6px 10px; font-family: var(--font-pixel); font-size: 8px; line-height: 13px; color: #7CFF7C; background: #111; min-height: 26px; }
 
+
+/* ===== MODO CELULAR (body.mob, ativado pelo script quando a largura é menor que 900px) ===== */
+body.mob { padding: 8px max(8px, env(safe-area-inset-right, 0px)) 56px max(8px, env(safe-area-inset-left, 0px)); -webkit-text-size-adjust: 100%; }
+body.mob button, body.mob .btn, body.mob select, body.mob summary { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+body.mob .page { overflow-x: visible; }
+body.mob .stage { height: auto !important; }
+body.mob .board, body.mob .board.wide, body.mob .board.hall { position: static; width: 100%; margin: 0; transform: none !important; }
+body.mob .area, body.mob .board.hall .area { height: auto; }
+body.mob .screen { position: static; inset: auto; }
+body.mob .win.big, body.mob #sGame .win.big, body.mob #sLobby .win.big, body.mob .win.login { position: relative; left: auto; top: auto; width: 100%; height: auto; box-shadow: inset 2px 2px 0 var(--hi), 4px 4px 0 var(--ink); }
+body.mob .content { padding: 6px; gap: 8px; }
+body.mob .mutebtn { right: 8px; bottom: 8px; height: 30px; font-size: 7px; padding: 0 8px; }
+body.mob .htoast { bottom: 52px; font-size: 12px; }
+
+/* faixa do título */
+body.mob .banner { height: 62px; margin-bottom: 4px; }
+body.mob .banner .deco { display: none; }
+body.mob .banner h1 { top: 6px; }
+body.mob .banner h1 .l1 { font-size: 34px; }
+body.mob .banner h1 .l2 { font-size: 20px; margin-left: 24px; }
+body.mob .sticker { right: 4px; top: 12px; font-size: 9px; padding: 8px 10px; }
+
+/* entrada */
+body.mob .lgrid { grid-template-columns: 1fr; gap: 10px; }
+body.mob .lleft { align-items: stretch; }
+body.mob .avbig { width: 132px; height: 132px; }
+body.mob .avbig svg { width: 126px; height: 126px; }
+body.mob .field { height: 44px; }
+body.mob .txtbtn { height: 40px; }
+body.mob .bigbtn { height: 52px; }
+body.mob .tab { height: 40px; padding: 0 10px; font-size: 8px; }
+body.mob .tab.is-on { height: 44px; }
+body.mob .pa { height: auto; max-height: 420px; padding: 6px; }
+body.mob #paPre { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+body.mob .pcard svg { width: 64px; height: 64px; }
+body.mob .cat { height: 34px; }
+body.mob .th { width: 60px; height: 60px; }
+body.mob .th svg { width: 52px; height: 52px; }
+body.mob .swc { width: 36px; height: 36px; }
+
+/* salão */
+body.mob #sLobby .who { height: auto; min-height: 44px; flex-wrap: wrap; padding: 4px 6px; }
+body.mob #sLobby .who .me { font-size: 12px; flex-wrap: wrap; row-gap: 2px; }
+body.mob #sLobby .hallrow { flex-direction: column; gap: 8px; }
+body.mob #sLobby .left { flex: none; }
+body.mob #sLobby .view { flex: none; height: min(58vh, 430px); min-height: 280px; }
+body.mob #sLobby .hint { right: 6px; bottom: 6px; font-size: 9px; max-width: 62%; }
+body.mob #sLobby .legend.ov { gap: 6px; padding: 3px 5px; font-size: 9px; }
+body.mob #sLobby .zoom .btn.small { width: 38px; height: 34px; }
+body.mob #sLobby .mm { transform-origin: 100% 100%; transform: scale(.62); }
+body.mob #sLobby .btn.small { height: 36px; padding: 0 10px; }
+body.mob #sLobby .nav .btn.small { height: 34px; }
+body.mob #sLobby .sayin { height: 40px; font-size: 16px; }
+body.mob #sLobby .hside { width: 100%; overflow: visible; display: flex; flex-direction: column; }
+body.mob #sLobby .card.near { order: -1; }
+body.mob #sLobby .nearbtns .bigbtn { height: 44px; }
+body.mob #sLobby #gStart, body.mob #sLobby #startBtn { height: 48px; }
+body.mob #sLobby .chip { height: 40px; }
+body.mob #sLobby .card.hgrp select.field { height: 40px; font-size: 14px; }
+body.mob #sLobby .form { grid-template-columns: 1fr 1fr; }
+body.mob .wlist { max-height: 160px; }
+body.mob details summary { padding: 6px 0; font-size: 13px; }
+
+/* tela do jogo (Gartic) */
+body.mob .content.gcontent { flex-direction: column; }
+body.mob .gmain { width: 100%; }
+body.mob .side { width: 100%; }
+body.mob .strip { height: auto; flex-wrap: wrap; gap: 6px; }
+body.mob .sa { width: auto; flex: 1 1 120px; min-height: 50px; }
+body.mob .sa .tema { font-size: 20px; line-height: 22px; }
+body.mob .sc { width: auto; flex: 1 1 130px; min-height: 50px; }
+body.mob .sb { order: 3; flex: 1 1 100%; min-height: 54px; padding: 4px 6px; }
+body.mob .letters { flex-wrap: wrap; row-gap: 4px; max-width: 100%; }
+body.mob .work { height: auto; flex-direction: column-reverse; gap: 8px; }
+body.mob .cvwrap { width: 100%; height: auto; aspect-ratio: 744 / 442; }
+body.mob .cvwrap canvas { width: 100%; height: 100%; }
+body.mob .cvwrap .ovrp canvas { width: 100%; height: auto; }
+body.mob .tools { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 6px; justify-content: space-between; }
+body.mob .tgrid { grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; width: 100%; }
+body.mob .tool { width: 100%; height: 38px; }
+body.mob .tool::after { display: none; }
+body.mob .tool svg { width: 20px; height: 20px; }
+body.mob .tools .grp { flex: 1 1 140px; }
+body.mob .tools > .duo { flex: 1 1 100%; }
+body.mob #pv { width: 100%; height: 40px; }
+body.mob .opt { height: 34px; }
+body.mob .txt { height: 38px; font-size: 10px; }
+body.mob #sizeRange { height: 30px; }
+body.mob .palette { height: auto; flex-wrap: wrap; gap: 8px; }
+body.mob .swatches { width: 100%; grid-template-columns: repeat(8, minmax(0, 1fr)); flex: 1 1 100%; }
+body.mob .sw { width: 100%; height: 36px; }
+body.mob .recent { width: auto; flex: 1 1 140px; }
+body.mob .rc { width: 28px; height: 28px; }
+body.mob .tip { display: none; }
+body.mob .skip { width: auto; flex: 1 1 100px; height: 44px; }
+body.mob .cur { flex: none; }
+body.mob .status { height: auto; flex-wrap: wrap; }
+body.mob .status span { font-size: 10px; }
+body.mob #stCount, body.mob #stPos, body.mob #stMode { display: none; }
+body.mob .status .btn { height: 34px; }
+body.mob .plist { height: 150px; }
+body.mob .reacts { flex-wrap: wrap; justify-content: center; gap: 6px; }
+body.mob .rb { width: 40px; height: 40px; }
+body.mob .chat { flex: none; }
+body.mob .clog { height: 160px; flex: none; }
+body.mob .cform input { height: 42px; font-size: 16px; }
+body.mob .cform button { height: 42px; width: 56px; }
+body.mob #sGame .over { position: fixed; inset: 0; z-index: 70; overflow-y: auto; align-items: center; justify-content: flex-start; padding: 16px 8px 40px; background: rgba(255, 255, 255, .96); }
+body.mob .ovmain { flex-direction: column; padding: 0; }
+body.mob .ovinfo { flex: none; width: 100%; max-width: 420px; }
+body.mob .ovrp { width: 100%; max-width: 378px; height: auto; aspect-ratio: 744 / 442; }
+body.mob .ovawards { flex: none; width: 100%; max-width: 420px; }
+body.mob .over .acts { flex-wrap: wrap; justify-content: center; }
+body.mob .cvhint { font-size: 11px; line-height: 16px; }
+body.mob .cvhint b { font-size: 24px; line-height: 28px; }
+
+/* fliperama em tela cheia */
+body.mob #sLobby .crt { position: fixed; inset: 0; z-index: 60; overflow: hidden; background: #0a0614; align-items: stretch; }
+body.mob #sLobby .crt .arc { width: 100%; height: 100%; border: 0; box-shadow: none; display: flex; flex-direction: column; }
+body.mob #sLobby .arcbar { flex: none; padding: 4px 8px; line-height: 18px; }
+body.mob #sLobby .arcbar span { display: none; }
+body.mob #sLobby .arcbar .btn { height: 34px; font-size: 8px; margin-left: auto; padding: 0 10px; }
+body.mob #sLobby .arcbody { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; grid-template-areas: "cv cv" "dp ab"; gap: 6px 10px; align-content: start; padding: 0 0 6px; }
+body.mob #sLobby .arcwrap { grid-area: cv; width: 100%; height: auto; aspect-ratio: 4 / 3; max-height: 62vh; justify-self: center; }
+body.mob #sLobby .arcwrap canvas { width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+body.mob #sLobby .arcfoot { display: none; }
+
+/* controle virtual */
+.vp { display: none; }
+body.mob .vp { display: grid; user-select: none; -webkit-user-select: none; touch-action: none; }
+body.mob .vp .vb { display: flex; align-items: center; justify-content: center; border: 3px solid var(--ink); background: var(--paper); box-shadow: inset 2px 2px 0 var(--hi), inset -3px -3px 0 var(--lo), 2px 3px 0 var(--ink); font-family: var(--font-pixel); font-size: 11px; color: var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; padding: 0; margin: 0; }
+body.mob .vp .vb.on { background: var(--desk); transform: translate(2px, 2px); box-shadow: inset 2px 2px 0 var(--lo), inset -2px -2px 0 var(--hi); }
+body.mob .vp .vb[hidden] { visibility: hidden; display: flex; }
+body.mob .vp.dp { grid-area: dp; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 5px; width: min(100%, 190px); height: 118px; justify-self: center; align-self: start; padding: 0 6px; }
+body.mob .vp.dp .vb[data-k=up] { grid-column: 2; grid-row: 1; }
+body.mob .vp.dp .vb[data-k=left] { grid-column: 1; grid-row: 2; }
+body.mob .vp.dp .vb[data-k=down] { grid-column: 2; grid-row: 2; }
+body.mob .vp.dp .vb[data-k=right] { grid-column: 3; grid-row: 2; }
+body.mob .vp.ab { grid-area: ab; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 5px; width: min(100%, 190px); height: 118px; justify-self: center; align-self: start; padding: 0 6px; }
+body.mob .vp.ab .vb { border-radius: 50%; font-size: 12px; }
+body.mob .vp.ab .vb[data-k=fire] { grid-column: 2; grid-row: 1; background: var(--orange); }
+body.mob .vp.ab .vb[data-k=alt] { grid-column: 1; grid-row: 1; }
+body.mob .vp.ab .vb[data-k=robot] { grid-column: 2; grid-row: 2; font-size: 8px; border-radius: 6px; }
+body.mob .vp.ab .vb[data-k=pause] { grid-column: 1; grid-row: 2; font-size: 10px; border-radius: 6px; }
+
+/* celular deitado: tela do jogo no centro, controles nas laterais */
+@media (orientation: landscape) and (max-height: 520px) {
+  body.mob #sLobby .arcbar { padding: 2px 8px; }
+  body.mob #sLobby .arcbody { grid-template-columns: minmax(130px, 1fr) auto minmax(130px, 1fr); grid-template-rows: 1fr; grid-template-areas: "dp cv ab"; align-items: center; gap: 4px; padding: 0 4px; }
+  body.mob #sLobby .arcwrap { width: auto; height: calc(100dvh - 40px); max-height: none; aspect-ratio: 4 / 3; max-width: 100%; }
+  body.mob .vp.dp, body.mob .vp.ab { align-self: center; width: min(100%, 170px); height: 110px; }
+  body.mob #sLobby .view { height: 78vh; }
+}
+
+/* ajustes finos do celular */
+body.mob .sticker { display: none; }
+body.mob .mutebtn { position: absolute; top: 14px; right: 8px; bottom: auto; z-index: 30; height: 32px; font-size: 7px; padding: 0 8px; }
+body.mob .side { display: flex; flex-direction: column; }
+body.mob .side .chat { order: -2; }
+body.mob .side .reacts { order: -1; }
+body.mob .plist { height: 132px; }
+body.mob .clog { height: 130px; }
+body.mob #sGame.viewer .tools, body.mob #sGame.viewer .palette { display: none; }
+body.mob .cur { width: 56px; height: 56px; }
+body.mob .palette .swatches { width: auto; flex: 1 1 0; min-width: 0; }
+body.mob .palette .recent { flex: 1 1 100%; flex-direction: row; align-items: center; gap: 6px; }
+body.mob .palette .recent .lbl { flex: none; }
+body.mob .sw { height: 30px; }
 </style>
 <!--body-->
 <div class="htoast" id="hToast" role="status" aria-live="polite" hidden></div>
@@ -731,12 +899,58 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     halloween: {
       nome: 'Halloween', grupo: 'Terror',
       palavras: [
-        'abóbora', 'fantasma', 'morcego', 'bruxa', 'vassoura', 'caldeirão', 'caveira', 'esqueleto',
-        'vampiro', 'múmia', 'zumbi', 'aranha', 'teia de aranha', 'gato preto', 'cemitério', 'lápide',
-        'caixão', 'lobisomem', 'monstro', 'poção', 'chapéu de bruxa', 'lua cheia', 'doces ou travessuras',
-        'balde de doces', 'casa assombrada', 'corvo', 'fogueira', 'vela', 'olho', 'dentes de vampiro',
-        'Frankenstein', 'coruja', 'cobra', 'sapo', 'espantalho', 'pirulito', 'máscara', 'capa', 'castelo',
-        'livro de feitiços'
+        'abóbora', 'fantasma', 'morcego', 'bruxa', 'vassoura', 'caldeirão', 'caveira',
+        'esqueleto', 'vampiro', 'múmia', 'zumbi', 'aranha', 'teia de aranha', 'gato preto',
+        'cemitério', 'lápide', 'caixão', 'lobisomem', 'monstro', 'poção', 'chapéu de bruxa',
+        'lua cheia', 'doces ou travessuras', 'balde de doces', 'casa assombrada', 'corvo', 'fogueira', 'vela',
+        'olho', 'dentes de vampiro', 'Frankenstein', 'coruja', 'cobra', 'sapo', 'espantalho',
+        'pirulito', 'máscara', 'capa', 'castelo', 'livro de feitiços', 'abóbora esculpida', 'lanterna de abóbora',
+        'Jack-o\'-lantern', 'milho doce', 'bala de caramelo', 'maçã do amor', 'bolo de aranha', 'biscoito de fantasma', 'cupcake de morcego',
+        'bala de goma', 'chocolate', 'saco de doces', 'cesta de doces', 'campainha', 'porta de entrada', 'tapete de boas-vindas',
+        'fantasia', 'fantasia de pirata', 'fantasia de bruxa', 'fantasia de múmia', 'fantasia de vampiro', 'fantasia de esqueleto', 'fantasia de zumbi',
+        'fantasia de palhaço', 'fantasia de fantasma', 'fantasia de diabinho', 'fantasia de anjo', 'fantasia de super-herói', 'fantasia de gato', 'fantasia de esqueleto mexicano',
+        'maquiagem de caveira', 'maquiagem de zumbi', 'sangue falso', 'cicatriz falsa', 'dentes de plástico', 'peruca colorida', 'luvas de bruxa',
+        'botas de bruxa', 'verruga', 'unhas compridas', 'garras', 'presas', 'olhos brilhantes', 'olhos vermelhos',
+        'língua para fora', 'sorriso assustador', 'risada maligna', 'grito', 'susto', 'arrepio', 'pesadelo',
+        'noite escura', 'noite de lua cheia', 'lua vermelha', 'nuvem escura', 'tempestade', 'raio', 'trovão',
+        'vento uivante', 'folhas secas', 'árvore seca', 'árvore assombrada', 'galho torto', 'floresta assombrada', 'pântano',
+        'neblina', 'lago escuro', 'ponte velha', 'estrada deserta', 'poste de luz', 'lampião', 'lanterna',
+        'tocha', 'castiçal', 'candelabro', 'vela derretida', 'lareira', 'cortina rasgada', 'janela quebrada',
+        'porta rangendo', 'maçaneta', 'chave enferrujada', 'cadeado', 'corrente', 'grade', 'portão de ferro',
+        'muro de pedra', 'mansão', 'mansão sombria', 'torre do castelo', 'ponte levadiça', 'masmorra', 'calabouço',
+        'cela', 'algemas', 'sótão', 'porão', 'escada de madeira', 'corredor escuro', 'quarto escuro',
+        'cama', 'cama com dossel', 'berço', 'boneca assombrada', 'boneco de pano', 'ursinho de pelúcia', 'caixa de música',
+        'espelho', 'espelho mágico', 'retrato antigo', 'quadro assombrado', 'armadura', 'espada', 'escudo',
+        'tesouro', 'baú', 'mapa do tesouro', 'pirata fantasma', 'navio fantasma', 'âncora', 'caveira e ossos cruzados',
+        'osso', 'ossada', 'crânio', 'costela', 'mão de esqueleto', 'mão saindo da terra', 'pé de múmia',
+        'ataduras', 'sarcófago', 'pirâmide', 'tumba', 'cripta', 'mausoléu', 'anjo de pedra',
+        'cruz', 'jazigo', 'coveiro', 'pá', 'terra fresca', 'buraco', 'cova',
+        'flores murchas', 'coroa de flores', 'urna', 'vela de cemitério', 'fantasma de lençol', 'fantasma amigável', 'fantasma de criança',
+        'fantasma de dama', 'poltergeist', 'alma penada', 'assombração', 'espírito', 'tabuleiro Ouija', 'bola de cristal',
+        'cartas de tarô', 'vidente', 'feiticeiro', 'mago', 'mago sombrio', 'bruxa verde', 'bruxa boa',
+        'bruxa má', 'gato de bruxa', 'vassoura voadora', 'sapo de bruxa', 'poção verde', 'poção borbulhante', 'frasco de veneno',
+        'veneno', 'caveira de veneno', 'ingredientes de poção', 'olho de sapo', 'rabo de lagartixa', 'cogumelo', 'cogumelo venenoso',
+        'planta carnívora', 'erva', 'ervas secas', 'cauda de rato', 'rato', 'ratazana', 'barata',
+        'centopeia', 'escorpião', 'aranha gigante', 'tarântula', 'viúva-negra', 'aranha de teia', 'teia',
+        'casulo', 'mosca', 'besouro', 'lagarta', 'larva', 'verme', 'caracol',
+        'lesma', 'morcego pendurado', 'morcego voando', 'caverna', 'estalactite', 'coruja branca', 'corvo preto',
+        'urubu', 'gralha', 'ovo de dragão', 'dragão', 'hidra', 'gárgula', 'ogro',
+        'troll', 'goblin', 'duende', 'gnomo', 'fada sombria', 'sereia', 'kraken',
+        'monstro marinho', 'monstro do pântano', 'monstro de lama', 'monstro peludo', 'monstro de um olho só', 'monstro de três cabeças', 'monstro embaixo da cama',
+        'monstro do armário', 'Drácula', 'castelo do Drácula', 'caixão do vampiro', 'vampiro morcego', 'estaca de madeira', 'alho',
+        'cruz e alho', 'sol nascendo', 'lobisomem uivando', 'lua e lobo', 'rastro de lobo', 'armadilha de urso', 'zumbi de braços esticados',
+        'cérebro', 'mão de zumbi', 'apocalipse zumbi', 'Frankenstein verde', 'parafuso no pescoço', 'laboratório', 'laboratório maluco',
+        'cientista louco', 'tubo de ensaio', 'cérebro em pote', 'olho em pote', 'coração batendo', 'sangue', 'gota de sangue',
+        'poça de sangue', 'pegada de sangue', 'pegada suja', 'mão ensanguentada', 'faca', 'machado', 'motosserra',
+        'serra', 'martelo', 'foice', 'ceifador', 'a Morte', 'capuz', 'capa preta',
+        'manto', 'pesadelo na cama', 'sonambulismo', 'sonho estranho', 'palhaço', 'palhaço maligno', 'circo abandonado',
+        'carrossel', 'roda-gigante', 'parque abandonado', 'casa de espelhos', 'casa do terror', 'trem fantasma', 'balão vermelho',
+        'boneco de ventríloquo', 'marionete', 'espantalho de milharal', 'milharal', 'plantação de abóboras', 'fazenda assombrada', 'celeiro',
+        'trator velho', 'cerca de madeira', 'corvo no espantalho', 'noite de Halloween', 'festa de Halloween', 'decoração de Halloween', 'guirlanda de Halloween',
+        'bolo de Halloween', 'balas de Halloween', 'pirulito de abóbora', 'pirulito de caveira', 'caramelo', 'algodão-doce', 'pipoca',
+        'suco de sangue', 'ponche', 'copo de caveira', 'caneca de bruxa', 'prato de aranha', 'cesta de abóboras', 'carruagem de abóbora',
+        'Cinderela e a abóbora', 'bruxa na vassoura em frente à lua', 'gato em cima da abóbora', 'morcegos saindo do castelo', 'fantasmas na janela', 'esqueleto dançando', 'esqueleto tocando violão',
+        'esqueleto no espelho', 'caveira mexicana', 'Dia dos Mortos', 'altar de velas', 'flor de cempasúchil', 'vela e flor'
       ]
     },
     terror_monstros: {
@@ -2492,6 +2706,38 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       else { if (keys[n]) { keys[n] = false; release(n); } }
     }
     function onBlur() { if (cur && cur.state === 'play' && !duoLive()) cur.state = 'pause'; Object.keys(keys).forEach(function (k) { keys[k] = false; }); }
+
+    /* ---------- controle virtual (celular) ---------- */
+    var PADS = {
+      pinball: ['left', 'right', 'fire', 'pause'], breakout: ['left', 'right', 'fire', 'pause'],
+      cobrinha: ['up', 'down', 'left', 'right', 'pause'], invasores: ['left', 'right', 'fire', 'pause'],
+      blocos: ['up', 'down', 'left', 'right', 'fire', 'alt', 'pause'], asteroides: ['up', 'left', 'right', 'fire', 'pause'],
+      corrida: ['up', 'down', 'left', 'right', 'fire', 'pause'], memoria: ['up', 'down', 'left', 'right', 'fire', 'pause'],
+      pong: ['up', 'down', 'fire', 'robot'], hoquei: ['up', 'down', 'left', 'right', 'fire', 'robot'],
+      ligue4: ['left', 'right', 'fire', 'robot'], naval: ['up', 'down', 'left', 'right', 'fire', 'alt', 'robot']
+    };
+    var VL = { up: '&#9650;', down: '&#9660;', left: '&#9664;', right: '&#9654;', fire: 'A', alt: 'B', robot: 'ROBÔ', pause: 'II' };
+    function padHtml(id, duo) {
+      var on = PADS[id] || ['up', 'down', 'left', 'right', 'fire', 'alt', 'pause'];
+      function b(k) { return '<button type="button" class="vb" data-k="' + k + '" aria-label="' + k + '"' + (on.indexOf(k) < 0 ? ' hidden' : '') + '>' + VL[k] + '</button>'; }
+      return '<div class="vp dp">' + b('up') + b('left') + b('down') + b('right') + '</div><div class="vp ab">' + b('alt') + b('fire') + b('pause') + b('robot') + '</div>';
+    }
+    function vkey(n, down) {
+      if (!cur) return;
+      if (n === 'pause') { if (down) togglePause(); return; }
+      if (down) { if (!keys[n]) { keys[n] = true; press(n); } }
+      else if (keys[n]) { keys[n] = false; release(n); }
+    }
+    function bindPad() {
+      var bs = crt.querySelectorAll('.vb');
+      Array.prototype.forEach.call(bs, function (el) {
+        var k = el.getAttribute('data-k');
+        el.addEventListener('pointerdown', function (e) { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (err) { /* segue */ } el.classList.add('on'); vkey(k, true); });
+        var up = function (e) { el.classList.remove('on'); vkey(k, false); };
+        el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('lostpointercapture', up);
+        el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      });
+    }
     function hook() {
       if (hooked) return; hooked = true;
       window.addEventListener('keydown', onKey, true);
@@ -2512,13 +2758,18 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
       hook();
       var nome = G[o.id].nome;
       cur = { id: o.id, g: null, state: 'title', score: 0, msg: '', rec: false, overAt: 0, duo: !!def.duo, net: null, round: 0, won: null };
-      crt.innerHTML = '<div class="arc" role="dialog" aria-label="' + esc(nome) + '"><div class="arcbar"><b>' + esc(nome) + '</b><span>SÓ VOCÊ JOGA NESTA TELA</span><button type="button" class="btn small" id="arcExit">SAIR (ESC)</button></div><div class="arcwrap"><canvas id="arcCv" width="' + (CW * S) + '" height="' + (CH * S) + '" tabindex="0" aria-label="' + esc(nome) + '"></canvas></div><div class="arcfoot">' + esc(def.help) + '</div></div>';
+      crt.innerHTML = '<div class="arc" role="dialog" aria-label="' + esc(nome) + '"><div class="arcbar"><b>' + esc(nome) + '</b><span>SÓ VOCÊ JOGA NESTA TELA</span><button type="button" class="btn small" id="arcExit">SAIR (ESC)</button></div><div class="arcbody"><div class="arcwrap"><canvas id="arcCv" width="' + (CW * S) + '" height="' + (CH * S) + '" tabindex="0" aria-label="' + esc(nome) + '"></canvas></div>' + padHtml(o.id, !!def.duo) + '</div><div class="arcfoot">' + esc(def.help) + '</div></div>';
       cv = $('arcCv'); cx = cv.getContext('2d');
       $('arcExit').addEventListener('click', function () { stop(); });
-      cv.addEventListener('mousemove', function (e) { if (cur && cur.g && cur.state === 'play' && cur.g.pointer) { var p = mpos(e); cur.g.pointer(p.x, p.y); } });
-      cv.addEventListener('mousedown', function (e) {
+      bindPad();
+      cv.addEventListener('pointermove', function (e) { if (cur && cur.g && cur.state === 'play' && cur.g.pointer) { var p = mpos(e); cur.g.pointer(p.x, p.y); } });
+      cv.addEventListener('pointerdown', function (e) {
         if (!cur) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (e.pointerType !== 'mouse') e.preventDefault();
+        try { cv.setPointerCapture(e.pointerId); } catch (err) { /* segue */ }
         cv.focus();
+        if (cur.state === 'play' && cur.g && cur.g.pointer) { var p0 = mpos(e); cur.g.pointer(p0.x, p0.y); }
         if (cur.duo) {
           var q = mpos(e);
           if (cur.state === 'title') { if (q.x < CW / 2) press('fire'); else press('robot'); return; }
@@ -5080,7 +5331,8 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     gWord.textContent = '';
     var w = (txt === undefined ? game.word : txt), n = w.length;
     if (!n) return;
-    var size = Math.max(14, Math.min(30, Math.floor((420 - (n - 1) * 4) / n)));
+    var mobW = document.body.classList.contains('mob'), avail = mobW ? Math.max(200, (gWord.parentNode.clientWidth || 330) - 16) : 420;
+    var size = Math.max(mobW ? 14 : 9, Math.min(30, Math.floor((avail - (n - 1) * 4) / n)));
     for (var i = 0; i < n; i++) {
       var ch = w.charAt(i);
       var d = document.createElement('div');
@@ -5871,11 +6123,15 @@ details summary { cursor: pointer; font-size: 12px; font-weight: 700; }
     var wide = current === 'game' || current === 'lobby';
     board.classList.toggle('wide', wide);
     board.classList.toggle('hall', current === 'lobby');
+    var mob = (document.documentElement.clientWidth || window.innerWidth) < 900;
+    document.body.classList.toggle('mob', mob);
+    if (mob) { board.style.transform = ''; stage.style.height = ''; return; }
     var s = Math.min(1, stage.clientWidth / (wide ? 1202 : BOARD_W));
     board.style.transform = 'scale(' + s + ')';
     stage.style.height = Math.ceil(board.offsetHeight * s) + 'px';
   }
   window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', function () { setTimeout(fit, 200); });
 
   /* ---------- início ---------- */
 

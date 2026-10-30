@@ -139,6 +139,35 @@ function playerByKey(key) { return room.players.find(function (p) { return p.key
 function playerOf(socket) { return socket.data && socket.data.key ? playerByKey(socket.data.key) : null; }
 function onlinePlayers() { return room.players.filter(function (p) { return p.online; }); }
 
+/* ---------- fliperama: presença (JOGANDO) e partidas em dupla ---------- */
+const SOLO_IDS = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria']);
+const DUO_IDS = new Set(['pong', 'hoquei', 'ligue4', 'naval']);
+const duoWait = {};
+
+function setPl(p, id) {
+  id = String(id || '').slice(0, 16);
+  if (id && !SOLO_IDS.has(id) && !DUO_IDS.has(id)) id = '';
+  if (room.phase !== 'lobby') id = '';
+  if ((p.pl || '') === id) return;
+  p.pl = id;
+  sendPlayers();
+}
+function duoCancelWait(p) {
+  if (p.duoWait && duoWait[p.duoWait] === p.key) delete duoWait[p.duoWait];
+  p.duoWait = '';
+}
+function duoLeave(p) {
+  duoCancelWait(p);
+  if (p.duoWith) {
+    const q = playerByKey(p.duoWith);
+    p.duoWith = '';
+    if (q && q.duoWith === p.key) { q.duoWith = ''; if (q.id) io.to(q.id).emit('duo_gone'); }
+  }
+}
+function endAllDuos() {
+  room.players.forEach(function (p) { p.pl = ''; if (p.duoWith || p.duoWait) duoLeave(p); });
+}
+
 function publicPlayers() {
   return room.players.map(function (p) {
     return {
@@ -148,6 +177,7 @@ function publicPlayers() {
       y: p.y,
       score: p.score,
       online: p.online,
+      pl: p.pl || '',
       drawing: room.phase === 'round' && room.drawer === p.key,
       guessed: room.phase === 'round' && p.guessed
     };
@@ -272,6 +302,7 @@ function startGame(starter, data) {
   room.turn = -1;
   room.order = shuffle(onlinePlayers().map(function (p) { return p.key; }));
   room.players.forEach(function (p) { p.score = 0; p.gain = 0; p.guessed = false; p.stats = newStats(); });
+  endAllDuos();
   io.emit('game_start', { key: room.cfg.key, nome: room.cfg.nome, total: total, seconds: seconds, by: playerOf(starter).nick });
   sys('Partida iniciada: ' + room.cfg.nome + ', ' + total + ' rodadas de ' + seconds + 's.');
   startRound();
@@ -405,6 +436,7 @@ function removePlayer(p) {
   if (p.offTimer) { clearTimeout(p.offTimer); p.offTimer = null; }
   const idx = room.players.indexOf(p);
   if (idx === -1) return;
+  duoLeave(p);
   room.players.splice(idx, 1);
   sys(p.nick + ' saiu.');
   if (room.phase === 'round' && p.key === room.drawer) endRound('drawer_left');
@@ -560,6 +592,49 @@ io.on('connection', function (socket) {
     } catch (e) { console.error('join', e); }
   });
 
+  socket.on('play', function (id) {
+    try { const p = playerOf(socket); if (p && p.id === socket.id) setPl(p, id); } catch (e) { console.error('play', e); }
+  });
+
+  socket.on('duo_find', function (id) {
+    try {
+      const p = playerOf(socket);
+      if (!p || room.phase !== 'lobby') return;
+      id = String(id || '');
+      if (!DUO_IDS.has(id)) return;
+      duoLeave(p);
+      const wk = duoWait[id], q = wk && wk !== p.key ? playerByKey(wk) : null;
+      if (q && q.online && q.id && q.duoWait === id) {
+        delete duoWait[id]; q.duoWait = '';
+        q.duoWith = p.key; p.duoWith = q.key;
+        io.to(q.id).emit('duo_start', { id: id, role: 'host', opp: p.nick });
+        socket.emit('duo_start', { id: id, role: 'guest', opp: q.nick });
+      } else {
+        duoWait[id] = p.key; p.duoWait = id;
+        socket.emit('duo_wait', { id: id });
+      }
+    } catch (e) { console.error('duo_find', e); }
+  });
+
+  socket.on('duo_cancel', function () {
+    try { const p = playerOf(socket); if (p) duoCancelWait(p); } catch (e) { console.error('duo_cancel', e); }
+  });
+
+  socket.on('duo_msg', function (m) {
+    try {
+      const p = playerOf(socket);
+      if (!p || !p.duoWith || !m || typeof m !== 'object') return;
+      const q = playerByKey(p.duoWith);
+      if (!q || !q.id || q.duoWith !== p.key) return;
+      if (JSON.stringify(m).length > 3000) return;
+      io.to(q.id).emit('duo_msg', m);
+    } catch (e) { console.error('duo_msg', e); }
+  });
+
+  socket.on('duo_end', function () {
+    try { const p = playerOf(socket); if (p) duoLeave(p); } catch (e) { console.error('duo_end', e); }
+  });
+
   socket.on('leave', function () {
     try {
       const p = playerOf(socket);
@@ -676,6 +751,8 @@ io.on('connection', function (socket) {
       if (!p || p.id !== socket.id) return;
       p.id = null;
       p.online = false;
+      p.pl = '';
+      duoLeave(p);
       p.offTimer = setTimeout(function () { removePlayer(p); }, GRACE_MS);
       if (room.phase === 'round' && room.drawer !== p.key && everyoneGuessed()) endRound('all');
       sendPlayers();

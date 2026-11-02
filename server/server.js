@@ -2,14 +2,22 @@
 
 /*
   Servidor do Gartic Listening.
-  Sala única, até 25 jogadores. Tudo fica na memória: se o servidor reiniciar, a sala zera.
+  Sala única, até 25 jogadores. A sala (partida em andamento) fica na memória; as contas, moedas,
+  níveis, conquistas e recordes ficam no banco (Supabase) para não se perder quando o servidor reinicia.
 
-  Variável de ambiente opcional:
+  Variáveis de ambiente:
     ALLOWED_ORIGIN  endereço do site (ex.: https://seuusuario.github.io). Pode ter vários, separados por vírgula.
                     Sem ela, qualquer site pode conectar (útil para testar no seu computador).
+    SUPABASE_URL    endereço do projeto no Supabase (ex.: https://abcd.supabase.co).
+    SUPABASE_KEY    chave "service_role" do Supabase (secreta, só no servidor).
+                    Sem as duas, os dados vão para um arquivo local (somem se o servidor reiniciar na hospedagem grátis).
+    ADMIN_KEY       senha sua para zerar o PIN de alguém: /admin/reset-pin?nick=NOME&key=SUA_SENHA
 */
 
 const http = require('http');
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const { Server } = require('socket.io');
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -178,6 +186,7 @@ function publicPlayers() {
       score: p.score,
       online: p.online,
       pl: p.pl || '',
+      lv: levelOfPlayer(p),
       drawing: room.phase === 'round' && room.drawer === p.key,
       guessed: room.phase === 'round' && p.guessed
     };
@@ -376,6 +385,7 @@ function endRound(reason) {
   });
   sendPlayers();
   if (last) {
+    try { garticRewards(); } catch (e) { console.error('recompensas gartic', e); }
     room.phase = 'lobby';
     room.drawer = null;
     sendPlayers();
@@ -437,6 +447,7 @@ function removePlayer(p) {
   const idx = room.players.indexOf(p);
   if (idx === -1) return;
   duoLeave(p);
+  saveAcct(p, true);
   room.players.splice(idx, 1);
   sys(p.nick + ' saiu.');
   if (room.phase === 'round' && p.key === room.drawer) endRound('drawer_left');
@@ -533,11 +544,368 @@ function handleDraw(socket, m) {
 
 /* ---------- servidor ---------- */
 
+/* ====================================================================
+   PERSISTÊNCIA, CONTAS, MOEDAS, NÍVEIS, CONQUISTAS E RANKING
+   ==================================================================== */
+
+const SB_URL = String(process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
+const SB_KEY = String(process.env.SUPABASE_KEY || '').trim();
+const ADMIN_KEY = String(process.env.ADMIN_KEY || '').trim();
+const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'data.json');
+
+/* ---------- banco: Supabase (se configurado) ou arquivo local ---------- */
+function supabaseStore() {
+  async function sb(method, pathq, body, extra) {
+    const res = await fetch(SB_URL + '/rest/v1/' + pathq, {
+      method: method,
+      headers: Object.assign({ apikey: SB_KEY, 'Content-Type': 'application/json' }, SB_KEY.indexOf('sb_') === 0 ? {} : { Authorization: 'Bearer ' + SB_KEY }, extra || {}),
+      body: body === undefined ? undefined : JSON.stringify(body)
+    });
+    const t = await res.text();
+    if (!res.ok) throw new Error('supabase ' + res.status + ' ' + t.slice(0, 200));
+    return t ? JSON.parse(t) : null;
+  }
+  const enc = encodeURIComponent;
+  return {
+    kind: 'supabase',
+    async getPlayer(key) { const r = await sb('GET', 'players?key=eq.' + enc(key) + '&select=*'); return r && r[0] ? r[0] : null; },
+    async createPlayer(row) { await sb('POST', 'players', row, { Prefer: 'return=minimal' }); },
+    async savePlayer(key, patch) { await sb('PATCH', 'players?key=eq.' + enc(key), Object.assign({ updated_at: new Date().toISOString() }, patch), { Prefer: 'return=minimal' }); },
+    async putScore(game, period, key, nick, score) {
+      await sb('POST', 'scores?on_conflict=game,period,key', { game: game, period: period, key: key, nick: nick, score: score, updated_at: new Date().toISOString() }, { Prefer: 'resolution=merge-duplicates,return=minimal' });
+    },
+    async top(game, period, n) { return (await sb('GET', 'scores?game=eq.' + enc(game) + '&period=eq.' + enc(period) + '&select=nick,score&order=score.desc&limit=' + n)) || []; }
+  };
+}
+
+function fileStore() {
+  let db = { players: {}, scores: {} };
+  try { db = Object.assign(db, JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'))); } catch (e) { /* começa vazio */ }
+  let timer = null;
+  function flush() {
+    timer = null;
+    try { fs.writeFileSync(DATA_FILE, JSON.stringify(db)); } catch (e) { console.error('arquivo de dados', e.message); }
+  }
+  function later() { if (!timer) { timer = setTimeout(flush, 1500); if (timer.unref) timer.unref(); } }
+  const clone = function (o) { return o ? JSON.parse(JSON.stringify(o)) : null; };
+  return {
+    kind: 'arquivo',
+    flush: flush,
+    async getPlayer(key) { return clone(db.players[key]); },
+    async createPlayer(row) { db.players[row.key] = clone(row); later(); },
+    async savePlayer(key, patch) { if (db.players[key]) Object.assign(db.players[key], clone(patch)); later(); },
+    async putScore(game, period, key, nick, score) { db.scores[game + '|' + period + '|' + key] = { game: game, period: period, key: key, nick: nick, score: score }; later(); },
+    async top(game, period, n) {
+      return Object.keys(db.scores).map(function (k) { return db.scores[k]; })
+        .filter(function (r) { return r.game === game && r.period === period; })
+        .sort(function (a, b) { return b.score - a.score; }).slice(0, n)
+        .map(function (r) { return { nick: r.nick, score: r.score }; });
+    }
+  };
+}
+const Store = SB_URL && SB_KEY ? supabaseStore() : fileStore();
+
+/* ---------- PIN ---------- */
+function scryptAsync(pin, salt) {
+  return new Promise(function (resolve, reject) { crypto.scrypt(pin, salt, 32, function (e, k) { if (e) reject(e); else resolve(k.toString('hex')); }); });
+}
+async function hashPin(pin, salt) { return scryptAsync(String(pin), salt); }
+async function checkPin(pin, acct) {
+  const h = await scryptAsync(String(pin), acct.salt);
+  const a = Buffer.from(h, 'hex'), b = Buffer.from(String(acct.hash), 'hex');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+const fails = {};   // chave -> { n, until }
+
+/* ---------- níveis e títulos ---------- */
+function lvOf(xp) { return Math.max(1, Math.floor((1 + Math.sqrt(1 + Math.max(0, xp) / 12.5)) / 2)); }
+function xpAt(l) { return 50 * l * (l - 1); }
+const TITLES = [[1, 'Novato do Fliperama'], [3, 'Ficha Quente'], [5, 'Craque do Joystick'], [8, 'Mestre dos Pixels'], [12, 'Lenda do Salão'], [16, 'Rei do Fliperama'], [20, 'Imortal do Arcade']];
+function titleOf(l) { let t = TITLES[0][1]; TITLES.forEach(function (r) { if (l >= r[0]) t = r[1]; }); return t; }
+
+/* ---------- datas (horário de Brasília) ---------- */
+function brt() { return new Date(Date.now() - 3 * 3600 * 1000); }
+function dayKey(d) { d = d || brt(); return d.toISOString().slice(0, 10); }
+function weekKey() {
+  const d = brt();
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dow = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - dow);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return t.getUTCFullYear() + '-W' + String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, '0');
+}
+function yesterdayKey() { return dayKey(new Date(brt().getTime() - 86400000)); }
+
+/* ---------- conquistas ---------- */
+const MASTER = { pinball: 100000, breakout: 1500, cobrinha: 500, invasores: 2500, blocos: 3000, asteroides: 3000, corrida: 3000, memoria: 1500 };
+const GNAME = { pinball: 'Pinball', breakout: 'Blocos', cobrinha: 'Cobrinha', invasores: 'Invasores', blocos: 'Tetris', asteroides: 'Asteroides', corrida: 'Corrida', memoria: 'Memória' };
+const ACH = [
+  { id: 'ficha', n: 'Primeira Ficha', d: 'Jogue qualquer máquina solo.', c: 10, t: function (s) { return s.runs >= 1; } },
+  { id: 'salao', n: 'Rodou o Salão', d: 'Jogue as 8 máquinas solo.', c: 40, t: function (s) { return Object.keys(s.solo).length >= 8; } },
+  { id: 'viciado', n: 'Viciado', d: 'Jogue 25 partidas solo.', c: 30, t: function (s) { return s.runs >= 25; } },
+  { id: 'maratona', n: 'Maratonista', d: 'Jogue 100 partidas solo.', c: 100, t: function (s) { return s.runs >= 100; } }
+].concat(Object.keys(MASTER).map(function (g) {
+  return { id: 'mestre_' + g, n: 'Mestre: ' + GNAME[g], d: 'Faça ' + MASTER[g].toLocaleString('pt-BR') + ' pontos em ' + GNAME[g] + '.', c: 30, t: function (s) { return s.solo[g] && s.solo[g].best >= MASTER[g]; } };
+})).concat([
+  { id: 'top3', n: 'No Placar', d: 'Entre no top 3 de uma máquina.', c: 25, t: function (s) { return s.top3 >= 1; } },
+  { id: 'top1', n: 'Dono do Placar', d: 'Fique em 1º lugar de uma máquina.', c: 50, t: function (s) { return s.top1 >= 1; } },
+  { id: 'rival', n: 'Primeira Vitória', d: 'Vença uma pessoa numa máquina de dupla.', c: 25, t: function (s) { return s.duoW >= 1; } },
+  { id: 'chamas', n: 'Em Chamas', d: 'Vença 3 duelos seguidos.', c: 40, t: function (s) { return s.duoBest >= 3; } },
+  { id: 'duelista', n: 'Duelista', d: 'Vença 10 duelos.', c: 60, t: function (s) { return s.duoW >= 10; } },
+  { id: 'quatro', n: 'Quatro Estilos', d: 'Vença nos 4 jogos de dupla.', c: 60, t: function (s) { return Object.keys(s.duoWon).length >= 4; } },
+  { id: 'gartic1', n: 'Rabisqueiro', d: 'Jogue uma partida de Gartic.', c: 10, t: function (s) { return s.g.games >= 1; } },
+  { id: 'acerto10', n: 'Olho Clínico', d: 'Acerte 10 palpites.', c: 25, t: function (s) { return s.g.hits >= 10; } },
+  { id: 'acerto50', n: 'Vidente', d: 'Acerte 50 palpites.', c: 60, t: function (s) { return s.g.hits >= 50; } },
+  { id: 'artista', n: 'Artista', d: 'Faça 3 pessoas acertarem o seu desenho numa partida.', c: 30, t: function (s) { return s.g.bestDrawn >= 3; } },
+  { id: 'relampago', n: 'Relâmpago', d: 'Acerte um palpite em menos de 5 segundos.', c: 30, t: function (s) { return s.g.fastest !== null && s.g.fastest < 5; } },
+  { id: 'rei_g', n: 'Rei do Rabisco', d: 'Vença uma partida de Gartic.', c: 40, t: function (s) { return s.g.wins >= 1; } },
+  { id: 'rei_g5', n: 'Pentacampeão', d: 'Vença 5 partidas de Gartic.', c: 80, t: function (s) { return s.g.wins >= 5; } },
+  { id: 'dia3', n: 'De Casa', d: 'Entre no salão 3 dias seguidos.', c: 30, t: function (s, a) { return a.streak >= 3; } },
+  { id: 'dia7', n: 'Morador', d: 'Entre no salão 7 dias seguidos.', c: 80, t: function (s, a) { return a.streak >= 7; } },
+  { id: 'lv5', n: 'Nível 5', d: 'Chegue ao nível 5.', c: 30, t: function (s, a) { return lvOf(a.xp) >= 5; } },
+  { id: 'lv10', n: 'Nível 10', d: 'Chegue ao nível 10.', c: 100, t: function (s, a) { return lvOf(a.xp) >= 10; } },
+  { id: 'rico', n: 'Cofrinho', d: 'Junte 500 moedas ao todo.', c: 50, t: function (s, a) { return a.total_coins >= 500; } }
+]);
+const ACH_PUB = ACH.map(function (a) { return { id: a.id, n: a.n, d: a.d, c: a.c }; });
+
+/* ---------- conta na memória ---------- */
+function newAcctStats() {
+  return { runs: 0, solo: {}, duoW: 0, duoL: 0, duoD: 0, duoStreak: 0, duoBest: 0, duoWon: {}, top3: 0, top1: 0,
+    g: { games: 0, hits: 0, wins: 0, drawn: 0, fastest: null, bestScore: 0, bestDrawn: 0 }, dayCoins: { d: '', n: 0 }, wk: { w: '', best: {} } };
+}
+function normalizeAcct(a) {
+  const base = newAcctStats();
+  const s = a.stats && typeof a.stats === 'object' ? a.stats : {};
+  a.stats = Object.assign(base, s);
+  a.stats.g = Object.assign(base.g, s.g || {});
+  a.stats.dayCoins = Object.assign({ d: '', n: 0 }, s.dayCoins || {});
+  a.stats.wk = Object.assign({ w: '', best: {} }, s.wk || {});
+  a.ach = a.ach && typeof a.ach === 'object' ? a.ach : {};
+  a.items = a.items && typeof a.items === 'object' ? a.items : {};
+  a.coins = a.coins | 0; a.xp = a.xp | 0; a.total_coins = a.total_coins | 0; a.streak = a.streak | 0;
+  a.last_daily = a.last_daily || '';
+  return a;
+}
+function acctPayload(p) {
+  const a = p.acct, l = lvOf(a.xp), solo = {};
+  Object.keys(a.stats.solo).forEach(function (g) { solo[g] = { n: a.stats.solo[g].n, best: a.stats.solo[g].best }; });
+  return { nick: p.nick, coins: a.coins, xp: a.xp, lv: l, lo: xpAt(l), hi: xpAt(l + 1), title: titleOf(l), ach: Object.keys(a.ach), streak: a.streak,
+    items: a.items, stats: { runs: a.stats.runs, solo: solo, duoW: a.stats.duoW, duoL: a.stats.duoL, duoD: a.stats.duoD, g: a.stats.g } };
+}
+function levelOfPlayer(p) { return p.acct ? lvOf(p.acct.xp) : 1; }
+
+/* salva com atraso para não sobrecarregar o banco */
+function saveAcct(p, now) {
+  if (!p.acct) return;
+  p.acctDirty = true;
+  if (p.saveTimer && !now) return;
+  if (p.saveTimer) { clearTimeout(p.saveTimer); p.saveTimer = null; }
+  const run = function () {
+    p.saveTimer = null;
+    if (!p.acctDirty || !p.acct) return Promise.resolve();
+    p.acctDirty = false;
+    const a = p.acct;
+    return Store.savePlayer(p.key, { nick: p.nick, av: a.av || '', coins: a.coins, xp: a.xp, total_coins: a.total_coins, ach: a.ach, stats: a.stats, items: a.items, last_daily: a.last_daily, streak: a.streak })
+      .catch(function (e) { console.error('salvar conta', e.message); p.acctDirty = true; p.saveTimer = setTimeout(run, 10000); });
+  };
+  if (now) return run();
+  p.saveTimer = setTimeout(run, 3000);
+}
+
+/* ---------- recompensas ---------- */
+function grant(p, r) {
+  // r: { kind, coins, xp, ...extras }  devolve o que foi dado e envia ao jogador
+  const a = p.acct;
+  if (!a) return null;
+  const lv0 = lvOf(a.xp);
+  const out = { kind: r.kind, coins: Math.max(0, r.coins | 0), xp: Math.max(0, r.xp | 0), ach: [], lvUp: 0 };
+  Object.keys(r).forEach(function (k) { if (['coins', 'xp'].indexOf(k) === -1) out[k] = r[k]; });
+  a.coins += out.coins; a.total_coins += out.coins; a.xp += out.xp;
+  // conquistas (podem render moedas e liberar outras)
+  for (let guard = 0; guard < 6; guard++) {
+    let found = false;
+    ACH.forEach(function (d) {
+      if (a.ach[d.id]) return;
+      let ok = false;
+      try { ok = !!d.t(a.stats, a); } catch (e) { ok = false; }
+      if (!ok) return;
+      a.ach[d.id] = Date.now();
+      a.coins += d.c; a.total_coins += d.c; a.xp += 40;
+      out.coins += d.c; out.xp += 40;
+      out.ach.push({ id: d.id, n: d.n, c: d.c });
+      found = true;
+    });
+    if (!found) break;
+  }
+  const lv1 = lvOf(a.xp);
+  if (lv1 > lv0) {
+    const bonus = 5 * (lv1 - lv0);
+    a.coins += bonus; a.total_coins += bonus; out.coins += bonus;
+    out.lvUp = lv1; out.title = titleOf(lv1);
+  }
+  saveAcct(p);
+  if (p.id) {
+    io.to(p.id).emit('reward', out);
+    io.to(p.id).emit('account', acctPayload(p));
+  }
+  if (out.lvUp) sendPlayers();
+  return out;
+}
+
+function dailyBonus(p) {
+  const a = p.acct, today = dayKey();
+  if (a.last_daily === today) return;
+  a.streak = a.last_daily === yesterdayKey() ? a.streak + 1 : 1;
+  a.last_daily = today;
+  grant(p, { kind: 'daily', coins: 10 + 2 * Math.min(a.streak, 7), xp: 20, streak: a.streak });
+}
+
+/* ---------- ranking ---------- */
+const topCache = {};
+function invalidateTop(game) { Object.keys(topCache).forEach(function (k) { if (k.indexOf(game + '|') === 0) delete topCache[k]; }); }
+async function getTop(game, period) {
+  const k = game + '|' + period, c = topCache[k];
+  if (c && Date.now() - c.t < 15000) return c.v;
+  const v = await Store.top(game, period, 10);
+  topCache[k] = { t: Date.now(), v: v };
+  return v;
+}
+const TOP_GAMES = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria', 'gartic']);
+
+// registra pontuação nas listas geral e da semana; devolve { rec, rank }
+async function submitScore(p, game, score) {
+  const a = p.acct, s = a.stats, wk = weekKey();
+  if (s.wk.w !== wk) s.wk = { w: wk, best: {} };
+  let rec = false, improved = false;
+  const prev = s.solo[game] ? s.solo[game].best : (game === 'gartic' ? s.g.bestScore : 0);
+  if (score > prev) {
+    improved = true;
+    rec = prev > 0;
+    await Store.putScore(game, 'all', p.key, p.nick, score);
+    invalidateTop(game);
+  }
+  if (score > (s.wk.best[game] || 0)) {
+    s.wk.best[game] = score;
+    await Store.putScore(game, wk, p.key, p.nick, score);
+    invalidateTop(game);
+  }
+  let rank = 0;
+  try {
+    const list = await getTop(game, 'all');
+    const i = list.findIndex(function (r) { return r.nick === p.nick; });
+    rank = i >= 0 ? i + 1 : 0;
+  } catch (e) { /* sem rank */ }
+  return { rec: rec, improved: improved, rank: rank };
+}
+
+/* ---------- fliperama solo ---------- */
+const DIV = { pinball: 5000, breakout: 100, cobrinha: 40, invasores: 150, blocos: 200, asteroides: 150, corrida: 150, memoria: 100 };
+const SCORE_CAP = { pinball: 5000000, breakout: 200000, cobrinha: 200000, invasores: 200000, blocos: 500000, asteroides: 200000, corrida: 500000, memoria: 100000 };
+const RUN_COIN_CAP = 20, DAY_COIN_CAP = 150;
+
+async function handleRun(p, m) {
+  if (!p || !p.acct || !m) return;
+  const game = String(m.game || '');
+  if (!SOLO_IDS.has(game)) return;
+  const now = Date.now();
+  if (p.lastRun && now - p.lastRun < 6000) return;
+  const secs = Math.max(0, Math.min(3600, Number(m.secs) || 0));
+  if (secs < 5) return;
+  p.lastRun = now;
+  const score = Math.floor(Math.max(0, Math.min(SCORE_CAP[game], Number(m.score) || 0)));
+  const a = p.acct, s = a.stats, today = dayKey();
+  s.runs++;
+  const g = s.solo[game] || (s.solo[game] = { n: 0, best: 0 });
+  g.n++;
+  const sc = await submitScore(p, game, score);
+  if (score > g.best) g.best = score;
+  if (sc.rank >= 1 && sc.rank <= 3 && sc.improved) { s.top3++; if (sc.rank === 1) s.top1++; }
+  if (s.dayCoins.d !== today) s.dayCoins = { d: today, n: 0 };
+  let coins = Math.min(RUN_COIN_CAP, (score > 0 ? 1 : 0) + Math.floor(score / DIV[game]));
+  coins = Math.max(0, Math.min(coins, DAY_COIN_CAP - s.dayCoins.n));
+  s.dayCoins.n += coins;
+  grant(p, { kind: 'run', game: game, score: score, rec: sc.rec, rank: sc.rank, coins: coins, xp: coins > 0 ? 5 + coins * 2 : 2 });
+}
+
+/* ---------- duelos ---------- */
+function settleDuo(p, q) {
+  // p e q reportaram; confere se os resultados batem
+  const ra = p.pend.res, rb = q.pend.res, game = p.pend.game || q.pend.game || '';
+  const ok = (ra === 'win' && rb === 'loss') || (ra === 'loss' && rb === 'win') || (ra === 'draw' && rb === 'draw');
+  [p, q].forEach(function (x) { if (x.pendTimer) { clearTimeout(x.pendTimer); x.pendTimer = null; } });
+  [[p, ra], [q, rb]].forEach(function (pair) {
+    const x = pair[0], res = ok ? pair[1] : 'part', s = x.acct.stats;
+    let coins = 3, xp = 8;
+    if (res === 'win') { s.duoW++; s.duoStreak++; if (s.duoStreak > s.duoBest) s.duoBest = s.duoStreak; s.duoWon[game] = (s.duoWon[game] || 0) + 1; coins = 15; xp = 30; }
+    else if (res === 'loss') { s.duoL++; s.duoStreak = 0; coins = 5; xp = 12; }
+    else if (res === 'draw') { s.duoD++; coins = 8; xp = 18; }
+    grant(x, { kind: 'duo', game: game, res: res, coins: coins, xp: xp });
+  });
+  p.pend = null; q.pend = null;
+}
+function handleDuoResult(p, m) {
+  if (!p || !p.acct || !p.duoWith) return;
+  const res = m && ['win', 'loss', 'draw'].indexOf(m.res) !== -1 ? m.res : '';
+  if (!res) return;
+  const now = Date.now();
+  if (p.lastDuoRes && now - p.lastDuoRes < 10000) return;
+  p.lastDuoRes = now;
+  const q = playerByKey(p.duoWith);
+  if (!q || !q.acct) return;
+  p.pend = { res: res, game: p.duoGame || '', t: now, vs: q.key };
+  if (q.pend && q.pend.vs === p.key && now - q.pend.t < 20000) { settleDuo(p, q); return; }
+  const t = now;
+  p.pendTimer = setTimeout(function () {
+    p.pendTimer = null;
+    if (p.pend && p.pend.t === t) { p.pend = null; grant(p, { kind: 'duo', game: p.duoGame || '', res: 'part', coins: 3, xp: 8 }); }
+  }, 20000);
+}
+
+/* ---------- Gartic: recompensas no fim da partida ---------- */
+function garticRewards() {
+  const list = room.players.filter(function (p) { return p.acct; }).slice().sort(function (a, b) { return b.score - a.score; });
+  if (!list.length) return;
+  const top = list[0].score;
+  list.forEach(function (p, i) {
+    const s = p.acct.stats.g;
+    const played = p.score > 0 || p.stats.hits > 0 || p.stats.drawnHits > 0;
+    if (!played) return;
+    s.games++; s.hits += p.stats.hits; s.drawn += p.stats.drawnHits;
+    if (p.stats.drawnHits > s.bestDrawn) s.bestDrawn = p.stats.drawnHits;
+    if (p.stats.fast !== null && (s.fastest === null || p.stats.fast < s.fastest)) s.fastest = p.stats.fast;
+    const win = list.length >= 2 && p.score === top && top > 0;
+    if (win) s.wins++;
+    const coins = Math.min(30, Math.round(p.score / 60)) + (win ? 15 : 0);
+    const xp = 20 + Math.min(80, Math.round(p.score / 20));
+    const afterScore = function () {
+      if (p.score > s.bestScore) s.bestScore = p.score;
+      grant(p, { kind: 'gartic', score: p.score, win: win, rank: i + 1, coins: coins, xp: xp });
+    };
+    submitScore(p, 'gartic', p.score).then(function (r) { afterScore(); }, function (e) { console.error('placar gartic', e.message); afterScore(); });
+  });
+}
+
+/* ---------- servidor http e socket ---------- */
+
 const server = http.createServer(function (req, res) {
   const url = (req.url || '/').split('?')[0];
   if (url === '/' || url === '/health') {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end('Servidor do Gartic Listening no ar. Jogadores conectados: ' + onlinePlayers().length + ' de ' + MAX_PLAYERS + '.');
+    return;
+  }
+  if (url === '/admin/reset-pin') {
+    const q = new URLSearchParams((req.url || '').split('?')[1] || '');
+    const ok = ADMIN_KEY && q.get('key') === ADMIN_KEY;
+    const key = cleanNick(q.get('nick')).toLowerCase();
+    res.writeHead(ok ? 200 : 403, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+    if (!ok) { res.end('Chave inválida ou ADMIN_KEY não configurada.'); return; }
+    Store.getPlayer(key).then(function (a) {
+      if (!a) { res.end('Apelido não encontrado: ' + key); return null; }
+      const mem = playerByKey(key);
+      if (mem && mem.acct) { mem.acct.hash = ''; mem.acct.salt = ''; }
+      return Store.savePlayer(key, { hash: '', salt: '' }).then(function () { res.end('PIN zerado. No próximo login, ' + key + ' define um PIN novo.'); });
+    }).catch(function (e) { res.end('Erro: ' + e.message); });
     return;
   }
   if (url === '/avatars') {
@@ -559,37 +927,104 @@ const io = new Server(server, {
 });
 
 io.on('connection', function (socket) {
-  socket.on('join', function (data) {
+  socket.on('join', async function (data) {
     try {
-      if (socket.data.key) return;
+      if (socket.data.key || socket.data.joining) return;
+      socket.data.joining = true;
       const nick = cleanNick(data && data.nick);
       const err = nickError(nick);
       if (err) { socket.emit('join_error', { msg: err }); return; }
       const key = nick.toLowerCase();
+      const pin = String((data && data.pin) || '').trim();
+      if (!/^\d{4}$/.test(pin)) { socket.emit('join_error', { code: 'pin', msg: 'Digite um PIN de 4 números. Na primeira vez, ele cria a sua conta.' }); return; }
+      const lock = fails[key];
+      if (lock && lock.until > Date.now()) { socket.emit('join_error', { code: 'pin', msg: 'PIN errado várias vezes. Tente de novo em ' + Math.ceil((lock.until - Date.now()) / 60000) + ' min.' }); return; }
       const av = cleanAvatar(data && data.av);
+      const checkRoom = function () {
+        const q = playerByKey(key);
+        if (q && q.online) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return false; }
+        if (!q && room.players.length >= MAX_PLAYERS) { socket.emit('join_error', { msg: 'A sala está cheia (' + MAX_PLAYERS + ' jogadores).' }); return false; }
+        if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return false; }
+        return true;
+      };
+      if (!checkRoom()) return;
       let p = playerByKey(key);
+      let acct = p && p.acct ? p.acct : null;
+      let isNew = false;
+      if (!acct) {
+        try { acct = await Store.getPlayer(key); } catch (e) { console.error('banco', e.message); socket.emit('join_error', { msg: 'O banco de dados não respondeu. Tente de novo em instantes.' }); return; }
+      }
+      if (acct && acct.hash) {
+        const ok = await checkPin(pin, acct);
+        if (!ok) {
+          const f = fails[key] || { n: 0, until: 0 };
+          f.n++;
+          if (f.n >= 5) { f.n = 0; f.until = Date.now() + 5 * 60000; }
+          fails[key] = f;
+          socket.emit('join_error', { code: 'pin', msg: f.until > Date.now() ? 'PIN errado várias vezes. Tente de novo em 5 min.' : 'PIN incorreto para esse apelido.' });
+          return;
+        }
+        delete fails[key];
+      } else if (acct) {
+        acct.salt = crypto.randomBytes(8).toString('hex');
+        acct.hash = await hashPin(pin, acct.salt);
+        isNew = true;
+        try { await Store.savePlayer(key, { salt: acct.salt, hash: acct.hash }); } catch (e) { console.error('banco', e.message); socket.emit('join_error', { msg: 'O banco de dados não respondeu. Tente de novo em instantes.' }); return; }
+      } else {
+        const salt = crypto.randomBytes(8).toString('hex');
+        acct = { key: key, nick: nick, salt: salt, hash: await hashPin(pin, salt), av: av || '', coins: 0, xp: 0, total_coins: 0, ach: {}, stats: {}, items: {}, last_daily: '', streak: 0 };
+        try { await Store.createPlayer(acct); } catch (e) { console.error('banco', e.message); socket.emit('join_error', { msg: 'O banco de dados não respondeu. Tente de novo em instantes.' }); return; }
+        isNew = true;
+      }
+      normalizeAcct(acct);
+      if (!checkRoom()) return;
+      p = playerByKey(key);
       let returning = false;
       if (p) {
-        if (p.online) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return; }
-        if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return; }
         if (p.offTimer) { clearTimeout(p.offTimer); p.offTimer = null; }
         if (av) p.av = av;
         p.id = socket.id;
         p.online = true;
         returning = true;
       } else {
-        if (room.players.length >= MAX_PLAYERS) { socket.emit('join_error', { msg: 'A sala está cheia (' + MAX_PLAYERS + ' jogadores).' }); return; }
-        if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return; }
         const t = freeTile();
-        p = { nick: nick, key: key, av: av, x: t.x, y: t.y, stats: newStats(), lastReact: 0, lastSay: 0, lastWalk: 0, id: socket.id, online: true, score: 0, gain: 0, guessed: false, offTimer: null, lastMsg: 0 };
+        p = { nick: nick, key: key, av: av || (acct.av && !avatarTaken(acct.av, key) ? acct.av : ''), x: t.x, y: t.y, stats: newStats(), lastReact: 0, lastSay: 0, lastWalk: 0, id: socket.id, online: true, score: 0, gain: 0, guessed: false, offTimer: null, lastMsg: 0 };
         room.players.push(p);
       }
+      p.acct = acct;
+      if (av) acct.av = av;
+      if (p.nick !== nick) { p.nick = nick; acct.nick = nick; }
       socket.data.key = key;
-      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase });
+      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase, isNew: isNew, achs: ACH_PUB, account: acctPayload(p), store: Store.kind });
       sys(p.nick + (returning ? ' voltou.' : ' entrou.'));
       sendPlayers();
       sendStateTo(socket, p);
-    } catch (e) { console.error('join', e); }
+      saveAcct(p);
+      dailyBonus(p);
+    } catch (e) { console.error('join', e); try { socket.emit('join_error', { msg: 'Não foi possível entrar agora. Tente de novo.' }); } catch (e2) { /* segue */ } }
+    finally { socket.data.joining = false; }
+  });
+
+  socket.on('run', function (m) {
+    try { const p = playerOf(socket); if (p && p.id === socket.id) handleRun(p, m).catch(function (e) { console.error('run', e.message); }); } catch (e) { console.error('run', e); }
+  });
+
+  socket.on('duo_result', function (m) {
+    try { const p = playerOf(socket); if (p && p.id === socket.id) handleDuoResult(p, m); } catch (e) { console.error('duo_result', e); }
+  });
+
+  socket.on('top', async function (game) {
+    try {
+      game = String(game || '');
+      if (!TOP_GAMES.has(game)) return;
+      const wk = weekKey();
+      const res = await Promise.all([getTop(game, 'all'), getTop(game, wk)]);
+      socket.emit('top', { game: game, all: res[0], week: res[1], wk: wk });
+    } catch (e) { console.error('top', e.message); }
+  });
+
+  socket.on('me', function () {
+    try { const p = playerOf(socket); if (p && p.acct) socket.emit('account', acctPayload(p)); } catch (e) { console.error('me', e); }
   });
 
   socket.on('play', function (id) {
@@ -606,7 +1041,7 @@ io.on('connection', function (socket) {
       const wk = duoWait[id], q = wk && wk !== p.key ? playerByKey(wk) : null;
       if (q && q.online && q.id && q.duoWait === id) {
         delete duoWait[id]; q.duoWait = '';
-        q.duoWith = p.key; p.duoWith = q.key;
+        q.duoWith = p.key; p.duoWith = q.key; q.duoGame = id; p.duoGame = id;
         io.to(q.id).emit('duo_start', { id: id, role: 'host', opp: p.nick });
         socket.emit('duo_start', { id: id, role: 'guest', opp: q.nick });
       } else {
@@ -753,6 +1188,7 @@ io.on('connection', function (socket) {
       p.online = false;
       p.pl = '';
       duoLeave(p);
+      saveAcct(p, true);
       p.offTimer = setTimeout(function () { removePlayer(p); }, GRACE_MS);
       if (room.phase === 'round' && room.drawer !== p.key && everyoneGuessed()) endRound('all');
       sendPlayers();
@@ -760,10 +1196,18 @@ io.on('connection', function (socket) {
   });
 });
 
+process.on('SIGTERM', function () {
+  Promise.all(room.players.map(function (p) { return saveAcct(p, true); })).catch(function () { /* segue */ }).then(function () {
+    if (Store.flush) Store.flush();
+    process.exit(0);
+  });
+  setTimeout(function () { process.exit(0); }, 4000);
+});
 process.on('uncaughtException', function (e) { console.error('uncaughtException', e); });
 process.on('unhandledRejection', function (e) { console.error('unhandledRejection', e); });
 
 server.listen(PORT, function () {
   console.log('Servidor do Gartic Listening rodando na porta ' + PORT + '.');
+  console.log(Store.kind === 'supabase' ? 'Banco: Supabase conectado.' : 'ATENÇÃO: sem Supabase configurado. Salvando em arquivo local (some se o servidor reiniciar na hospedagem grátis).');
   console.log(ALLOWED.length ? 'Aceitando conexões de: ' + ALLOWED.join(', ') : 'ALLOWED_ORIGIN vazio: aceitando conexões de qualquer site (modo de teste).');
 });

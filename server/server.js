@@ -12,6 +12,7 @@
     SUPABASE_KEY    chave "service_role" do Supabase (secreta, só no servidor).
                     Sem as duas, os dados vão para um arquivo local (somem se o servidor reiniciar na hospedagem grátis).
     ADMIN_KEY       senha sua para zerar o PIN de alguém: /admin/reset-pin?nick=NOME&key=SUA_SENHA
+                    e para apagar um desenho da galeria: /admin/gallery-delete?id=NUMERO&key=SUA_SENHA
 */
 
 const http = require('http');
@@ -24,7 +25,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const MAX_PLAYERS = 25;
 const GRACE_MS = 20000;   // tempo para quem caiu voltar com o mesmo apelido sem perder pontos
 // Salão de fliperama: mesmo mapa do cliente (gerado a partir dele).
-const HALL = {"W":22,"H":16,"blocked":[[3,0],[4,0],[6,0],[7,0],[9,0],[10,0],[12,0],[13,0],[18,0],[0,2],[21,2],[0,3],[16,3],[17,3],[0,4],[16,4],[17,4],[0,5],[0,6],[10,6],[11,6],[12,6],[0,7],[10,7],[11,7],[12,7],[0,8],[10,8],[11,8],[12,8],[0,9],[16,10],[17,10],[4,11],[5,11],[16,11],[17,11],[4,12],[5,12],[21,13],[2,15]],"spots":[[1,2,"pinball"],[1,3,"breakout"],[1,4,"cobrinha"],[1,5,"invasores"],[1,6,"blocos"],[1,7,"asteroides"],[1,8,"corrida"],[1,9,"memoria"],[3,1,"pong"],[4,1,"pong"],[6,1,"hoquei"],[7,1,"hoquei"],[9,1,"ligue4"],[10,1,"ligue4"],[12,1,"naval"],[13,1,"naval"],[9,6,"gartic"],[13,6,"gartic"],[9,7,"gartic"],[13,7,"gartic"],[9,8,"gartic"],[13,8,"gartic"],[9,9,"gartic"],[10,9,"gartic"],[11,9,"gartic"],[12,9,"gartic"],[13,9,"gartic"],[15,5,"quiz"],[16,5,"quiz"],[17,5,"quiz"],[18,5,"quiz"],[15,6,"quiz"],[16,6,"quiz"],[17,6,"quiz"],[18,6,"quiz"],[15,7,"quiz"],[16,7,"quiz"],[17,7,"quiz"],[18,7,"quiz"],[15,9,"batata"],[16,9,"batata"],[17,9,"batata"],[18,9,"batata"],[15,10,"batata"],[18,10,"batata"],[15,11,"batata"],[18,11,"batata"],[15,12,"batata"],[16,12,"batata"],[17,12,"batata"],[18,12,"batata"],[3,10,"arena"],[4,10,"arena"],[5,10,"arena"],[6,10,"arena"],[3,11,"arena"],[6,11,"arena"],[3,12,"arena"],[6,12,"arena"],[3,13,"arena"],[4,13,"arena"],[5,13,"arena"],[6,13,"arena"],[18,1,"jukebox"]],"spawn":[[8,12],[9,12],[10,12],[11,12],[12,12],[13,12],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[8,14],[9,14],[10,14],[11,14],[12,14],[13,14],[8,15],[9,15],[10,15],[11,15],[12,15],[13,15]]};
+const HALL = {"W":22,"H":16,"blocked":[[3,0],[4,0],[6,0],[7,0],[9,0],[10,0],[12,0],[13,0],[18,0],[0,2],[21,2],[0,3],[16,3],[17,3],[0,4],[16,4],[17,4],[0,5],[0,6],[10,6],[11,6],[12,6],[0,7],[10,7],[11,7],[12,7],[0,8],[10,8],[11,8],[12,8],[0,9],[16,10],[17,10],[4,11],[5,11],[16,11],[17,11],[4,12],[5,12],[21,13],[2,15],[19,7],[20,7],[20,10],[5,4],[6,4]],"spots":[[1,2,"pinball"],[1,3,"breakout"],[1,4,"cobrinha"],[1,5,"invasores"],[1,6,"blocos"],[1,7,"asteroides"],[1,8,"corrida"],[1,9,"memoria"],[3,1,"pong"],[4,1,"pong"],[6,1,"hoquei"],[7,1,"hoquei"],[9,1,"ligue4"],[10,1,"ligue4"],[12,1,"naval"],[13,1,"naval"],[9,6,"gartic"],[13,6,"gartic"],[9,7,"gartic"],[13,7,"gartic"],[9,8,"gartic"],[13,8,"gartic"],[9,9,"gartic"],[10,9,"gartic"],[11,9,"gartic"],[12,9,"gartic"],[13,9,"gartic"],[15,5,"quiz"],[16,5,"quiz"],[17,5,"quiz"],[18,5,"quiz"],[15,6,"quiz"],[16,6,"quiz"],[17,6,"quiz"],[18,6,"quiz"],[15,7,"quiz"],[16,7,"quiz"],[17,7,"quiz"],[18,7,"quiz"],[15,9,"batata"],[16,9,"batata"],[17,9,"batata"],[18,9,"batata"],[15,10,"batata"],[18,10,"batata"],[15,11,"batata"],[18,11,"batata"],[15,12,"batata"],[16,12,"batata"],[17,12,"batata"],[18,12,"batata"],[3,10,"arena"],[4,10,"arena"],[5,10,"arena"],[6,10,"arena"],[3,11,"arena"],[6,11,"arena"],[3,12,"arena"],[6,12,"arena"],[3,13,"arena"],[4,13,"arena"],[5,13,"arena"],[6,13,"arena"],[18,1,"jukebox"],[19,8],[20,8],[19,10],[20,11],[5,5],[6,5]],"spawn":[[8,12],[9,12],[10,12],[11,12],[12,12],[13,12],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[8,14],[9,14],[10,14],[11,14],[12,14],[13,14],[8,15],[9,15],[10,15],[11,15],[12,15],[13,15]]};
 const ROOM_W = HALL.W, ROOM_H = HALL.H;
 const BLOCKSET = new Set(HALL.blocked.map(function (t) { return t[0] + ',' + t[1]; }));
 const SPOTSET = new Set(HALL.spots.map(function (t) { return t[0] + ',' + t[1]; }));
@@ -187,6 +188,7 @@ function publicPlayers() {
       online: p.online,
       pl: p.pl || '',
       lv: levelOfPlayer(p),
+      pet: p.acct && p.acct.items ? p.acct.items.pet : '',
       drawing: room.phase === 'round' && room.drawer === p.key,
       guessed: room.phase === 'round' && p.guessed
     };
@@ -568,6 +570,12 @@ function supabaseStore() {
   const enc = encodeURIComponent;
   return {
     kind: 'supabase',
+    async listPlayers() { return (await sb('GET', 'players?select=key,nick,av,xp,items&order=xp.desc&limit=200')) || []; },
+    async galList(n) { return (await sb('GET', 'gallery?select=id,key,nick,word,theme,img,likes,n_likes,created_at&order=created_at.desc&limit=' + n)) || []; },
+    async galAdd(row) { const r = await sb('POST', 'gallery', row, { Prefer: 'return=representation' }); return r && r[0] ? r[0] : null; },
+    async galGet(id) { id = parseInt(id, 10); if (!(id > 0)) return null; const r = await sb('GET', 'gallery?id=eq.' + id + '&select=id,key,nick,likes,n_likes'); return r && r[0] ? r[0] : null; },
+    async galSet(id, patch) { await sb('PATCH', 'gallery?id=eq.' + parseInt(id, 10), patch, { Prefer: 'return=minimal' }); },
+    async galDel(id) { await sb('DELETE', 'gallery?id=eq.' + parseInt(id, 10), undefined, { Prefer: 'return=minimal' }); },
     async getPlayer(key) { const r = await sb('GET', 'players?key=eq.' + enc(key) + '&select=*'); return r && r[0] ? r[0] : null; },
     async createPlayer(row) { await sb('POST', 'players', row, { Prefer: 'return=minimal' }); },
     async savePlayer(key, patch) { await sb('PATCH', 'players?key=eq.' + enc(key), Object.assign({ updated_at: new Date().toISOString() }, patch), { Prefer: 'return=minimal' }); },
@@ -579,7 +587,7 @@ function supabaseStore() {
 }
 
 function fileStore() {
-  let db = { players: {}, scores: {} };
+  let db = { players: {}, scores: {}, gallery: [], gseq: 0 };
   try { db = Object.assign(db, JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'))); } catch (e) { /* começa vazio */ }
   let timer = null;
   function flush() {
@@ -591,6 +599,12 @@ function fileStore() {
   return {
     kind: 'arquivo',
     flush: flush,
+    async listPlayers() { return Object.keys(db.players).map(function (k) { const r = db.players[k]; return { key: r.key, nick: r.nick, av: r.av, xp: r.xp, items: r.items }; }); },
+    async galList(n) { return db.gallery.slice().sort(function (a, b) { return b.id - a.id; }).slice(0, n).map(clone); },
+    async galAdd(row) { const r = Object.assign({ id: ++db.gseq, created_at: new Date().toISOString() }, clone(row)); db.gallery.push(r); later(); return clone(r); },
+    async galGet(id) { id = parseInt(id, 10); return clone(db.gallery.find(function (r) { return r.id === id; })); },
+    async galSet(id, patch) { id = parseInt(id, 10); const r = db.gallery.find(function (x) { return x.id === id; }); if (r) Object.assign(r, clone(patch)); later(); },
+    async galDel(id) { id = parseInt(id, 10); db.gallery = db.gallery.filter(function (r) { return r.id !== id; }); later(); },
     async getPlayer(key) { return clone(db.players[key]); },
     async createPlayer(row) { db.players[row.key] = clone(row); later(); },
     async savePlayer(key, patch) { if (db.players[key]) Object.assign(db.players[key], clone(patch)); later(); },
@@ -624,7 +638,8 @@ const TITLES = [[1, 'Novato do Fliperama'], [3, 'Ficha Quente'], [5, 'Craque do 
 function titleOf(l) { let t = TITLES[0][1]; TITLES.forEach(function (r) { if (l >= r[0]) t = r[1]; }); return t; }
 
 /* ---------- datas (horário de Brasília) ---------- */
-function brt() { return new Date(Date.now() - 3 * 3600 * 1000); }
+function nowMs() { return process.env.FAKE_NOW ? Date.parse(process.env.FAKE_NOW) : Date.now(); }
+function brt() { return new Date(nowMs() - 3 * 3600 * 1000); }
 function dayKey(d) { d = d || brt(); return d.toISOString().slice(0, 10); }
 function weekKey() {
   const d = brt();
@@ -666,6 +681,16 @@ const ACH = [
   { id: 'lv10', n: 'Nível 10', d: 'Chegue ao nível 10.', c: 100, t: function (s, a) { return lvOf(a.xp) >= 10; } },
   { id: 'rico', n: 'Cofrinho', d: 'Junte 500 moedas ao todo.', c: 50, t: function (s, a) { return a.total_coins >= 500; } }
 ]);
+ACH.push(
+  { id: 'comprador', n: 'Primeira Compra', d: 'Compre algo na loja.', c: 10, t: function (s, a) { return Object.keys(a.items.own).length >= 1; } },
+  { id: 'colecionador', n: 'Colecionador', d: 'Tenha 10 itens diferentes.', c: 40, t: function (s, a) { return Object.keys(a.items.own).length >= 10; } },
+  { id: 'decorador', n: 'Decorador', d: 'Coloque 8 itens no seu quarto.', c: 40, t: function (s, a) { return a.items.room.put.length >= 8; } },
+  { id: 'adotou', n: 'Pai de Pet', d: 'Adote um bichinho.', c: 20, t: function (s, a) { return !!a.items.pet; } },
+  { id: 'visitante', n: 'Vizinho Simpático', d: 'Visite 5 quartos de outras pessoas.', c: 30, t: function (s, a) { return Object.keys(a.items.visits).length >= 5; } },
+  { id: 'galerista', n: 'Na Galeria', d: 'Publique um desenho na galeria.', c: 20, t: function (s, a) { return a.items.gal.total >= 1; } },
+  { id: 'estrela', n: 'Artista Querido', d: 'Receba 10 curtidas nos seus desenhos.', c: 50, t: function (s, a) { return a.items.gal.likes >= 10; } },
+  { id: 'popular', n: 'Quarto Popular', d: 'Receba 5 curtidas no seu quarto.', c: 40, t: function (s, a) { return Object.keys(a.items.likes).length >= 5; } }
+);
 const ACH_PUB = ACH.map(function (a) { return { id: a.id, n: a.n, d: a.d, c: a.c }; });
 
 /* ---------- conta na memória ---------- */
@@ -681,7 +706,7 @@ function normalizeAcct(a) {
   a.stats.dayCoins = Object.assign({ d: '', n: 0 }, s.dayCoins || {});
   a.stats.wk = Object.assign({ w: '', best: {} }, s.wk || {});
   a.ach = a.ach && typeof a.ach === 'object' ? a.ach : {};
-  a.items = a.items && typeof a.items === 'object' ? a.items : {};
+  normItems(a);
   a.coins = a.coins | 0; a.xp = a.xp | 0; a.total_coins = a.total_coins | 0; a.streak = a.streak | 0;
   a.last_daily = a.last_daily || '';
   return a;
@@ -690,7 +715,7 @@ function acctPayload(p) {
   const a = p.acct, l = lvOf(a.xp), solo = {};
   Object.keys(a.stats.solo).forEach(function (g) { solo[g] = { n: a.stats.solo[g].n, best: a.stats.solo[g].best }; });
   return { nick: p.nick, coins: a.coins, xp: a.xp, lv: l, lo: xpAt(l), hi: xpAt(l + 1), title: titleOf(l), ach: Object.keys(a.ach), streak: a.streak,
-    items: a.items, stats: { runs: a.stats.runs, solo: solo, duoW: a.stats.duoW, duoL: a.stats.duoL, duoD: a.stats.duoD, g: a.stats.g } };
+    items: itemsPub(a), stats: { runs: a.stats.runs, solo: solo, duoW: a.stats.duoW, duoL: a.stats.duoL, duoD: a.stats.duoD, g: a.stats.g } };
 }
 function levelOfPlayer(p) { return p.acct ? lvOf(p.acct.xp) : 1; }
 
@@ -824,7 +849,9 @@ async function handleRun(p, m) {
   let coins = Math.min(RUN_COIN_CAP, (score > 0 ? 1 : 0) + Math.floor(score / DIV[game]));
   coins = Math.max(0, Math.min(coins, DAY_COIN_CAP - s.dayCoins.n));
   s.dayCoins.n += coins;
-  grant(p, { kind: 'run', game: game, score: score, rec: sc.rec, rank: sc.rank, coins: coins, xp: coins > 0 ? 5 + coins * 2 : 2 });
+  const mu = evMult();
+  coins = boosted(coins);
+  grant(p, { kind: 'run', game: game, score: score, rec: sc.rec, rank: sc.rank, mult: mu, coins: coins, xp: coins > 0 ? 5 + coins * 2 : 2 });
 }
 
 /* ---------- duelos ---------- */
@@ -839,7 +866,7 @@ function settleDuo(p, q) {
     if (res === 'win') { s.duoW++; s.duoStreak++; if (s.duoStreak > s.duoBest) s.duoBest = s.duoStreak; s.duoWon[game] = (s.duoWon[game] || 0) + 1; coins = 15; xp = 30; }
     else if (res === 'loss') { s.duoL++; s.duoStreak = 0; coins = 5; xp = 12; }
     else if (res === 'draw') { s.duoD++; coins = 8; xp = 18; }
-    grant(x, { kind: 'duo', game: game, res: res, coins: coins, xp: xp });
+    grant(x, { kind: 'duo', game: game, res: res, mult: evMult(), coins: boosted(coins), xp: xp });
   });
   p.pend = null; q.pend = null;
 }
@@ -879,11 +906,252 @@ function garticRewards() {
     const xp = 20 + Math.min(80, Math.round(p.score / 20));
     const afterScore = function () {
       if (p.score > s.bestScore) s.bestScore = p.score;
-      grant(p, { kind: 'gartic', score: p.score, win: win, rank: i + 1, coins: coins, xp: xp });
+      grant(p, { kind: 'gartic', score: p.score, win: win, rank: i + 1, mult: evMult(), coins: boosted(coins), xp: xp });
     };
     submitScore(p, 'gartic', p.score).then(function (r) { afterScore(); }, function (e) { console.error('placar gartic', e.message); afterScore(); });
   });
 }
+
+
+/* ====================================================================
+   FASE 2: EVENTOS, LOJA, QUARTO E GALERIA
+   ==================================================================== */
+
+/* ---------- eventos e estações (horário de Brasília) ---------- */
+function easterDate(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(y, month - 1, day));
+}
+function inMD(md, a, b) { return a <= b ? (md >= a && md <= b) : (md >= a || md <= b); }
+// ev: { id, n, a, b (mês*100+dia) ou fn(hoje) -> bool, shopA, shopB, mult, sale }
+const EVENTS = [
+  { id: 'halloween', n: 'Halloween', a: 1020, b: 1103, shopA: 1010, shopB: 1107 },
+  { id: 'blackfriday', n: 'Black Friday', a: 1123, b: 1130, sale: 0.25 },
+  { id: 'natal', n: 'Natal', a: 1210, b: 1226, shopA: 1201, shopB: 1231 },
+  { id: 'ano_novo', n: 'Ano Novo', a: 1227, b: 102, shopA: 1227, shopB: 110, mult: 2 },
+  { id: 'junina', n: 'Festa Junina', a: 610, b: 705, shopA: 601, shopB: 710 },
+  { id: 'carnaval', n: 'Carnaval', mult: 1.5, shopFrom: -60, shopTo: -44, fn: function (t, y) { const e = easterDate(y).getTime(); const d = Math.round((t - e) / 86400000); return d >= -51 && d <= -46; } },
+  { id: 'pascoa', n: 'Páscoa', shopFrom: -21, shopTo: 1, fn: function (t, y) { const e = easterDate(y).getTime(); const d = Math.round((t - e) / 86400000); return d >= -7 && d <= 0; } }
+];
+function bdate() { const d = brt(); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+function mdOf(d) { return (d.getUTCMonth() + 1) * 100 + d.getUTCDate(); }
+function evActive(ev, shop) {
+  const t = bdate(), y = t.getUTCFullYear(), md = mdOf(t);
+  if (ev.fn) {
+    if (!shop) return ev.fn(t.getTime(), y);
+    const d = Math.round((t.getTime() - easterDate(y).getTime()) / 86400000);
+    return d >= ev.shopFrom && d <= ev.shopTo;
+  }
+  return shop ? inMD(md, ev.shopA || ev.a, ev.shopB || ev.b) : inMD(md, ev.a, ev.b);
+}
+function isSextou() { const d = brt(); return d.getUTCDay() === 5 && d.getUTCHours() >= 17; }
+function seasonOf() {
+  const md = mdOf(bdate());
+  if (inMD(md, 1221, 319)) return 'verao';
+  if (inMD(md, 320, 620)) return 'outono';
+  if (inMD(md, 621, 921)) return 'inverno';
+  return 'primavera';
+}
+function activeEvents() { return EVENTS.filter(function (e) { return evActive(e, false); }); }
+function evMult() {
+  let m = 1;
+  activeEvents().forEach(function (e) { if (e.mult && e.mult > m) m = e.mult; });
+  if (isSextou() && m < 1.5) m = 1.5;
+  return m;
+}
+function evSale() { let s = 0; activeEvents().forEach(function (e) { if (e.sale && e.sale > s) s = e.sale; }); return s; }
+function eventsPayload() {
+  const list = activeEvents().map(function (e) { return { id: e.id, n: e.n }; });
+  if (isSextou()) list.push({ id: 'sextou', n: 'Sextou no Fliperama' });
+  return { ev: list, mult: evMult(), sale: evSale(), season: seasonOf(), shop: EVENTS.filter(function (e) { return evActive(e, true); }).map(function (e) { return e.id; }) };
+}
+
+/* ---------- catálogo ---------- */
+const CAT = [];
+function I(id, n, cat, p, w, d, o) { CAT.push(Object.assign({ id: id, n: n, cat: cat, p: p, w: w || 1, d: d || 1 }, o || {})); }
+// móveis (no chão)
+I('sofa', 'Sofá retrô', 'movel', 90, 2, 1);
+I('poltrona', 'Poltrona', 'movel', 60);
+I('pufe', 'Pufe', 'movel', 30);
+I('mesinha', 'Mesinha', 'movel', 35);
+I('mesa', 'Mesa de jantar', 'movel', 80, 2, 1);
+I('tv', 'TV de tubo', 'movel', 120);
+I('computador', 'Computador 8-bit', 'movel', 140);
+I('estante', 'Estante', 'movel', 70);
+I('cama', 'Cama', 'movel', 110, 1, 2);
+I('abajur', 'Abajur neon', 'movel', 35);
+I('vaso', 'Planta em vaso', 'movel', 25);
+I('caixa', 'Caixa de som', 'movel', 55);
+I('geladeira', 'Frigobar', 'movel', 130);
+I('aquario', 'Aquário', 'movel', 150);
+I('fliper', 'Mini fliperama', 'movel', 220);
+I('juke', 'Mini jukebox', 'movel', 260);
+I('bau', 'Baú do tesouro', 'movel', 100);
+I('trofeu', 'Troféu dourado', 'movel', 180);
+// tapetes (planos)
+I('tapete1', 'Tapete xadrez', 'tapete', 45, 2, 2, { flat: true });
+I('tapete2', 'Tapete redondo', 'tapete', 60, 2, 2, { flat: true });
+I('tapete3', 'Tapete neon', 'tapete', 90, 2, 2, { flat: true });
+// quadros (na parede)
+I('quadro1', 'Quadro Memphis', 'quadro', 30, 1, 1, { wall: true });
+I('quadro2', 'Quadro Pôr do sol', 'quadro', 30, 1, 1, { wall: true });
+I('quadro3', 'Quadro Pixel', 'quadro', 40, 1, 1, { wall: true });
+I('relogio', 'Relógio de parede', 'quadro', 35, 1, 1, { wall: true });
+I('neon', 'Letreiro neon', 'quadro', 70, 1, 1, { wall: true });
+I('prateleira', 'Prateleira', 'quadro', 45, 1, 1, { wall: true });
+I('espelho', 'Espelho', 'quadro', 40, 1, 1, { wall: true });
+// sazonais
+I('abobora', 'Abóbora esculpida', 'movel', 30, 1, 1, { ev: 'halloween' });
+I('fantasma_d', 'Fantasma de lençol', 'movel', 35, 1, 1, { ev: 'halloween' });
+I('teia', 'Teia de aranha', 'quadro', 20, 1, 1, { wall: true, ev: 'halloween' });
+I('arvore', 'Árvore de Natal', 'movel', 100, 1, 1, { ev: 'natal' });
+I('presente', 'Pilha de presentes', 'movel', 30, 1, 1, { ev: 'natal' });
+I('meia', 'Meia de Natal', 'quadro', 20, 1, 1, { wall: true, ev: 'natal' });
+I('bandeira', 'Bandeirinhas', 'quadro', 25, 1, 1, { wall: true, ev: 'junina' });
+I('fogueira', 'Fogueirinha', 'movel', 40, 1, 1, { ev: 'junina' });
+I('ovo', 'Ovo de Páscoa', 'movel', 30, 1, 1, { ev: 'pascoa' });
+I('mascara', 'Máscara de carnaval', 'quadro', 30, 1, 1, { wall: true, ev: 'carnaval' });
+I('fogos', 'Quadro de fogos', 'quadro', 40, 1, 1, { wall: true, ev: 'ano_novo' });
+// pisos e paredes
+I('piso_xadrez', 'Xadrez roxo', 'piso', 0, 1, 1, { free: true });
+I('piso_madeira', 'Madeira', 'piso', 40);
+I('piso_grama', 'Grama', 'piso', 50);
+I('piso_azulejo', 'Azulejo', 'piso', 50);
+I('piso_areia', 'Areia', 'piso', 60);
+I('piso_neon', 'Pista neon', 'piso', 80);
+I('piso_galaxia', 'Galáxia', 'piso', 120);
+I('par_roxa', 'Roxo arcade', 'parede', 0, 1, 1, { free: true });
+I('par_azul', 'Azul noite', 'parede', 40);
+I('par_rosa', 'Rosa chiclete', 'parede', 40);
+I('par_verde', 'Verde menta', 'parede', 40);
+I('par_tijolo', 'Tijolinho', 'parede', 60);
+I('par_memphis', 'Memphis', 'parede', 90);
+I('par_estrelas', 'Céu de estrelas', 'parede', 110);
+// bichinhos
+I('pet_gato', 'Gatinho', 'pet', 80);
+I('pet_cao', 'Cachorrinho', 'pet', 80);
+I('pet_fantasma', 'Fantasminha', 'pet', 60);
+I('pet_pintinho', 'Pintinho', 'pet', 50);
+I('pet_robo', 'Robozinho', 'pet', 120);
+I('pet_raposa', 'Raposa', 'pet', 150);
+I('pet_dragao', 'Dragãozinho', 'pet', 300);
+const CATMAP = {};
+CAT.forEach(function (it) { CATMAP[it.id] = it; });
+const CAT_PUB = CAT.map(function (it) { const o = { id: it.id, n: it.n, cat: it.cat, p: it.p, w: it.w, d: it.d }; if (it.flat) o.flat = 1; if (it.wall) o.wall = 1; if (it.ev) o.ev = it.ev; if (it.free) o.free = 1; return o; });
+const ROOM_N = 8, ROOM_MAX_ITEMS = 60, OWN_MAX = 8;
+
+function itemPrice(it) { if (it.free) return 0; return Math.max(1, Math.round(it.p * (1 - evSale()))); }
+function itemOnShelf(it) { if (!it.ev) return true; const ev = EVENTS.find(function (e) { return e.id === it.ev; }); return !!ev && evActive(ev, true); }
+
+function normItems(a) {
+  const it = a.items && typeof a.items === 'object' ? a.items : {};
+  it.own = it.own && typeof it.own === 'object' ? it.own : {};
+  it.room = it.room && typeof it.room === 'object' ? it.room : {};
+  it.room.floor = CATMAP[it.room.floor] && CATMAP[it.room.floor].cat === 'piso' ? it.room.floor : 'piso_xadrez';
+  it.room.wall = CATMAP[it.room.wall] && CATMAP[it.room.wall].cat === 'parede' ? it.room.wall : 'par_roxa';
+  it.room.put = Array.isArray(it.room.put) ? it.room.put : [];
+  it.pet = typeof it.pet === 'string' && CATMAP[it.pet] && CATMAP[it.pet].cat === 'pet' ? it.pet : '';
+  it.likes = it.likes && typeof it.likes === 'object' ? it.likes : {};
+  it.visits = it.visits && typeof it.visits === 'object' ? it.visits : {};
+  it.gal = Object.assign({ d: '', n: 0, total: 0, likes: 0 }, it.gal && typeof it.gal === 'object' ? it.gal : {});
+  a.items = it;
+  return it;
+}
+function itemsPub(a) {
+  const it = a.items;
+  return { own: it.own, room: it.room, pet: it.pet, likes: Object.keys(it.likes).length, visits: Object.keys(it.visits).length, gal: { total: it.gal.total, likes: it.gal.likes, d: it.gal.d, n: it.gal.n } };
+}
+function ownedOk(a, id) { const it = CATMAP[id]; return !!it && (it.free || (a.items.own[id] || 0) > 0); }
+
+// valida e limpa o quarto enviado pelo cliente; devolve { room, pet } ou { err }
+function cleanRoom(a, m) {
+  if (!m || typeof m !== 'object') return { err: 'Quarto inválido.' };
+  const floor = ownedOk(a, m.floor) && CATMAP[m.floor].cat === 'piso' ? m.floor : a.items.room.floor;
+  const wall = ownedOk(a, m.wall) && CATMAP[m.wall].cat === 'parede' ? m.wall : a.items.room.wall;
+  const pet = m.pet === '' ? '' : (typeof m.pet === 'string' && CATMAP[m.pet] && CATMAP[m.pet].cat === 'pet' && (a.items.own[m.pet] || 0) > 0 ? m.pet : a.items.pet);
+  const put = [], count = {}, taken = {}, flatTaken = {}, wallTaken = {};
+  const list = Array.isArray(m.put) ? m.put.slice(0, ROOM_MAX_ITEMS) : [];
+  for (let i = 0; i < list.length; i++) {
+    const q = list[i], it = q && CATMAP[q.id];
+    if (!it || ['movel', 'tapete', 'quadro'].indexOf(it.cat) === -1) continue;
+    if ((count[it.id] || 0) >= (a.items.own[it.id] || 0)) continue;
+    if (it.wall) {
+      const s = q.s === 'R' ? 'R' : 'L', ix = q.i | 0, k = s + ix;
+      if (ix < 0 || ix >= ROOM_N || wallTaken[k]) continue;
+      wallTaken[k] = 1; count[it.id] = (count[it.id] || 0) + 1;
+      put.push({ id: it.id, s: s, i: ix });
+    } else {
+      const r = q.r ? 1 : 0, fw = r ? it.d : it.w, fd = r ? it.w : it.d, x = q.x | 0, y = q.y | 0;
+      if (x < 0 || y < 0 || x + fw > ROOM_N || y + fd > ROOM_N) continue;
+      const bag = it.flat ? flatTaken : taken;
+      let clash = false;
+      for (let yy = y; yy < y + fd && !clash; yy++) for (let xx = x; xx < x + fw; xx++) if (bag[xx + ',' + yy]) { clash = true; break; }
+      if (clash) continue;
+      for (let yy = y; yy < y + fd; yy++) for (let xx = x; xx < x + fw; xx++) bag[xx + ',' + yy] = 1;
+      count[it.id] = (count[it.id] || 0) + 1;
+      put.push({ id: it.id, x: x, y: y, r: r });
+    }
+  }
+  return { room: { floor: floor, wall: wall, put: put }, pet: pet };
+}
+
+/* ---------- ações sobre contas, em memória ou no banco ---------- */
+async function mutateAcct(key, fn) {
+  const mem = playerByKey(key);
+  if (mem && mem.acct) { fn(mem.acct); saveAcct(mem); return mem; }
+  const a = await Store.getPlayer(key);
+  if (!a) return null;
+  normalizeAcct(a);
+  fn(a);
+  await Store.savePlayer(key, { coins: a.coins, total_coins: a.total_coins, xp: a.xp, items: a.items });
+  return null;
+}
+async function loadAcct(key) {
+  const mem = playerByKey(key);
+  if (mem && mem.acct) return mem.acct;
+  const a = await Store.getPlayer(key);
+  return a ? normalizeAcct(a) : null;
+}
+
+/* ---------- lista de quartos ---------- */
+let roomsCache = { t: 0, v: [] };
+async function roomsList() {
+  if (Date.now() - roomsCache.t < 15000) return roomsCache.v;
+  const rows = await Store.listPlayers();
+  const out = rows.map(function (r) {
+    const mem = playerByKey(r.key), a = mem && mem.acct ? mem.acct : null;
+    const it = a ? a.items : (r.items && typeof r.items === 'object' ? r.items : {});
+    const put = it.room && Array.isArray(it.room.put) ? it.room.put.length : 0;
+    const likes = it.likes && typeof it.likes === 'object' ? Object.keys(it.likes).length : 0;
+    return { key: r.key, nick: a ? a.nick : r.nick, av: r.av || '', lv: lvOf(a ? a.xp : (r.xp | 0)), n: put, likes: likes };
+  });
+  out.sort(function (x, y) { return (y.likes - x.likes) || (y.n - x.n) || (y.lv - x.lv); });
+  roomsCache = { t: Date.now(), v: out };
+  return out;
+}
+function roomsOnline(list) {
+  return list.map(function (r) { const m = playerByKey(r.key); return { nick: r.nick, av: r.av, lv: r.lv, n: r.n, likes: r.likes, on: !!(m && m.online) }; });
+}
+
+/* ---------- galeria ---------- */
+let galCache = { t: 0, v: [] };
+async function galAll() {
+  if (Date.now() - galCache.t < 20000) return galCache.v;
+  const v = await Store.galList(100);
+  galCache = { t: Date.now(), v: v };
+  return v;
+}
+function galPub(row, p) {
+  const likes = row.likes && typeof row.likes === 'object' ? row.likes : {};
+  return { id: row.id, nick: row.nick, word: row.word || '', theme: row.theme || '', img: row.img, n: row.n_likes | 0, liked: !!(p && likes[p.key]), mine: !!(p && row.key === p.key) };
+}
+const GAL_KEEP = 80, GAL_DAY = 5;
+const IMG_RE = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/;
+
+/* ---------- aplica o multiplicador de eventos nas moedas de partidas ---------- */
+function boosted(coins) { const m = evMult(); return m > 1 ? Math.round(coins * m) : coins; }
 
 /* ---------- servidor http e socket ---------- */
 
@@ -906,6 +1174,14 @@ const server = http.createServer(function (req, res) {
       if (mem && mem.acct) { mem.acct.hash = ''; mem.acct.salt = ''; }
       return Store.savePlayer(key, { hash: '', salt: '' }).then(function () { res.end('PIN zerado. No próximo login, ' + key + ' define um PIN novo.'); });
     }).catch(function (e) { res.end('Erro: ' + e.message); });
+    return;
+  }
+  if (url === '/admin/gallery-delete') {
+    const q = new URLSearchParams((req.url || '').split('?')[1] || '');
+    const ok = ADMIN_KEY && q.get('key') === ADMIN_KEY;
+    res.writeHead(ok ? 200 : 403, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+    if (!ok) { res.end('Chave inválida ou ADMIN_KEY não configurada.'); return; }
+    Store.galDel(q.get('id')).then(function () { galCache.t = 0; io.emit('gal_new', { id: 0 }); res.end('Obra ' + q.get('id') + ' apagada.'); }).catch(function (e) { res.end('Erro: ' + e.message); });
     return;
   }
   if (url === '/avatars') {
@@ -995,7 +1271,7 @@ io.on('connection', function (socket) {
       if (av) acct.av = av;
       if (p.nick !== nick) { p.nick = nick; acct.nick = nick; }
       socket.data.key = key;
-      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase, isNew: isNew, achs: ACH_PUB, account: acctPayload(p), store: Store.kind });
+      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase, isNew: isNew, achs: ACH_PUB, account: acctPayload(p), store: Store.kind, shop: CAT_PUB, events: eventsPayload() });
       sys(p.nick + (returning ? ' voltou.' : ' entrou.'));
       sendPlayers();
       sendStateTo(socket, p);
@@ -1024,7 +1300,7 @@ io.on('connection', function (socket) {
   });
 
   socket.on('me', function () {
-    try { const p = playerOf(socket); if (p && p.acct) socket.emit('account', acctPayload(p)); } catch (e) { console.error('me', e); }
+    try { const p = playerOf(socket); if (p && p.acct) { socket.emit('account', acctPayload(p)); socket.emit('events', eventsPayload()); } } catch (e) { console.error('me', e); }
   });
 
   socket.on('play', function (id) {
@@ -1178,6 +1454,176 @@ io.on('connection', function (socket) {
         io.emit('chat', { k: 'msg', nick: p.nick, text: text });
       }
     } catch (e) { console.error('guess', e); }
+  });
+
+
+  /* ---------- FASE 2: loja, quarto, galeria ---------- */
+  function liveP() { const p = playerOf(socket); return p && p.id === socket.id && p.acct ? p : null; }
+
+  socket.on('events', function () { try { socket.emit('events', eventsPayload()); } catch (e) { console.error('events', e); } });
+
+  socket.on('shop_buy', function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const id = String((m && m.id) || ''), it = CATMAP[id], a = p.acct;
+      const fail = function (msg) { socket.emit('shop_err', { id: id, msg: msg }); };
+      if (!it || it.free) return fail('Esse item não existe.');
+      if (!itemOnShelf(it)) return fail('Esse item só aparece na temporada dele.');
+      const single = ['piso', 'parede', 'pet'].indexOf(it.cat) !== -1;
+      const have = a.items.own[id] || 0;
+      if (single && have) return fail('Você já tem esse item.');
+      if (!single && have >= OWN_MAX) return fail('Limite de ' + OWN_MAX + ' unidades desse item.');
+      const price = itemPrice(it);
+      if (a.coins < price) return fail('Faltam ' + (price - a.coins) + ' moedas.');
+      a.coins -= price;
+      a.items.own[id] = have + 1;
+      if (it.cat === 'pet' && !a.items.pet) { a.items.pet = id; sendPlayers(); }
+      saveAcct(p);
+      roomsCache.t = 0;
+      socket.emit('shop_ok', { id: id, price: price, name: it.n });
+      grant(p, { kind: 'shop', coins: 0, xp: 3, spent: price });
+    } catch (e) { console.error('shop_buy', e); }
+  });
+
+  socket.on('room_save', function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const now = Date.now();
+      if (p.lastRoomSave && now - p.lastRoomSave < 400) return;
+      p.lastRoomSave = now;
+      const a = p.acct, r = cleanRoom(a, m);
+      if (r.err) { socket.emit('room_err', { msg: r.err }); return; }
+      const petChanged = a.items.pet !== r.pet;
+      a.items.room = r.room; a.items.pet = r.pet;
+      saveAcct(p);
+      roomsCache.t = 0;
+      socket.emit('account', acctPayload(p));
+      if (petChanged) sendPlayers();
+      grant(p, { kind: 'room', coins: 0, xp: 0 });
+    } catch (e) { console.error('room_save', e); }
+  });
+
+  socket.on('pet_set', function (id) {
+    try {
+      const p = liveP(); if (!p) return;
+      id = String(id || '');
+      if (id !== '' && !(CATMAP[id] && CATMAP[id].cat === 'pet' && p.acct.items.own[id] > 0)) return;
+      if (p.acct.items.pet === id) return;
+      p.acct.items.pet = id;
+      saveAcct(p);
+      socket.emit('account', acctPayload(p));
+      sendPlayers();
+      grant(p, { kind: 'room', coins: 0, xp: 0 });
+    } catch (e) { console.error('pet_set', e); }
+  });
+
+  socket.on('rooms_list', async function () {
+    try {
+      if (!liveP()) return;
+      const list = await roomsList();
+      socket.emit('rooms_list', { list: roomsOnline(list) });
+    } catch (e) { console.error('rooms_list', e.message); socket.emit('rooms_list', { list: [], err: true }); }
+  });
+
+  socket.on('room_get', async function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const key = cleanNick(m && m.nick).toLowerCase();
+      if (!key) return;
+      const a = key === p.key ? p.acct : await loadAcct(key);
+      if (!a) { socket.emit('room_data', { err: 'Esse jogador não existe.' }); return; }
+      const mine = key === p.key;
+      socket.emit('room_data', { nick: a.nick || key, av: a.av || '', lv: lvOf(a.xp), room: a.items.room, pet: a.items.pet, likes: Object.keys(a.items.likes).length, liked: !!a.items.likes[p.key], mine: mine });
+      if (!mine && !p.acct.items.visits[key]) {
+        if (Object.keys(p.acct.items.visits).length < 80) p.acct.items.visits[key] = 1;
+        saveAcct(p);
+        grant(p, { kind: 'visit', coins: 0, xp: 4, nick: a.nick || key });
+      }
+    } catch (e) { console.error('room_get', e.message); socket.emit('room_data', { err: 'Não foi possível abrir esse quarto agora.' }); }
+  });
+
+  socket.on('room_like', async function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const key = cleanNick(m && m.nick).toLowerCase();
+      if (!key || key === p.key) return;
+      const a0 = await loadAcct(key);
+      if (!a0) return;
+      if (a0.items.likes[p.key]) { socket.emit('room_liked', { nick: a0.nick, likes: Object.keys(a0.items.likes).length, dup: true }); return; }
+      const owner = await mutateAcct(key, function (a) { a.items.likes[p.key] = 1; a.coins += 2; a.total_coins += 2; });
+      roomsCache.t = 0;
+      const a1 = await loadAcct(key);
+      socket.emit('room_liked', { nick: a1.nick, likes: Object.keys(a1.items.likes).length });
+      if (owner) grant(owner, { kind: 'liked', coins: 0, xp: 5, by: p.nick, what: 'quarto' });
+    } catch (e) { console.error('room_like', e.message); }
+  });
+
+  socket.on('gal_list', async function (m) {
+    try {
+      const p = liveP();
+      const n = Math.max(1, Math.min(60, (m && m.n | 0) || 40));
+      const list = await galAll();
+      socket.emit('gal_list', { items: list.slice(0, n).map(function (r) { return galPub(r, p); }), n: n });
+    } catch (e) { console.error('gal_list', e.message); socket.emit('gal_list', { items: [], err: true }); }
+  });
+
+  socket.on('gal_add', async function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const fail = function (msg) { socket.emit('gal_err', { msg: msg }); };
+      const img = String((m && m.img) || '');
+      if (img.length > 70000 || !IMG_RE.test(img)) return fail('Imagem inválida.');
+      const a = p.acct, today = dayKey();
+      if (a.items.gal.d !== today) { a.items.gal.d = today; a.items.gal.n = 0; }
+      if (a.items.gal.n >= GAL_DAY) return fail('Você já publicou ' + GAL_DAY + ' obras hoje. Volte amanhã.');
+      const now = Date.now();
+      if (p.lastGal && now - p.lastGal < 3000) return;
+      p.lastGal = now;
+      const row = { key: p.key, nick: p.nick, word: String((m && m.word) || '').slice(0, 40), theme: String((m && m.theme) || '').slice(0, 30), img: img, likes: {}, n_likes: 0 };
+      const saved = await Store.galAdd(row);
+      if (!saved) return fail('Não foi possível publicar agora.');
+      a.items.gal.n++; a.items.gal.total++;
+      galCache.t = 0;
+      try {
+        const all = await galAll();
+        for (let i = GAL_KEEP; i < all.length; i++) await Store.galDel(all[i].id);
+        if (all.length > GAL_KEEP) galCache.t = 0;
+      } catch (e) { /* a limpeza fica para a próxima */ }
+      socket.emit('gal_ok', { id: saved.id });
+      io.emit('gal_new', { id: saved.id });
+      grant(p, { kind: 'gal', coins: 3, xp: 10 });
+    } catch (e) { console.error('gal_add', e.message); try { socket.emit('gal_err', { msg: 'A galeria não respondeu. Rode o SQL da Fase 2 no Supabase.' }); } catch (e2) { /* segue */ } }
+  });
+
+  socket.on('gal_like', async function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const id = m && m.id;
+      const row = await Store.galGet(id);
+      if (!row || row.key === p.key) return;
+      const likes = row.likes && typeof row.likes === 'object' ? row.likes : {};
+      if (likes[p.key]) return;
+      likes[p.key] = 1;
+      const n = (row.n_likes | 0) + 1;
+      await Store.galSet(id, { likes: likes, n_likes: n });
+      galCache.t = 0;
+      socket.emit('gal_liked', { id: id, n: n });
+      const owner = await mutateAcct(row.key, function (a) { a.coins += 1; a.total_coins += 1; a.items.gal.likes += 1; });
+      if (owner) grant(owner, { kind: 'liked', coins: 0, xp: 3, by: p.nick, what: 'desenho' });
+    } catch (e) { console.error('gal_like', e.message); }
+  });
+
+  socket.on('gal_del', async function (m) {
+    try {
+      const p = liveP(); if (!p) return;
+      const id = m && m.id;
+      const row = await Store.galGet(id);
+      if (!row || row.key !== p.key) return;
+      await Store.galDel(id);
+      galCache.t = 0;
+      socket.emit('gal_deleted', { id: id });
+      io.emit('gal_new', { id: 0 });
+    } catch (e) { console.error('gal_del', e.message); }
   });
 
   socket.on('disconnect', function () {

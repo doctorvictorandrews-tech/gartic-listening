@@ -25,7 +25,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const MAX_PLAYERS = 25;
 const GRACE_MS = 20000;   // tempo para quem caiu voltar com o mesmo apelido sem perder pontos
 // Salão de fliperama: mesmo mapa do cliente (gerado a partir dele).
-const HALL = {"W":22,"H":16,"blocked":[[3,0],[4,0],[6,0],[7,0],[9,0],[10,0],[12,0],[13,0],[18,0],[0,2],[21,2],[0,3],[16,3],[17,3],[0,4],[16,4],[17,4],[0,5],[0,6],[10,6],[11,6],[12,6],[0,7],[10,7],[11,7],[12,7],[0,8],[10,8],[11,8],[12,8],[0,9],[16,10],[17,10],[4,11],[5,11],[16,11],[17,11],[4,12],[5,12],[21,13],[2,15],[19,7],[20,7],[20,10],[5,4],[6,4]],"spots":[[1,2,"pinball"],[1,3,"breakout"],[1,4,"cobrinha"],[1,5,"invasores"],[1,6,"blocos"],[1,7,"asteroides"],[1,8,"corrida"],[1,9,"memoria"],[3,1,"pong"],[4,1,"pong"],[6,1,"hoquei"],[7,1,"hoquei"],[9,1,"ligue4"],[10,1,"ligue4"],[12,1,"naval"],[13,1,"naval"],[9,6,"gartic"],[13,6,"gartic"],[9,7,"gartic"],[13,7,"gartic"],[9,8,"gartic"],[13,8,"gartic"],[9,9,"gartic"],[10,9,"gartic"],[11,9,"gartic"],[12,9,"gartic"],[13,9,"gartic"],[15,5,"quiz"],[16,5,"quiz"],[17,5,"quiz"],[18,5,"quiz"],[15,6,"quiz"],[16,6,"quiz"],[17,6,"quiz"],[18,6,"quiz"],[15,7,"quiz"],[16,7,"quiz"],[17,7,"quiz"],[18,7,"quiz"],[15,9,"batata"],[16,9,"batata"],[17,9,"batata"],[18,9,"batata"],[15,10,"batata"],[18,10,"batata"],[15,11,"batata"],[18,11,"batata"],[15,12,"batata"],[16,12,"batata"],[17,12,"batata"],[18,12,"batata"],[3,10,"arena"],[4,10,"arena"],[5,10,"arena"],[6,10,"arena"],[3,11,"arena"],[6,11,"arena"],[3,12,"arena"],[6,12,"arena"],[3,13,"arena"],[4,13,"arena"],[5,13,"arena"],[6,13,"arena"],[18,1,"jukebox"],[19,8],[20,8],[19,10],[20,11],[5,5],[6,5]],"spawn":[[8,12],[9,12],[10,12],[11,12],[12,12],[13,12],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[8,14],[9,14],[10,14],[11,14],[12,14],[13,14],[8,15],[9,15],[10,15],[11,15],[12,15],[13,15]]};
+const HALL = {"W":50,"H":36,"blocked":[[2,3],[3,3],[4,3],[5,3],[7,3],[8,3],[9,3],[10,3],[12,3],[13,3],[14,3],[15,3],[18,3],[19,3],[20,3],[21,3],[23,3],[24,3],[25,3],[26,3],[28,3],[29,3],[30,3],[31,3],[35,3],[36,3],[37,3],[38,3],[40,3],[41,3],[42,3],[43,3],[2,8],[3,8],[4,8],[5,8],[7,8],[8,8],[9,8],[10,8],[12,8],[13,8],[14,8],[15,8],[18,8],[19,8],[20,8],[21,8],[23,8],[24,8],[25,8],[26,8],[36,8],[37,8],[38,8],[17,11],[33,11],[1,12],[48,12],[18,14],[32,14],[34,14],[48,14],[2,15],[3,15],[4,15],[5,15],[7,15],[8,15],[9,15],[10,15],[12,15],[13,15],[14,15],[15,15],[30,15],[37,15],[38,15],[37,16],[38,16],[43,16],[44,16],[24,17],[25,17],[26,17],[43,17],[44,17],[24,18],[25,18],[26,18],[24,19],[25,19],[26,19],[2,20],[3,20],[4,20],[5,20],[7,20],[8,20],[9,20],[10,20],[14,21],[15,21],[40,21],[41,21],[11,22],[12,22],[13,22],[40,22],[41,22],[3,24],[4,24],[5,24],[14,24],[18,24],[32,24],[34,24],[48,24],[1,26],[48,26],[17,27],[33,27],[22,28],[27,28],[3,29],[4,29],[8,29],[9,29],[14,29],[31,29],[32,29],[33,29],[34,29],[35,29],[36,29],[42,29],[43,29],[44,29],[45,29],[46,29],[47,29],[19,30],[20,30],[42,30],[43,30],[44,30],[45,30],[46,30],[47,30],[19,31],[20,31],[31,31],[33,31],[35,31],[37,31],[42,31],[43,31],[44,31],[45,31],[46,31],[47,31],[22,33],[27,33],[1,34],[21,34],[28,34],[48,34]],"spots":[[3,4,"pinball"],[8,4,"breakout"],[13,4,"cobrinha"],[3,9,"invasores"],[8,9,"asteroides"],[13,9,"blocos"],[19,4,"termo"],[24,4,"g2048"],[29,4,"minas"],[19,9,"memoria"],[24,9,"genius"],[36,4,"corrida"],[41,4,"toupeira"],[3,16,"pong"],[4,16,"pong"],[8,16,"hoquei"],[9,16,"hoquei"],[13,16,"ligue4"],[14,16,"ligue4"],[3,21,"naval"],[4,21,"naval"],[8,21,"velha"],[9,21,"velha"],[23,17,"gartic"],[27,17,"gartic"],[23,18,"gartic"],[27,18,"gartic"],[23,19,"gartic"],[27,19,"gartic"],[23,20,"gartic"],[24,20,"gartic"],[25,20,"gartic"],[26,20,"gartic"],[27,20,"gartic"],[36,17,"quiz"],[37,17,"quiz"],[38,17,"quiz"],[39,17,"quiz"],[36,18,"quiz"],[37,18,"quiz"],[38,18,"quiz"],[39,18,"quiz"],[36,19,"quiz"],[37,19,"quiz"],[38,19,"quiz"],[39,19,"quiz"],[42,15,"batata"],[43,15,"batata"],[44,15,"batata"],[45,15,"batata"],[42,16,"batata"],[45,16,"batata"],[42,17,"batata"],[45,17,"batata"],[42,18,"batata"],[43,18,"batata"],[44,18,"batata"],[45,18,"batata"],[39,20,"arena"],[40,20,"arena"],[41,20,"arena"],[42,20,"arena"],[39,21,"arena"],[42,21,"arena"],[39,22,"arena"],[42,22,"arena"],[39,23,"arena"],[40,23,"arena"],[41,23,"arena"],[42,23,"arena"],[30,16,"jukebox"],[36,9,"placar"],[37,9,"placar"],[38,9,"placar"],[8,30,"loja"],[9,30,"loja"],[13,29,"portal"],[14,30,"portal"],[3,30,"galeria"],[4,30,"galeria"]],"spawn":[[23,29],[24,29],[25,29],[26,29],[23,30],[24,30],[25,30],[26,30],[23,31],[24,31],[25,31],[26,31],[23,32],[24,32],[25,32],[26,32],[23,33],[24,33],[25,33],[26,33],[23,34],[24,34],[25,34],[26,34]]};
 const ROOM_W = HALL.W, ROOM_H = HALL.H;
 const BLOCKSET = new Set(HALL.blocked.map(function (t) { return t[0] + ',' + t[1]; }));
 const SPOTSET = new Set(HALL.spots.map(function (t) { return t[0] + ',' + t[1]; }));
@@ -138,10 +138,10 @@ function freeTile() {
   const free = HALL.spawn.filter(function (t) { return !room.players.some(function (q) { return q.x === t[0] && q.y === t[1]; }); });
   if (free.length) { const t = free[Math.floor(Math.random() * free.length)]; return { x: t[0], y: t[1] }; }
   for (let i = 0; i < 60; i++) {
-    const x = 8 + Math.floor(Math.random() * 6), y = 12 + Math.floor(Math.random() * 4);
+    const x = 23 + Math.floor(Math.random() * 4), y = 29 + Math.floor(Math.random() * 6);
     if (!isBlocked(x, y) && !SPOTSET.has(x + ',' + y)) return { x: x, y: y };
   }
-  return { x: 11, y: 14 };
+  return { x: 24, y: 31 };
 }
 
 function playerByKey(key) { return room.players.find(function (p) { return p.key === key; }) || null; }
@@ -149,8 +149,8 @@ function playerOf(socket) { return socket.data && socket.data.key ? playerByKey(
 function onlinePlayers() { return room.players.filter(function (p) { return p.online; }); }
 
 /* ---------- fliperama: presença (JOGANDO) e partidas em dupla ---------- */
-const SOLO_IDS = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria']);
-const DUO_IDS = new Set(['pong', 'hoquei', 'ligue4', 'naval']);
+const SOLO_IDS = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria', 'termo', 'g2048', 'minas', 'genius', 'toupeira']);
+const DUO_IDS = new Set(['pong', 'hoquei', 'ligue4', 'naval', 'velha']);
 const duoWait = {};
 
 function setPl(p, id) {
@@ -653,8 +653,8 @@ function weekKey() {
 function yesterdayKey() { return dayKey(new Date(brt().getTime() - 86400000)); }
 
 /* ---------- conquistas ---------- */
-const MASTER = { pinball: 100000, breakout: 1500, cobrinha: 500, invasores: 2500, blocos: 3000, asteroides: 3000, corrida: 3000, memoria: 1500 };
-const GNAME = { pinball: 'Pinball', breakout: 'Blocos', cobrinha: 'Cobrinha', invasores: 'Invasores', blocos: 'Tetris', asteroides: 'Asteroides', corrida: 'Corrida', memoria: 'Memória' };
+const MASTER = { pinball: 100000, breakout: 1500, cobrinha: 500, invasores: 2500, blocos: 3000, asteroides: 3000, corrida: 3000, memoria: 1500, termo: 2000, g2048: 20000, minas: 2500, genius: 800, toupeira: 900 };
+const GNAME = { pinball: 'Pinball', breakout: 'Blocos', cobrinha: 'Cobrinha', invasores: 'Invasores', blocos: 'Tetris', asteroides: 'Asteroides', corrida: 'Corrida', memoria: 'Memória', termo: 'Termo', g2048: '2048', minas: 'Campo Minado', genius: 'Genius', toupeira: 'Toupeira' };
 const ACH = [
   { id: 'ficha', n: 'Primeira Ficha', d: 'Jogue qualquer máquina solo.', c: 10, t: function (s) { return s.runs >= 1; } },
   { id: 'salao', n: 'Rodou o Salão', d: 'Jogue as 8 máquinas solo.', c: 40, t: function (s) { return Object.keys(s.solo).length >= 8; } },
@@ -823,7 +823,7 @@ async function getTop(game, period) {
   topCache[k] = { t: Date.now(), v: v };
   return v;
 }
-const TOP_GAMES = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria', 'gartic']);
+const TOP_GAMES = new Set(['pinball', 'breakout', 'cobrinha', 'invasores', 'blocos', 'asteroides', 'corrida', 'memoria', 'termo', 'g2048', 'minas', 'genius', 'toupeira', 'gartic']);
 
 // registra pontuação nas listas geral e da semana; devolve { rec, rank }
 async function submitScore(p, game, score) {
@@ -852,8 +852,8 @@ async function submitScore(p, game, score) {
 }
 
 /* ---------- fliperama solo ---------- */
-const DIV = { pinball: 5000, breakout: 100, cobrinha: 40, invasores: 150, blocos: 200, asteroides: 150, corrida: 150, memoria: 100 };
-const SCORE_CAP = { pinball: 5000000, breakout: 200000, cobrinha: 200000, invasores: 200000, blocos: 500000, asteroides: 200000, corrida: 500000, memoria: 100000 };
+const DIV = { pinball: 5000, breakout: 100, cobrinha: 40, invasores: 150, blocos: 200, asteroides: 150, corrida: 150, memoria: 100, termo: 100, g2048: 1000, minas: 100, genius: 50, toupeira: 50 };
+const SCORE_CAP = { pinball: 5000000, breakout: 200000, cobrinha: 200000, invasores: 200000, blocos: 500000, asteroides: 200000, corrida: 500000, memoria: 100000, termo: 100000, g2048: 3000000, minas: 100000, genius: 100000, toupeira: 20000 };
 const RUN_COIN_CAP = 40, DAY_COIN_CAP = 400;
 
 async function handleRun(p, m) {
@@ -1334,7 +1334,7 @@ function cleanPut2(own, g, list) {
       const ch = g.wl[y].charAt(x);
       if (ch === '.' || ch !== ch.toLowerCase()) continue;
       const fx = s === 'S' ? x : x + 1, fy = s === 'S' ? y + 1 : y;
-      if (fx >= LOT_W || fy >= LOT_H || g.fl[fy].charAt(fx) === '.' || !lotTall(g, x, y)) continue;
+      if (fx >= LOT_W || fy >= LOT_H || g.wl[fy].charAt(fx) !== '.' || !lotTall(g, x, y)) continue;
       wallTaken[k] = 1; count[it.id] = (count[it.id] || 0) + 1;
       put.push({ id: it.id, s: s, x: x, y: y, c: c });
     } else {
@@ -1401,11 +1401,25 @@ function cleanPut(own, pl, list) {
   }
   return put;
 }
+/* ordem dos lotes na rua: cada conta recebe um número fixo, na ordem de chegada */
+let LOT_SEQ = 0;
+async function initLots() {
+  try {
+    const rows = await Store.listPlayers();
+    rows.forEach(function (r) { const l = r.items && typeof r.items === 'object' ? (r.items.lot | 0) : 0; if (l > LOT_SEQ) LOT_SEQ = l; });
+    const missing = rows.filter(function (r) { return !(r.items && typeof r.items === 'object' && r.items.lot > 0); }).sort(function (a, b) { return a.key < b.key ? -1 : 1; });
+    for (const r of missing) { const items = r.items && typeof r.items === 'object' ? r.items : {}; items.lot = ++LOT_SEQ; await Store.savePlayer(r.key, { items: items }); }
+    roomsCache = { t: 0, v: [] };
+  } catch (e) { console.error('initLots', e && e.message); }
+}
+function blankHouse() { const row = new Array(LOT_W + 1).join('.'), fl = [], wl = []; for (let y = 0; y < LOT_H; y++) { fl.push(row); wl.push(row); } return { v: 2, fp: [], wp: [], fl: fl, wl: wl, put: [] }; }
 function normItems(a) {
   const it = a.items && typeof a.items === 'object' ? a.items : {};
   it.own = it.own && typeof it.own === 'object' ? it.own : {};
   let h = it.house && typeof it.house === 'object' ? it.house : null;
-  if (!h) {
+  if (!h && !(it.room && typeof it.room === 'object' && Array.isArray(it.room.put) && it.room.put.length)) {
+    h = blankHouse();
+  } else if (!h) {
     const r = it.room && typeof it.room === 'object' ? it.room : {};
     const fl = CATMAP[r.floor] && CATMAP[r.floor].cat === 'piso' ? r.floor : '', wl = CATMAP[r.wall] && CATMAP[r.wall].cat === 'parede' ? r.wall : '';
     const fz = {}, wz = {};
@@ -1415,14 +1429,15 @@ function normItems(a) {
     h = plan2house(PLANS[h.plan] ? h.plan : 'm', h.fl && typeof h.fl === 'object' ? h.fl : {}, h.wl && typeof h.wl === 'object' ? h.wl : {}, Array.isArray(h.put) ? h.put : []);
   }
   h.fp = Array.isArray(h.fp) ? h.fp : []; h.wp = Array.isArray(h.wp) ? h.wp : [];
-  h.fl = Array.isArray(h.fl) && h.fl.length === LOT_H ? h.fl : plan2house('p').fl;
-  h.wl = Array.isArray(h.wl) && h.wl.length === LOT_H ? h.wl : plan2house('p').wl;
+  h.fl = Array.isArray(h.fl) && h.fl.length === LOT_H ? h.fl : blankHouse().fl;
+  h.wl = Array.isArray(h.wl) && h.wl.length === LOT_H ? h.wl : blankHouse().wl;
   h.put = cleanPut2(it.own, h, Array.isArray(h.put) ? h.put : []);
   it.house = h; delete it.room;
   it.pet = typeof it.pet === 'string' && CATMAP[it.pet] && CATMAP[it.pet].cat === 'pet' ? it.pet : '';
   it.likes = it.likes && typeof it.likes === 'object' ? it.likes : {};
   it.visits = it.visits && typeof it.visits === 'object' ? it.visits : {};
   it.starter = it.starter ? 1 : 0; it.starter2 = it.starter2 ? 1 : 0;
+  it.lot = it.lot > 0 ? it.lot | 0 : ++LOT_SEQ;
   it.gal = Object.assign({ d: '', n: 0, total: 0, likes: 0 }, it.gal && typeof it.gal === 'object' ? it.gal : {});
   a.items = it;
   return it;
@@ -1470,16 +1485,16 @@ async function roomsList() {
     const it = a ? a.items : (r.items && typeof r.items === 'object' ? r.items : {});
     const hh = it.house || it.room, put = hh && Array.isArray(hh.put) ? hh.put.length : 0;
     let pln = 'm';
-    if (hh && hh.v === 2 && Array.isArray(hh.fl)) { const t = hh.fl.join('').replace(/\./g, '').length; pln = t < 70 ? 'p' : t < 130 ? 'm' : 'g'; } else if (hh && PLANS[hh.plan]) pln = hh.plan;
+    if (hh && hh.v === 2 && Array.isArray(hh.fl)) { const t = hh.fl.join('').replace(/\./g, '').length, wn = Array.isArray(hh.wl) ? hh.wl.join('').replace(/\./g, '').length : 0; pln = !t && !wn ? 'v' : t < 70 ? 'p' : t < 130 ? 'm' : 'g'; } else if (hh && PLANS[hh.plan]) pln = hh.plan;
     const likes = it.likes && typeof it.likes === 'object' ? Object.keys(it.likes).length : 0;
-    return { key: r.key, nick: a ? a.nick : r.nick, av: r.av || '', lv: lvOf(a ? a.xp : (r.xp | 0)), n: put, likes: likes, plan: pln };
+    return { key: r.key, nick: a ? a.nick : r.nick, av: r.av || '', lv: lvOf(a ? a.xp : (r.xp | 0)), n: put, likes: likes, plan: pln, lot: it.lot | 0 };
   });
   out.sort(function (x, y) { return (y.likes - x.likes) || (y.n - x.n) || (y.lv - x.lv); });
   roomsCache = { t: Date.now(), v: out };
   return out;
 }
 function roomsOnline(list) {
-  return list.map(function (r) { const m = playerByKey(r.key); return { nick: r.nick, av: r.av, lv: r.lv, n: r.n, likes: r.likes, plan: r.plan, on: !!(m && m.online) }; });
+  return list.map(function (r) { const m = playerByKey(r.key); return { nick: r.nick, av: r.av, lv: r.lv, n: r.n, likes: r.likes, plan: r.plan, lot: r.lot, on: !!(m && m.online) }; });
 }
 
 /* ---------- galeria ---------- */
@@ -2022,6 +2037,7 @@ process.on('uncaughtException', function (e) { console.error('uncaughtException'
 process.on('unhandledRejection', function (e) { console.error('unhandledRejection', e); });
 
 server.listen(PORT, function () {
+  initLots();
   console.log('Servidor do Gartic Listening rodando na porta ' + PORT + '.');
   console.log(Store.kind === 'supabase' ? 'Banco: Supabase conectado.' : 'ATENÇÃO: sem Supabase configurado. Salvando em arquivo local (some se o servidor reiniciar na hospedagem grátis).');
   console.log(ALLOWED.length ? 'Aceitando conexões de: ' + ALLOWED.join(', ') : 'ALLOWED_ORIGIN vazio: aceitando conexões de qualquer site (modo de teste).');

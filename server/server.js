@@ -780,10 +780,14 @@ function grant(p, r) {
 
 function giveStarter(p) {
   const a = p.acct;
-  if (!a || a.items.starter) return;
-  a.items.starter = 1; a.coins += STARTER;
+  if (!a) return;
+  let gift = 0;
+  if (!a.items.starter) gift = STARTER; else if (!a.items.starter2) gift = Math.max(0, STARTER - STARTER_OLD);
+  a.items.starter = 1; a.items.starter2 = 1;
+  if (!gift) return;
+  a.coins += gift;
   saveAcct(p, true);
-  try { io.to(p.id).emit('reward', { kind: 'starter', coins: STARTER, xp: 0, ach: [], lvUp: 0 }); io.to(p.id).emit('account', acctPayload(p)); } catch (e) { /* segue */ }
+  try { io.to(p.id).emit('reward', { kind: 'starter', coins: gift, xp: 0, ach: [], lvUp: 0 }); io.to(p.id).emit('account', acctPayload(p)); } catch (e) { /* segue */ }
 }
 /* renda por passear: a cada 10 minutos online, 20 moedas (até 400 por dia) */
 setInterval(function () {
@@ -1077,8 +1081,175 @@ I('churrasqueira', 'Churrasqueira', 'movel', 90);
 I('poste', 'Poste de luz', 'movel', 40);
 I('cerca', 'Cerquinha', 'movel', 20);
 I('piscina', 'Piscina', 'tapete', 260, 3, 2, { flat: true });
+/* ===== Catálogo da Fase 4: móveis, quadros, pisos e paredes novos (dados puros, usados pelo servidor e pelo cliente) =====
+   linha: [id, nome, cat, preço, largura, fundo, altura, grupo, flags, arte]
+   flags: f = plano, w = parede, x = extra (não entra nas moedas iniciais)
+   arte de chão: "x y w d z h cor" (caixa), "o x y z raio cor" (círculo), "e x y z rx ry cor" (elipse), separados por ;
+   arte de parede: fragmento SVG 30x38 */
+var CAT3 = [
+  /* ---- sala ---- */
+  ['sofa3', 'Sofá grande', 'movel', 120, 3, 1, 30, 'sala', '', '0 0 3 1 0 10 #3b6fd0;0 0 3 .3 10 18 #2f58a8;0 .3 .22 .7 10 10 #2f58a8;2.78 .3 .22 .7 10 10 #2f58a8;.22 .3 .85 .7 10 4 #5b8ae8;1.07 .3 .85 .7 10 4 #5b8ae8;1.92 .3 .86 .7 10 4 #5b8ae8'],
+  ['sofa_l', 'Sofá de canto', 'movel', 150, 2, 2, 30, 'sala', '', '0 0 2 1 0 10 #1f9a8a;0 1 1 1 0 10 #1f9a8a;0 0 2 .3 10 18 #177a6e;0 0 .3 2 10 18 #177a6e;.3 .3 1.7 .7 10 4 #3fc0ae;.3 1 .7 1 10 4 #3fc0ae'],
+  ['poltrona2', 'Poltrona laranja', 'movel', 60, 1, 1, 34, 'sala', '', '.05 .05 .9 .9 0 9 #e8782a;.05 .05 .9 .28 9 20 #c8621a;.05 .33 .2 .62 9 9 #d8701e;.75 .33 .2 .62 9 9 #d8701e;.25 .33 .5 .62 9 4 #f8a050'],
+  ['banqueta', 'Banqueta', 'movel', 20, 1, 1, 22, 'sala', '', '.2 .2 .1 .1 0 14 #6a4318;.7 .2 .1 .1 0 14 #6a4318;.2 .7 .1 .1 0 14 #6a4318;.7 .7 .1 .1 0 14 #6a4318;.12 .12 .76 .76 14 6 #c98f45'],
+  ['rack', 'Rack de TV', 'movel', 110, 2, 1, 46, 'sala', '', '0 .1 2 .8 0 14 #6a4318;.1 .9 .8 .02 3 8 #3a2410;.6 .3 .8 .4 14 4 #20202a;.7 .35 .6 .3 18 24 #15151c;.75 .65 .5 .02 22 16 #5fd0ff'],
+  ['tv_plana', 'TV de tela plana', 'movel', 150, 1, 1, 50, 'sala', '', '.3 .3 .4 .4 0 4 #333;.45 .45 .1 .1 4 8 #333;.05 .4 .9 .12 12 34 #15151c;.1 .52 .8 .02 15 28 #5fd0ff;.1 .52 .35 .02 24 19 #bff0ff'],
+  ['lareira', 'Lareira', 'movel', 180, 2, 1, 70, 'sala', '', '0 .1 2 .9 0 60 #9a4a30;.4 .98 1.2 .02 4 26 #1a0f0a;.6 .94 .8 .06 4 12 #f6b83a;.8 .94 .4 .06 4 20 #e63a00;0 0 2 1.05 60 6 #d8c8a8'],
+  ['piano', 'Piano', 'movel', 300, 2, 1, 52, 'sala', 'x', '0 0 .1 .9 0 24 #111;1.9 0 .1 .9 0 24 #111;0 0 2 1 24 14 #1c1c24;.1 .55 1.8 .4 38 3 #fff;.1 .6 1.8 .05 41 2 #232323;0 0 2 .5 38 12 #1c1c24'],
+  ['vaso_alto', 'Vaso alto', 'movel', 45, 1, 1, 80, 'sala', '', '.3 .3 .4 .4 0 22 #c25a2a;.2 .2 .6 .6 22 40 #3D9A3D;.35 .35 .3 .3 62 16 #5cc45a'],
+  ['luminaria', 'Luminária de chão', 'movel', 40, 1, 1, 76, 'sala', '', '.3 .3 .4 .4 0 3 #333;.47 .47 .06 .06 3 55 #333;.25 .25 .5 .5 58 18 #F6D84A;.3 .3 .4 .4 76 2 #fff3b0'],
+  ['cacto', 'Cacto', 'movel', 20, 1, 1, 44, 'sala', '', '.3 .3 .4 .4 0 12 #E85AA0;.4 .4 .2 .2 12 28 #3D9A3D;.6 .45 .15 .1 22 4 #3D9A3D;.25 .45 .15 .1 16 4 #3D9A3D'],
+  ['samambaia', 'Samambaia', 'movel', 30, 1, 1, 60, 'sala', '', '.3 .3 .4 .4 0 14 #a8702e;.1 .1 .8 .8 14 20 #3D9A3D;.25 .25 .5 .5 34 14 #5cc45a;.4 .4 .2 .2 48 8 #7cdc7c'],
+  ['mesa_centro', 'Mesa de centro', 'movel', 55, 2, 1, 18, 'sala', '', '.1 .15 .1 .1 0 12 #232323;1.8 .15 .1 .1 0 12 #232323;.1 .75 .1 .1 0 12 #232323;1.8 .75 .1 .1 0 12 #232323;0 .05 2 .9 12 4 #bfe9f5'],
+  ['violao', 'Violão', 'movel', 70, 1, 1, 56, 'lazer', '', '.3 .4 .4 .15 6 24 #c98f45;.45 .45 .1 .08 30 24 #6a4318;.42 .54 .16 .02 14 8 #232323;.25 .35 .1 .1 0 8 #333'],
+  ['globo', 'Globo terrestre', 'movel', 55, 1, 1, 40, 'sala', '', '.35 .35 .3 .3 0 4 #6a4318;.45 .45 .1 .1 4 12 #a8702e;o .5 .5 24 11 #2B7ac4;o .45 .45 26 4 #3D9A3D'],
+  ['estatua', 'Estátua', 'movel', 120, 1, 1, 66, 'sala', '', '.2 .2 .6 .6 0 16 #bdbdbd;.35 .35 .3 .3 16 28 #e8e8e8;o .5 .5 50 7 #e8e8e8'],
+  ['planta_g', 'Planta grande', 'movel', 70, 1, 1, 90, 'sala', '', '.25 .25 .5 .5 0 18 #a8702e;.45 .45 .1 .1 18 20 #6a4318;.1 .1 .8 .8 38 28 #3D9A3D;.25 .25 .5 .5 66 16 #5cc45a'],
+  ['biblioteca', 'Estante grande', 'movel', 120, 2, 1, 80, 'escritorio', '', '0 .1 2 .6 0 78 #7a4a20;.08 .7 .35 .02 6 18 #E63A00;.45 .7 .3 .02 6 18 #2B4EC4;.8 .7 .4 .02 6 18 #D8D82E;1.25 .7 .3 .02 6 18 #3D9A3D;1.6 .7 .3 .02 6 18 #E85AA0;.08 .7 .3 .02 34 18 #2BC4C4;.42 .7 .4 .02 34 18 #F6D84A;.85 .7 .3 .02 34 18 #E63A00;1.2 .7 .5 .02 34 18 #3D9A3D'],
+  ['aparador', 'Aparador', 'movel', 90, 2, 1, 36, 'sala', '', '0 .1 2 .8 0 30 #8a5a2a;0 .05 2 .9 30 4 #a8702e;.45 .9 .06 .02 14 8 #F6D84A;1.45 .9 .06 .02 14 8 #F6D84A;.98 .9 .04 .02 2 26 #4a2a10'],
+  /* ---- quarto ---- */
+  ['cama_casal', 'Cama de casal', 'movel', 180, 2, 2, 36, 'quarto', '', '0 0 2 2 0 8 #8a5a2a;.05 .05 1.9 1.9 8 8 #f2f2f2;.05 .55 1.9 1.4 8 9 #5b8ae8;.2 .1 .6 .4 16 5 #fff;1.2 .1 .6 .4 16 5 #fff;0 0 2 .15 8 28 #6a4318'],
+  ['beliche', 'Beliche', 'movel', 200, 1, 2, 74, 'quarto', '', '.02 .02 .1 .1 0 70 #6a4318;.88 .02 .1 .1 0 70 #6a4318;.02 1.88 .1 .1 0 70 #6a4318;.88 1.88 .1 .1 0 70 #6a4318;.05 .1 .9 1.8 10 6 #f2f2f2;.05 .6 .9 1.3 10 8 #2B4EC4;.05 .1 .9 1.8 40 6 #fff;.05 .6 .9 1.3 40 8 #E63A00'],
+  ['criado', 'Criado-mudo', 'movel', 40, 1, 1, 30, 'quarto', '', '.12 .12 .76 .76 0 20 #8a5a2a;.08 .08 .84 .84 20 4 #a8702e;.45 .88 .1 .02 10 4 #F6D84A;.4 .4 .2 .2 24 8 #F6D84A'],
+  ['comoda', 'Cômoda', 'movel', 100, 2, 1, 38, 'quarto', '', '0 .1 2 .8 0 34 #7a4a20;0 .05 2 .9 34 4 #a8702e;.1 .9 .8 .02 6 12 #5a3a18;1.1 .9 .8 .02 6 12 #5a3a18;.1 .9 .8 .02 20 12 #5a3a18;1.1 .9 .8 .02 20 12 #5a3a18;.45 .91 .1 .02 10 3 #F6D84A;1.45 .91 .1 .02 24 3 #F6D84A'],
+  ['penteadeira', 'Penteadeira', 'movel', 110, 2, 1, 62, 'quarto', '', '0 .2 .1 .7 0 24 #f0d0d8;1.9 .2 .1 .7 0 24 #f0d0d8;0 .2 2 .7 24 4 #f8e0e8;.5 .25 1 .05 28 34 #6a4318;.55 .31 .9 .02 32 26 #bfe9f5'],
+  ['ursinho', 'Ursinho de pelúcia', 'movel', 30, 1, 1, 28, 'quarto', '', '.3 .3 .4 .4 0 14 #b8793a;o .5 .5 20 7 #b8793a;.3 .3 .1 .1 24 4 #8a5a2a;.6 .3 .1 .1 24 4 #8a5a2a'],
+  ['cesto', 'Cesto de roupa', 'movel', 20, 1, 1, 30, 'quarto', '', '.2 .2 .6 .6 0 24 #c98f45;.25 .25 .5 .5 24 2 #f2f2f2'],
+  ['rede', 'Rede de dormir', 'movel', 90, 2, 1, 38, 'jardim', '', '.02 .4 .1 .1 0 40 #8a5a2a;1.88 .4 .1 .1 0 40 #8a5a2a;.1 .3 1.8 .4 14 5 #E85AA0;.1 .35 1.8 .3 19 3 #f8a0c8'],
+  ['espelho_pe', 'Espelho de chão', 'movel', 60, 1, 1, 80, 'quarto', '', '.15 .4 .7 .1 0 78 #6a4318;.2 .52 .6 .02 4 70 #bfe9f5;.2 .52 .25 .02 40 34 #fff'],
+  ['puff_cama', 'Banco de pé de cama', 'movel', 40, 2, 1, 18, 'quarto', '', '0 .1 2 .8 0 10 #6a4318;.05 .15 1.9 .7 10 6 #d9437a'],
+  /* ---- cozinha ---- */
+  ['balcao', 'Balcão', 'movel', 90, 2, 1, 40, 'cozinha', '', '0 .05 2 .9 0 32 #c9a06a;0 0 2 1 32 4 #e8e8f0;.1 .95 .8 .02 4 24 #8a6a3a;1.1 .95 .8 .02 4 24 #8a6a3a'],
+  ['ilha', 'Ilha de cozinha', 'movel', 130, 2, 1, 42, 'cozinha', '', '0 .1 2 .8 0 34 #2B4EC4;0 0 2 1 34 5 #f2f2f2;.9 .9 .2 .1 12 12 #1f3a8a'],
+  ['armario', 'Armário de cozinha', 'movel', 70, 1, 1, 76, 'cozinha', '', '.05 .05 .9 .9 0 70 #e8d8b8;.05 .05 .9 .9 70 4 #d8c8a8;.1 .95 .38 .02 6 58 #c8b898;.52 .95 .38 .02 6 58 #c8b898'],
+  ['microondas', 'Micro-ondas', 'movel', 50, 1, 1, 34, 'cozinha', '', '.1 .1 .8 .8 0 14 #8a5a2a;.15 .2 .7 .6 14 18 #cfcfd6;.2 .8 .5 .02 17 12 #232323;.75 .8 .08 .02 18 10 #3fd070'],
+  ['mesa_redonda', 'Mesa redonda', 'movel', 110, 2, 2, 28, 'cozinha', '', '.8 .8 .4 .4 0 22 #6a4318;e 1 1 24 30 15 #c98f45;e 1 1 26 24 12 #d8a055'],
+  ['banqueta_bar', 'Banqueta de bar', 'movel', 30, 1, 1, 38, 'cozinha', '', '.45 .45 .1 .1 0 26 #888;.25 .25 .5 .5 26 6 #E63A00;.3 .3 .4 .4 0 3 #666'],
+  ['fruteira', 'Fruteira', 'movel', 25, 1, 1, 22, 'cozinha', '', '.1 .1 .8 .8 0 12 #8a5a2a;o .35 .5 18 5 #E63A00;o .55 .45 18 5 #F6D84A;o .5 .6 17 5 #3D9A3D'],
+  ['geladeira_g', 'Geladeira grande', 'movel', 190, 1, 1, 90, 'cozinha', '', '.1 .1 .8 .8 0 88 #e8e8f0;.1 .9 .8 .02 44 2 #999;.75 .9 .06 .02 50 20 #888;.75 .9 .06 .02 10 14 #888'],
+  ['mesa_madeira', 'Mesa de madeira', 'movel', 130, 2, 2, 30, 'cozinha', '', '.1 .1 .1 .1 0 24 #6a4318;1.8 .1 .1 .1 0 24 #6a4318;.1 1.8 .1 .1 0 24 #6a4318;1.8 1.8 .1 .1 0 24 #6a4318;.05 .05 1.9 1.9 24 6 #b9803a;.8 .8 .4 .4 30 3 #fff'],
+  /* ---- banheiro ---- */
+  ['pia_b', 'Pia de banheiro', 'movel', 90, 2, 1, 44, 'banheiro', '', '0 .1 2 .8 0 30 #e8e8f0;0 0 2 1 30 4 #f2f2f2;.2 .2 .6 .6 33 2 #8fb4c8;1.2 .2 .6 .6 33 2 #8fb4c8;.45 .1 .1 .1 34 9 #9a9aa4;1.45 .1 .1 .1 34 9 #9a9aa4'],
+  ['tapete_b', 'Tapete de banheiro', 'tapete', 25, 2, 1, 2, 'banheiro', 'f', '0 0 2 1 0 2 #6bd0e8;.1 .1 1.8 .8 2 1 #8ae0f4'],
+  ['lixeira', 'Lixeira', 'movel', 15, 1, 1, 24, 'banheiro', '', '.3 .3 .4 .4 0 20 #9a9aa4;.28 .28 .44 .44 20 3 #bdbdc8'],
+  ['balanca', 'Balança', 'tapete', 20, 1, 1, 6, 'banheiro', 'f', '.2 .2 .6 .6 0 5 #cfcfd6;.35 .35 .3 .15 5 1 #232323'],
+  ['armario_b', 'Armário de banheiro', 'movel', 60, 1, 1, 60, 'banheiro', '', '.1 .1 .8 .8 0 56 #f2f2f2;.1 .9 .8 .02 4 52 #cfcfd6;.45 .91 .1 .02 24 10 #888'],
+  ['hidro', 'Banheira de hidromassagem', 'movel', 280, 2, 2, 30, 'banheiro', 'x', '0 0 2 2 0 24 #e8e8f0;.1 .1 1.8 1.8 24 2 #5ad0f0;.3 .3 .4 .4 26 4 #bff0ff;1.2 .8 .3 .3 26 3 #bff0ff;1.7 0 .3 .3 24 10 #9a9aa4'],
+  ['box_ch', 'Box de chuveiro', 'movel', 120, 1, 1, 80, 'banheiro', '', '.05 .05 .06 .06 0 78 #bbb;.89 .05 .06 .06 0 78 #bbb;.05 .89 .06 .06 0 78 #bbb;.89 .89 .06 .06 0 78 #bbb;.3 .3 .4 .4 70 5 #bbb;.45 .45 .1 .1 60 10 #bbb'],
+  /* ---- escritório ---- */
+  ['escrivaninha', 'Escrivaninha', 'movel', 110, 2, 1, 30, 'escritorio', '', '0 .05 .1 .9 0 24 #8a5a2a;1.9 .05 .1 .9 0 24 #8a5a2a;0 .05 2 .9 24 4 #c98f45;1.5 .1 .4 .8 4 20 #7a4a20;1.5 .95 .3 .02 12 6 #F6D84A'],
+  ['cadeira_g', 'Cadeira gamer', 'movel', 130, 1, 1, 50, 'escritorio', '', '.3 .3 .4 .4 0 6 #232323;.15 .15 .7 .7 6 8 #E63A00;.15 .15 .7 .2 14 30 #E63A00;.25 .15 .5 .2 44 8 #232323'],
+  ['arquivo', 'Arquivo', 'movel', 70, 1, 1, 50, 'escritorio', '', '.1 .1 .8 .8 0 48 #8a9098;.1 .9 .8 .02 24 2 #555;.1 .9 .8 .02 4 2 #555;.4 .91 .2 .02 32 4 #333;.4 .91 .2 .02 12 4 #333'],
+  ['impressora', 'Impressora', 'movel', 60, 1, 1, 28, 'escritorio', '', '.1 .1 .8 .8 0 14 #8a5a2a;.15 .2 .7 .6 14 10 #d6d6dc;.2 .3 .6 .4 24 2 #fff'],
+  ['lousa', 'Lousa móvel', 'movel', 70, 1, 1, 70, 'escritorio', '', '.1 .45 .06 .06 0 24 #888;.84 .45 .06 .06 0 24 #888;.05 .45 .9 .06 24 42 #8a5a2a;.1 .52 .8 .02 28 34 #f2f2f2;.15 .52 .3 .02 50 2 #E63A00'],
+  ['mesa_reuniao', 'Mesa de reunião', 'movel', 160, 3, 1, 28, 'escritorio', '', '.1 .1 .1 .8 0 22 #232323;2.8 .1 .1 .8 0 22 #232323;0 .05 3 .9 22 5 #3a3a48'],
+  ['setup', 'Setup duplo', 'movel', 200, 2, 1, 50, 'escritorio', '', '0 .1 .1 .8 0 24 #333;1.9 .1 .1 .8 0 24 #333;0 .05 2 .9 24 4 #232323;.1 .4 .7 .08 28 24 #15151c;.12 .5 .66 .02 31 18 #5fd0ff;1.1 .4 .7 .08 28 24 #15151c;1.12 .5 .66 .02 31 18 #7cffc8'],
+  /* ---- jardim ---- */
+  ['palmeira', 'Palmeira', 'movel', 90, 1, 1, 100, 'jardim', '', '.42 .42 .16 .16 0 62 #8a5a2a;0 .4 1 .2 62 4 #3D9A3D;.4 0 .2 1 62 4 #3D9A3D;.3 .3 .4 .4 66 6 #5cc45a'],
+  ['arbusto', 'Arbusto', 'movel', 25, 1, 1, 36, 'jardim', '', '.1 .1 .8 .8 0 28 #3D9A3D;.2 .2 .6 .6 28 6 #5cc45a'],
+  ['pinheiro', 'Pinheiro', 'movel', 70, 1, 1, 110, 'jardim', '', '.44 .44 .12 .12 0 20 #6a4318;.1 .1 .8 .8 14 22 #2a7a3a;.2 .2 .6 .6 36 22 #2a8a3a;.3 .3 .4 .4 58 22 #36a046;.4 .4 .2 .2 80 22 #44b454'],
+  ['ipe', 'Ipê amarelo', 'movel', 110, 1, 1, 96, 'jardim', '', '.44 .44 .12 .12 0 48 #7a4a20;.0 .0 1 1 44 22 #f6d84a;.15 .15 .7 .7 66 14 #f8e46a'],
+  ['fonte', 'Fonte', 'movel', 250, 2, 2, 40, 'jardim', 'x', '0 0 2 2 0 12 #bdbdbd;.1 .1 1.8 1.8 12 2 #5ad0f0;.85 .85 .3 .3 14 20 #bdbdbd;.6 .6 .8 .8 34 5 #bdbdbd;.9 .9 .2 .2 39 6 #bff0ff'],
+  ['lago', 'Laguinho', 'tapete', 150, 3, 2, 2, 'jardim', 'fx', '0 0 3 2 0 2 #2a7ac4;.1 .1 2.8 1.8 2 1 #3a8ad4;.6 .5 .4 .4 3 1 #3D9A3D;1.8 1 .4 .4 3 1 #3D9A3D'],
+  ['balanco', 'Balanço', 'movel', 100, 2, 1, 70, 'jardim', '', '0 .4 .1 .1 0 66 #8a5a2a;1.9 .4 .1 .1 0 66 #8a5a2a;0 .4 2 .1 62 5 #8a5a2a;.45 .45 .03 .03 22 40 #232323;1.5 .45 .03 .03 22 40 #232323;.35 .35 .4 .3 18 4 #E63A00;1.35 .35 .4 .3 18 4 #2B4EC4'],
+  ['mesa_jardim', 'Mesa de jardim', 'movel', 120, 2, 2, 30, 'jardim', '', '.9 .9 .2 .2 0 22 #bbb;e 1 1 24 30 15 #f2f2f2;e 1 1 26 24 12 #e0e0e8'],
+  ['guarda_sol', 'Guarda-sol', 'movel', 60, 1, 1, 90, 'jardim', '', '.46 .46 .08 .08 0 70 #bbb;0 0 1 1 70 6 #E63A00;.2 .2 .6 .6 76 5 #fff;.35 .35 .3 .3 81 4 #E63A00'],
+  ['espreguicadeira', 'Espreguiçadeira', 'movel', 80, 1, 2, 26, 'jardim', '', '.1 0 .8 2 0 8 #2BC4C4;.1 0 .8 .6 8 14 #1fa5a5;.1 .6 .8 1.4 8 3 #7cdcdc'],
+  ['hortinha', 'Horta', 'movel', 45, 2, 1, 18, 'jardim', '', '0 .1 2 .8 0 10 #5a3a1a;.15 .3 .3 .4 10 8 #3D9A3D;.7 .3 .3 .4 10 8 #E63A00;1.2 .3 .3 .4 10 8 #5cc45a'],
+  ['pedras', 'Pedras', 'movel', 15, 1, 1, 14, 'jardim', '', '.1 .2 .4 .4 0 10 #8a8f98;.5 .4 .4 .4 0 7 #9aa0a8;.3 .1 .3 .3 0 6 #a8aeb6'],
+  ['lanterna', 'Lanterna de jardim', 'movel', 35, 1, 1, 40, 'jardim', '', '.4 .4 .2 .2 0 20 #6a6a74;.35 .35 .3 .3 20 12 #F6D84A;.3 .3 .4 .4 32 4 #333'],
+  ['cerca_l', 'Cerca longa', 'movel', 40, 3, 1, 26, 'jardim', '', '.05 .4 .1 .2 0 26 #fff;1.45 .4 .1 .2 0 26 #fff;2.85 .4 .1 .2 0 26 #fff;0 .45 3 .1 16 4 #f2f2f2;0 .45 3 .1 6 4 #f2f2f2'],
+  ['portao', 'Portãozinho', 'movel', 45, 2, 1, 30, 'jardim', '', '0 .4 .1 .2 0 30 #8a5a2a;1.9 .4 .1 .2 0 30 #8a5a2a;.1 .45 1.8 .1 18 4 #a8702e;.1 .45 1.8 .1 6 4 #a8702e;.9 .45 .1 .1 6 16 #a8702e'],
+  ['correio', 'Caixa de correio', 'movel', 30, 1, 1, 44, 'jardim', '', '.46 .46 .08 .08 0 28 #6a4318;.25 .3 .5 .4 28 14 #E63A00;.25 .7 .5 .02 30 8 #b82e00'],
+  ['casinha', 'Casinha de cachorro', 'movel', 70, 1, 1, 36, 'jardim', '', '.1 .1 .8 .8 0 22 #c25a2a;0 0 1 1 22 6 #6a4318;.3 .9 .4 .02 2 14 #1a0f0a'],
+  ['gazebo', 'Gazebo', 'movel', 300, 3, 3, 96, 'jardim', 'x', '.05 .05 .12 .12 0 82 #f2f2f2;2.83 .05 .12 .12 0 82 #f2f2f2;.05 2.83 .12 .12 0 82 #f2f2f2;2.83 2.83 .12 .12 0 82 #f2f2f2;0 0 3 3 82 8 #E63A00;.4 .4 2.2 2.2 90 6 #f2f2f2'],
+  ['trampolim', 'Cama elástica', 'movel', 160, 2, 2, 22, 'jardim', 'x', '.1 .1 .1 .1 0 14 #555;1.8 .1 .1 .1 0 14 #555;.1 1.8 .1 .1 0 14 #555;1.8 1.8 .1 .1 0 14 #555;e 1 1 16 30 15 #232323;e 1 1 18 24 12 #2B4EC4'],
+  ['piscina2', 'Piscina grande', 'tapete', 380, 4, 3, 2, 'jardim', 'fx', '0 0 4 3 0 2 #e8e8f0;.15 .15 3.7 2.7 2 1 #3fb4ea;.3 .3 3.4 2.4 3 1 #5ad0f0;.6 .5 .8 .5 4 1 #bff0ff'],
+  ['barraca', 'Barraca de camping', 'movel', 140, 2, 2, 50, 'jardim', '', '0 0 2 2 0 8 #E8782A;.2 .2 1.6 1.6 8 10 #E8782A;.4 .4 1.2 1.2 18 10 #f09a50;.6 .6 .8 .8 28 10 #E8782A'],
+  ['fogueira2', 'Fogueira de acampamento', 'movel', 40, 1, 1, 24, 'jardim', '', '.15 .15 .7 .1 0 6 #6a4318;.15 .75 .7 .1 0 6 #6a4318;.3 .3 .4 .4 4 8 #E63A00;.4 .4 .2 .2 10 12 #F6D84A'],
+  ['bike', 'Bicicleta', 'movel', 90, 1, 2, 40, 'jardim', '', '.4 .1 .2 .5 0 24 #232323;.4 1.4 .2 .5 0 24 #232323;.4 .5 .2 1 14 4 #E63A00;.35 .3 .3 .2 24 4 #232323;.3 1.5 .4 .1 28 3 #232323'],
+  /* ---- lazer ---- */
+  ['sinuca', 'Mesa de sinuca', 'movel', 300, 3, 2, 34, 'lazer', 'x', '.1 .1 .2 .2 0 24 #6a4318;2.7 .1 .2 .2 0 24 #6a4318;.1 1.7 .2 .2 0 24 #6a4318;2.7 1.7 .2 .2 0 24 #6a4318;0 0 3 2 24 8 #6a4318;.15 .15 2.7 1.7 28 4 #1f8a4a;o 1 .8 34 2 #fff;o 1.8 1.1 34 2 #E63A00'],
+  ['pebolim', 'Pebolim', 'movel', 160, 2, 1, 30, 'lazer', '', '.1 .15 .1 .7 0 14 #333;1.8 .15 .1 .7 0 14 #333;0 .05 2 .9 14 10 #2B4EC4;.05 .1 1.9 .8 24 2 #1f8a4a;.4 0 .1 1 26 2 #E63A00;1.2 0 .1 1 26 2 #D8D82E'],
+  ['pingue', 'Mesa de ping-pong', 'movel', 150, 3, 2, 30, 'lazer', 'x', '.1 .1 .1 .1 0 22 #333;2.8 .1 .1 .1 0 22 #333;.1 1.8 .1 .1 0 22 #333;2.8 1.8 .1 .1 0 22 #333;0 0 3 2 22 3 #1f6ad0;1.45 0 .1 2 25 8 #f2f2f2;1.4 0 .02 2 25 .5 #fff'],
+  ['xadrez', 'Mesa de xadrez', 'movel', 70, 1, 1, 34, 'lazer', '', '.4 .4 .2 .2 0 22 #6a4318;.1 .1 .8 .8 22 3 #f2f2f2;.1 .1 .2 .2 25 1 #232323;.5 .1 .2 .2 25 1 #232323;.3 .3 .2 .2 25 1 #232323;.1 .5 .2 .2 25 1 #232323;.5 .5 .2 .2 25 1 #232323;o .3 .3 30 3 #E63A00;o .7 .7 30 3 #232323'],
+  ['arcade2', 'Fliperama clássico', 'movel', 200, 1, 1, 82, 'lazer', '', '.1 .1 .8 .8 0 70 #2B4EC4;.2 .9 .6 .02 38 22 #0b2a22;.25 .91 .5 .02 40 18 #7CFFC8;.1 .1 .8 .8 70 8 #F15A1A;.2 .85 .6 .08 30 6 #E63A00;.4 .88 .08 .08 34 4 #F6D84A'],
+  ['karaoke', 'Karaokê', 'movel', 120, 1, 1, 60, 'lazer', '', '.3 .4 .4 .3 0 4 #333;.46 .5 .08 .08 4 40 #333;.4 .45 .2 .2 44 12 #232323;.7 .4 .3 .1 0 36 #15151c;.75 .5 .2 .02 8 24 #7CFFC8'],
+  ['dj', 'Mesa de DJ', 'movel', 220, 2, 1, 46, 'lazer', 'x', '0 .1 .1 .8 0 30 #232323;1.9 .1 .1 .8 0 30 #232323;0 .05 2 .9 30 6 #3a3a48;.2 .3 .5 .5 36 3 #15151c;1.3 .3 .5 .5 36 3 #15151c;o .45 .55 40 6 #F15A1A;o 1.55 .55 40 6 #2BC4C4'],
+  ['poker', 'Mesa de pôquer', 'movel', 180, 2, 2, 28, 'lazer', '', '.8 .8 .4 .4 0 22 #6a4318;e 1 1 24 30 15 #1f8a4a;e 1 1 26 26 13 #2aa05a;o .6 .8 28 3 #E63A00;o 1.4 1.1 28 3 #2B4EC4'],
+  ['cabine', 'Cabine de fotos', 'movel', 200, 1, 1, 90, 'lazer', 'x', '.05 .05 .9 .9 0 84 #E63A00;.05 .05 .9 .9 84 6 #232323;.15 .9 .7 .02 20 50 #1a0f2a;.3 .92 .4 .02 40 14 #F6D84A'],
+  /* ---- decoração de parede ---- */
+  ['janela1', 'Janela', 'quadro', 50, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#e8e0d0"/><rect x="3" y="3" width="24" height="32" fill="#8fd0f5"/><rect x="14" y="3" width="2" height="32" fill="#e8e0d0"/><rect x="3" y="18" width="24" height="2" fill="#e8e0d0"/><rect x="5" y="5" width="6" height="8" fill="#fff" opacity=".5"/>'],
+  ['janela2', 'Janela redonda', 'quadro', 60, 1, 1, 0, 'decor', 'w', '<circle cx="15" cy="19" r="16" fill="#6a4318"/><circle cx="15" cy="19" r="13" fill="#8fd0f5"/><rect x="14" y="6" width="2" height="26" fill="#6a4318"/><rect x="2" y="18" width="26" height="2" fill="#6a4318"/><circle cx="10" cy="13" r="3" fill="#fff" opacity=".6"/>'],
+  ['janela3', 'Janela com cortina', 'quadro', 80, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#e8e0d0"/><rect x="3" y="3" width="24" height="32" fill="#8fd0f5"/><rect x="2" y="2" width="9" height="34" fill="#E85AA0"/><rect x="19" y="2" width="9" height="34" fill="#E85AA0"/><rect x="5" y="2" width="2" height="34" fill="#c84880"/><rect x="22" y="2" width="2" height="34" fill="#c84880"/>'],
+  ['quadro4', 'Paisagem', 'quadro', 40, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#6a4318"/><rect x="3" y="3" width="24" height="32" fill="#8fd0f5"/><polygon points="3,35 12,16 20,35" fill="#5a7a5a"/><polygon points="12,35 21,12 27,35" fill="#44684a"/><rect x="3" y="28" width="24" height="7" fill="#3D9A3D"/><circle cx="22" cy="9" r="3" fill="#F6D84A"/>'],
+  ['quadro5', 'Retrato', 'quadro', 40, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#a8702e"/><rect x="3" y="3" width="24" height="32" fill="#d8c8a8"/><circle cx="15" cy="16" r="6" fill="#f2c9a0"/><rect x="9" y="22" width="12" height="12" fill="#2B4EC4"/><rect x="9" y="9" width="12" height="4" fill="#5a3a1a"/>'],
+  ['quadro6', 'Flores', 'quadro', 35, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#232323"/><rect x="3" y="3" width="24" height="32" fill="#f8e8c8"/><rect x="14" y="16" width="2" height="16" fill="#3D9A3D"/><circle cx="15" cy="13" r="5" fill="#E85AA0"/><circle cx="15" cy="13" r="2" fill="#F6D84A"/><circle cx="8" cy="22" r="3" fill="#E63A00"/><circle cx="22" cy="24" r="3" fill="#8a2be2"/>'],
+  ['quadro7', 'Gatinho', 'quadro', 40, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#232323"/><rect x="3" y="3" width="24" height="32" fill="#2BC4C4"/><rect x="9" y="12" width="12" height="12" fill="#F28C28"/><rect x="9" y="9" width="3" height="4" fill="#F28C28"/><rect x="18" y="9" width="3" height="4" fill="#F28C28"/><rect x="11" y="15" width="2" height="2" fill="#232323"/><rect x="17" y="15" width="2" height="2" fill="#232323"/><rect x="14" y="19" width="2" height="2" fill="#E85AA0"/>'],
+  ['quadro8', 'Mapa-múndi', 'quadro', 45, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#6a4318"/><rect x="2" y="6" width="26" height="26" fill="#8fc4f0"/><polygon points="6,12 12,10 14,16 10,24 7,18" fill="#3D9A3D"/><polygon points="16,10 24,12 22,20 18,18" fill="#5cc45a"/><polygon points="14,22 18,22 17,29 14,28" fill="#3D9A3D"/>'],
+  ['quadro9', 'Abstrato', 'quadro', 50, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#232323"/><rect x="3" y="3" width="24" height="32" fill="#f2f2f2"/><rect x="5" y="6" width="10" height="14" fill="#E63A00"/><rect x="12" y="14" width="12" height="10" fill="#2B4EC4" opacity=".85"/><circle cx="20" cy="9" r="4" fill="#F6D84A"/><rect x="6" y="26" width="18" height="3" fill="#232323"/>'],
+  ['cuco', 'Relógio cuco', 'quadro', 80, 1, 1, 0, 'decor', 'w', '<polygon points="15,0 30,12 0,12" fill="#8a3a10"/><rect x="2" y="12" width="26" height="22" fill="#a8702e"/><circle cx="15" cy="23" r="8" fill="#f2f2f2"/><rect x="14" y="17" width="2" height="7" fill="#232323"/><rect x="15" y="23" width="5" height="2" fill="#232323"/><rect x="12" y="34" width="6" height="4" fill="#F6D84A"/>'],
+  ['tv_parede', 'TV de parede', 'quadro', 120, 1, 1, 0, 'decor', 'w', '<rect y="6" width="30" height="20" fill="#15151c"/><rect x="2" y="8" width="26" height="16" fill="#5fd0ff"/><polygon points="2,8 14,8 6,24 2,24" fill="#bff0ff" opacity=".5"/><rect x="12" y="26" width="6" height="2" fill="#333"/>'],
+  ['arandela', 'Arandela', 'quadro', 35, 1, 1, 0, 'decor', 'w', '<rect x="12" y="4" width="6" height="8" fill="#6a4318"/><polygon points="6,28 24,28 20,12 10,12" fill="#F6D84A"/><rect x="6" y="28" width="18" height="3" fill="#a8702e"/><circle cx="15" cy="32" r="6" fill="#fff3b0" opacity=".4"/>'],
+  ['nicho', 'Nicho com plantas', 'quadro', 45, 1, 1, 0, 'decor', 'w', '<rect x="0" y="22" width="30" height="4" fill="#a8702e"/><rect x="4" y="12" width="8" height="10" fill="#c25a2a"/><rect x="2" y="2" width="12" height="10" fill="#3D9A3D"/><rect x="18" y="14" width="8" height="8" fill="#E85AA0"/><rect x="20" y="6" width="4" height="8" fill="#5cc45a"/>'],
+  ['bandeira_br', 'Bandeira do Brasil', 'quadro', 60, 1, 1, 0, 'decor', 'w', '<rect x="1" y="6" width="28" height="20" fill="#2a9a3a"/><polygon points="15,9 26,16 15,23 4,16" fill="#F6D84A"/><circle cx="15" cy="16" r="5" fill="#2B4EC4"/><rect x="0" y="2" width="2" height="34" fill="#a8702e"/>'],
+  ['guirlanda', 'Guirlanda', 'quadro', 40, 1, 1, 0, 'decor', 'w', '<circle cx="15" cy="17" r="14" fill="#2a7a3a"/><circle cx="15" cy="17" r="8" fill="#e8e0d0" opacity="0"/><circle cx="15" cy="17" r="7" fill="none"/><circle cx="8" cy="10" r="2" fill="#E63A00"/><circle cx="22" cy="12" r="2" fill="#E63A00"/><circle cx="21" cy="24" r="2" fill="#F6D84A"/><circle cx="9" cy="23" r="2" fill="#F6D84A"/><rect x="11" y="30" width="8" height="6" fill="#E63A00"/>'],
+  ['dardos', 'Alvo de dardos', 'quadro', 40, 1, 1, 0, 'decor', 'w', '<circle cx="15" cy="19" r="15" fill="#232323"/><circle cx="15" cy="19" r="12" fill="#E63A00"/><circle cx="15" cy="19" r="8" fill="#f2f2f2"/><circle cx="15" cy="19" r="4" fill="#232323"/><circle cx="15" cy="19" r="1.5" fill="#E63A00"/><rect x="18" y="10" width="2" height="6" fill="#F6D84A"/>'],
+  ['skate', 'Skate na parede', 'quadro', 50, 1, 1, 0, 'decor', 'w', '<rect x="10" y="0" width="10" height="38" fill="#E85AA0"/><rect x="12" y="4" width="6" height="30" fill="#2BC4C4"/><rect x="8" y="6" width="4" height="4" fill="#232323"/><rect x="18" y="6" width="4" height="4" fill="#232323"/><rect x="8" y="28" width="4" height="4" fill="#232323"/><rect x="18" y="28" width="4" height="4" fill="#232323"/>'],
+  ['violao_p', 'Violão na parede', 'quadro', 60, 1, 1, 0, 'decor', 'w', '<rect x="13" y="0" width="4" height="20" fill="#6a4318"/><polygon points="6,34 8,22 22,22 24,34 15,38" fill="#c98f45"/><circle cx="15" cy="28" r="3" fill="#232323"/><rect x="12" y="2" width="6" height="4" fill="#232323"/>'],
+  ['vinil', 'Disco de vinil', 'quadro', 35, 1, 1, 0, 'decor', 'w', '<circle cx="15" cy="19" r="15" fill="#15151c"/><circle cx="15" cy="19" r="11" fill="#232333"/><circle cx="15" cy="19" r="5" fill="#E63A00"/><circle cx="15" cy="19" r="1.5" fill="#15151c"/><path d="M6 14 q9 -9 18 0" fill="none" stroke="#fff" stroke-width="1" opacity=".4"/>'],
+  ['placa', 'Placa LISTENING', 'quadro', 70, 1, 1, 0, 'decor', 'w', '<rect y="8" width="30" height="22" fill="#232323"/><rect x="2" y="10" width="26" height="18" fill="#F15A1A"/><rect x="5" y="14" width="20" height="3" fill="#232323"/><rect x="5" y="20" width="14" height="3" fill="#232323"/><rect x="21" y="20" width="4" height="3" fill="#F6D84A"/>'],
+  ['recados', 'Quadro de recados', 'quadro', 35, 1, 1, 0, 'decor', 'w', '<rect width="30" height="38" fill="#6a4318"/><rect x="3" y="3" width="24" height="32" fill="#c98f45"/><rect x="6" y="7" width="8" height="8" fill="#F6D84A"/><rect x="16" y="9" width="8" height="8" fill="#E85AA0"/><rect x="8" y="20" width="9" height="8" fill="#5fd0ff"/><circle cx="10" cy="8" r="1.5" fill="#E63A00"/>'],
+  ['espelho_r', 'Espelho redondo', 'quadro', 50, 1, 1, 0, 'decor', 'w', '<circle cx="15" cy="19" r="16" fill="#a8702e"/><circle cx="15" cy="19" r="13" fill="#bfe9f5"/><polygon points="6,24 10,12 16,6 22,8" fill="#fff" opacity=".4"/>'],
+  /* ---- pisos ---- */
+  ['piso_ceramica', 'Cerâmica bege', 'piso', 45, 1, 1, 0, 'estilo', '', ''],
+  ['piso_marmore', 'Mármore', 'piso', 90, 1, 1, 0, 'estilo', '', ''],
+  ['piso_taco', 'Tábua escura', 'piso', 60, 1, 1, 0, 'estilo', '', ''],
+  ['piso_pedra', 'Pedra', 'piso', 50, 1, 1, 0, 'estilo', '', ''],
+  ['piso_bw', 'Xadrez preto e branco', 'piso', 60, 1, 1, 0, 'estilo', '', ''],
+  ['piso_rosa', 'Rosa pastel', 'piso', 40, 1, 1, 0, 'estilo', '', ''],
+  ['piso_azul', 'Azul céu', 'piso', 40, 1, 1, 0, 'estilo', '', ''],
+  ['piso_verde', 'Verde folha', 'piso', 40, 1, 1, 0, 'estilo', '', ''],
+  ['piso_vermelho', 'Carpete vermelho', 'piso', 70, 1, 1, 0, 'estilo', '', ''],
+  ['piso_cinza', 'Concreto', 'piso', 35, 1, 1, 0, 'estilo', '', ''],
+  ['piso_lilas', 'Lilás', 'piso', 40, 1, 1, 0, 'estilo', '', ''],
+  ['piso_terracota', 'Terracota', 'piso', 50, 1, 1, 0, 'estilo', '', ''],
+  ['piso_gelo', 'Gelo', 'piso', 70, 1, 1, 0, 'estilo', '', ''],
+  ['piso_amarelo', 'Amarelo sol', 'piso', 40, 1, 1, 0, 'estilo', '', ''],
+  /* ---- paredes ---- */
+  ['par_creme', 'Creme', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_cinza', 'Cinza', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_laranja', 'Laranja', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_vermelha', 'Vermelho', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_branca', 'Branco', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_preta', 'Preto', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_lilas', 'Lilás', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_amarela', 'Amarelo', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_madeira', 'Madeira', 'parede', 60, 1, 1, 0, 'estilo', '', ''],
+  ['par_pedra', 'Pedra', 'parede', 60, 1, 1, 0, 'estilo', '', ''],
+  ['par_celeste', 'Celeste', 'parede', 40, 1, 1, 0, 'estilo', '', ''],
+  ['par_listras', 'Listras rosa', 'parede', 70, 1, 1, 0, 'estilo', '', ''],
+  ['par_listras2', 'Listras azuis', 'parede', 70, 1, 1, 0, 'estilo', '', '']
+];
+/* cores de pisos e paredes novos (cliente) */
+var FLOORS3 = {
+  piso_ceramica: { a: '#e8dcc0', b: '#d8ccb0' }, piso_marmore: { a: '#f0f0f4', b: '#dcdce4', dots: '#c8c8d4' }, piso_taco: { a: '#6a4a30', b: '#5a3c26', plank: 1 },
+  piso_pedra: { a: '#9aa0a8', b: '#8a9098', dots: '#70767e' }, piso_bw: { a: '#f2f2f2', b: '#232323' }, piso_rosa: { a: '#f0b8d0', b: '#e8a8c4' }, piso_azul: { a: '#8fc4f0', b: '#7ab4e4' },
+  piso_verde: { a: '#7ac47a', b: '#6ab46a' }, piso_vermelho: { a: '#b02a2a', b: '#9a2222' }, piso_cinza: { a: '#9a9aa4', b: '#8e8e98' }, piso_lilas: { a: '#b8a0e0', b: '#a890d4' },
+  piso_terracota: { a: '#d8884a', b: '#c87a3e' }, piso_gelo: { a: '#d0f0ff', b: '#b8e4f8', stars: 1 }, piso_amarelo: { a: '#f0d868', b: '#e4c858' }
+};
+var WALLS3 = {
+  par_creme: { l: '#f0e4c8', r: '#d8ccb0' }, par_cinza: { l: '#8a8e98', r: '#70747e' }, par_laranja: { l: '#e8884a', r: '#c87238' }, par_vermelha: { l: '#b83a3a', r: '#982e2e' },
+  par_branca: { l: '#f4f4f6', r: '#d8d8de' }, par_preta: { l: '#2a2a32', r: '#1e1e26' }, par_lilas: { l: '#a888d8', r: '#8e72bc' }, par_amarela: { l: '#f0d050', r: '#d8b840' },
+  par_madeira: { l: '#a8702e', r: '#8a5a22', plank: 1 }, par_pedra: { l: '#8a8f98', r: '#70757e', brick: 1 }, par_celeste: { l: '#8fc4f0', r: '#74a8d8' },
+  par_listras: { l: '#f0b8d0', r: '#d898b8', stripe: '#fff' }, par_listras2: { l: '#7ab0e8', r: '#6298d0', stripe: '#fff' }
+};
+
+const GROUPS_OLD = {"sala": ["sofa", "poltrona", "pufe", "mesinha", "tv", "estante", "caixa", "abajur", "vaso", "aquario", "tapete1", "tapete2", "tapete3"], "quarto": ["cama", "guarda_roupa"], "cozinha": ["mesa", "cadeira", "fogao", "pia", "geladeira"], "banheiro": ["privada", "banheira", "lavatorio", "chuveiro"], "escritorio": ["computador"], "jardim": ["arvore_j", "canteiro", "banco_j", "churrasqueira", "poste", "cerca", "piscina"], "lazer": ["fliper", "juke", "bau", "trofeu"], "decor": ["quadro1", "quadro2", "quadro3", "relogio", "neon", "prateleira", "espelho"]};
+CAT3.forEach(function (r) { const o = { id: r[0], n: r[1], cat: r[2], p: r[3], w: r[4], d: r[5], g: r[7] }; if (r[8].indexOf('f') >= 0) o.flat = true; if (r[8].indexOf('w') >= 0) o.wall = true; if (r[8].indexOf('x') >= 0) o.x = 1; CAT.push(o); });
 const CATMAP = {};
 CAT.forEach(function (it) { CATMAP[it.id] = it; });
+Object.keys(GROUPS_OLD).forEach(function (g) { GROUPS_OLD[g].forEach(function (id) { if (CATMAP[id]) CATMAP[id].g = g; }); });
 const PLANS = {
   p: { id: 'p', n: 'Casa pequena', W: 14, H: 12, iw: 9, ih: 6,
     parts: [[5, 0, 1, 2], [5, 3, 1, 3], [6, 3, 1, 1], [8, 3, 1, 1]],
@@ -1098,16 +1269,111 @@ Object.keys(PLANS).forEach(function (k) {
   pl.parts.forEach(function (r) { for (let y = r[1]; y < r[1] + r[3]; y++) for (let x = r[0]; x < r[0] + r[2]; x++) pl.blocked[x + ',' + y] = 1; });
   for (let x = pl.exit[0]; x < pl.exit[0] + pl.exit[2]; x++) for (let y = pl.exit[1]; y < pl.exit[1] + pl.exit[3]; y++) pl.blocked[x + ',' + y] = 1;
 });
-const OWN_MAX = 8, HOUSE_MAX_ITEMS = 140;
+const OWN_MAX = 8, HOUSE_MAX_ITEMS = 240;
 const EXTRA_IDS = ['fliper', 'juke', 'trofeu', 'aquario', 'piso_galaxia', 'par_estrelas', 'pet_dragao', 'pet_raposa', 'pet_robo', 'piscina', 'neon'];
 EXTRA_IDS.forEach(function (id) { if (CATMAP[id]) CATMAP[id].x = 1; });
-const CAT_PUB = CAT.map(function (it) { const o = { id: it.id, n: it.n, cat: it.cat, p: it.p, w: it.w, d: it.d }; if (it.flat) o.flat = 1; if (it.wall) o.wall = 1; if (it.ev) o.ev = it.ev; if (it.free) o.free = 1; if (it.x) o.x = 1; return o; });
+const CAT_PUB = CAT.map(function (it) { const o = { id: it.id, n: it.n, cat: it.cat, p: it.p, w: it.w, d: it.d, g: it.g || '' }; if (it.flat) o.flat = 1; if (it.wall) o.wall = 1; if (it.ev) o.ev = it.ev; if (it.free) o.free = 1; if (it.x) o.x = 1; return o; });
 /* moedas iniciais: cobrem uma unidade de tudo que é básico (sem itens de temporada nem extras), com folga */
-const STARTER = Math.ceil(CAT.filter(function (it) { return !it.free && !it.ev && !it.x; }).reduce(function (s, it) { return s + it.p; }, 0) * 1.2 / 100) * 100;
+const STARTER = Math.ceil(CAT.filter(function (it) { return !it.free && !it.ev && !it.x; }).reduce(function (s, it) { return s + it.p; }, 0) * 1.15 / 100) * 100;
+const STARTER_OLD = 3900;
 const EASY = 2;   /* multiplicador geral de moedas ganhas nas partidas */
 
 function itemPrice(it) { if (it.free) return 0; return Math.max(1, Math.round(it.p * (1 - evSale()))); }
 function itemOnShelf(it) { if (!it.ev) return true; const ev = EVENTS.find(function (e) { return e.id === it.ev; }); return !!ev && evActive(ev, true); }
+
+/* ===== Fase 4: casa livre (terreno com paredes finas, portas e piso por tile) ===== */
+const LOT_W = 22, LOT_H = 20, EXIT_X = 10, EXIT_Y = 19, WALL_MAX = 420, B36 = '0123456789abcdefghijklmnopqrstuvwxyz';
+function lotCell(g, x, y) { return x >= 0 && y >= 0 && x < LOT_W && y < LOT_H && (g.fl[y].charAt(x) !== '.' || g.wl[y].charAt(x) !== '.'); }
+function lotTall(g, x, y) { return !lotCell(g, x, y - 1) || !lotCell(g, x - 1, y); }
+function isExitTile(x, y) { return y === EXIT_Y && x >= EXIT_X && x < EXIT_X + 2; }
+function zoneAtP(pl, x, y) { for (let i = 0; i < pl.zones.length; i++) { const z = pl.zones[i]; if (x >= z.x && x < z.x + z.w && y >= z.y && y < z.y + z.h) return z; } return null; }
+function zoneNearP(pl, x, y) {
+  let z = zoneAtP(pl, x, y); if (z) return z;
+  for (let r = 1; r < 5; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { z = zoneAtP(pl, x + dx, y + dy); if (z) return z; }
+  return pl.zones[0];
+}
+/* converte uma planta antiga (e seus pisos/paredes por cômodo) para o terreno livre */
+function plan2house(pid, flz, wlz, putOld) {
+  const pl = PLANS[pid] || PLANS.m, OX = 3, OY = 2, fl = [], wl = [], fp = [], wp = [];
+  for (let y = 0; y < LOT_H; y++) { fl.push(new Array(LOT_W).fill('.')); wl.push(new Array(LOT_W).fill('.')); }
+  function fi(id) { let i = fp.indexOf(id); if (i < 0) { fp.push(id); i = fp.length - 1; } return B36.charAt(i); }
+  function wi(id) { let i = wp.indexOf(id); if (i < 0) { wp.push(id); i = wp.length - 1; } return String.fromCharCode(97 + i); }
+  flz = flz || {}; wlz = wlz || {};
+  for (let y = 0; y < pl.ih; y++) for (let x = 0; x < pl.iw; x++) fl[OY + y][OX + x] = fi(flz[zoneNearP(pl, x, y).id] || 'piso_xadrez');
+  function wid(x, y) { return wlz[zoneNearP(pl, Math.max(0, Math.min(pl.iw - 1, x)), Math.max(0, Math.min(pl.ih - 1, y))).id] || 'par_roxa'; }
+  for (let y = -1; y <= pl.ih; y++) for (let x = -1; x <= pl.iw; x++) if (x === -1 || y === -1 || x === pl.iw || y === pl.ih) wl[OY + y][OX + x] = wi(wid(x, y));
+  pl.parts.forEach(function (r) { for (let y = r[1]; y < r[1] + r[3]; y++) for (let x = r[0]; x < r[0] + r[2]; x++) wl[OY + y][OX + x] = wi(wid(x, y)); });
+  /* porta da frente, na altura da saída antiga, e portas nos vãos entre paredes */
+  const dx = OX + pl.exit[0];
+  wl[OY + pl.ih][dx] = wl[OY + pl.ih][dx].toUpperCase();
+  for (let y = 0; y < pl.ih; y++) for (let x = 0; x < pl.iw; x++) {
+    if (wl[OY + y][OX + x] !== '.') continue;
+    const w = wl[OY + y][OX + x - 1] !== '.' && wl[OY + y][OX + x + 1] !== '.', n = wl[OY + y - 1][OX + x] !== '.' && wl[OY + y + 1][OX + x] !== '.';
+    if (w || n) wl[OY + y][OX + x] = wi(wid(x, y)).toUpperCase();
+  }
+  const put = [];
+  (putOld || []).forEach(function (q) {
+    if (!q || typeof q.id !== 'string') return;
+    if (q.s === 'R') put.push({ id: q.id, s: 'S', x: OX + (q.i | 0), y: OY - 1, c: 0 });
+    else if (q.s === 'L') put.push({ id: q.id, s: 'E', x: OX - 1, y: OY + (q.i | 0), c: 0 });
+    else { const x = q.x | 0, y = q.y | 0; put.push({ id: q.id, x: x + OX + (x >= pl.iw ? 1 : 0), y: y + OY + (y >= pl.ih ? 1 : 0), r: q.r ? 1 : 0, c: 0 }); }
+  });
+  return { v: 2, fp: fp, wp: wp, fl: fl.map(function (r) { return r.join(''); }), wl: wl.map(function (r) { return r.join(''); }), put: put };
+}
+function cleanPut2(own, g, list) {
+  const put = [], count = {}, taken = {}, flatTaken = {}, wallTaken = {};
+  list = Array.isArray(list) ? list.slice(0, HOUSE_MAX_ITEMS) : [];
+  for (let i = 0; i < list.length; i++) {
+    const q = list[i], it = q && CATMAP[q.id];
+    if (!it || ['movel', 'tapete', 'quadro'].indexOf(it.cat) === -1) continue;
+    if ((count[it.id] || 0) >= (own[it.id] || 0)) continue;
+    const c = (q.c | 0) & 15;
+    if (it.wall) {
+      const s = q.s === 'E' ? 'E' : 'S', x = q.x | 0, y = q.y | 0, k = s + x + ',' + y;
+      if (x < 0 || y < 0 || x >= LOT_W || y >= LOT_H || wallTaken[k]) continue;
+      const ch = g.wl[y].charAt(x);
+      if (ch === '.' || ch !== ch.toLowerCase()) continue;
+      const fx = s === 'S' ? x : x + 1, fy = s === 'S' ? y + 1 : y;
+      if (fx >= LOT_W || fy >= LOT_H || g.fl[fy].charAt(fx) === '.' || !lotTall(g, x, y)) continue;
+      wallTaken[k] = 1; count[it.id] = (count[it.id] || 0) + 1;
+      put.push({ id: it.id, s: s, x: x, y: y, c: c });
+    } else {
+      const r = q.r ? 1 : 0, fw = r ? it.d : it.w, fd = r ? it.w : it.d, x = q.x | 0, y = q.y | 0;
+      if (x < 0 || y < 0 || x + fw > LOT_W || y + fd > LOT_H) continue;
+      const bag = it.flat ? flatTaken : taken;
+      let clash = false;
+      for (let yy = y; yy < y + fd && !clash; yy++) for (let xx = x; xx < x + fw; xx++) if (bag[xx + ',' + yy] || g.wl[yy].charAt(xx) !== '.' || isExitTile(xx, yy)) { clash = true; break; }
+      if (clash) continue;
+      for (let yy = y; yy < y + fd; yy++) for (let xx = x; xx < x + fw; xx++) bag[xx + ',' + yy] = 1;
+      count[it.id] = (count[it.id] || 0) + 1;
+      put.push({ id: it.id, x: x, y: y, r: r, c: c });
+    }
+  }
+  return put;
+}
+function houseBase(a, m) {
+  const own = a.items.own, fpIn = Array.isArray(m.fp) ? m.fp.slice(0, 36) : [], wpIn = Array.isArray(m.wp) ? m.wp.slice(0, 26) : [];
+  const flIn = Array.isArray(m.fl) ? m.fl : [], wlIn = Array.isArray(m.wl) ? m.wl : [], fp = [], wp = [], fl = [], wl = [];
+  let nWalls = 0;
+  function okF(id) { return typeof id === 'string' && !!CATMAP[id] && CATMAP[id].cat === 'piso' && ownedOk(a, id); }
+  function okW(id) { return typeof id === 'string' && !!CATMAP[id] && CATMAP[id].cat === 'parede' && ownedOk(a, id); }
+  for (let y = 0; y < LOT_H; y++) {
+    const rf = String(flIn[y] || ''), rw = String(wlIn[y] || '');
+    let of = '', ow = '';
+    for (let x = 0; x < LOT_W; x++) {
+      let f = '.', w = '.';
+      const cf = rf.charAt(x) || '.', cw = rw.charAt(x) || '.';
+      if (cf !== '.') { const ix = parseInt(cf, 36); if (isFinite(ix) && ix < fpIn.length && okF(fpIn[ix])) { let j = fp.indexOf(fpIn[ix]); if (j < 0) { fp.push(fpIn[ix]); j = fp.length - 1; } f = B36.charAt(j); } }
+      if (cw !== '.' && !isExitTile(x, y) && nWalls < WALL_MAX) {
+        const lc = cw.toLowerCase(), wi = lc.charCodeAt(0) - 97;
+        if (wi >= 0 && wi < wpIn.length && okW(wpIn[wi])) { let j = wp.indexOf(wpIn[wi]); if (j < 0) { wp.push(wpIn[wi]); j = wp.length - 1; } w = String.fromCharCode(97 + j); if (cw !== lc) w = w.toUpperCase(); nWalls++; }
+      }
+      of += f; ow += w;
+    }
+    fl.push(of); wl.push(ow);
+  }
+  return { v: 2, fp: fp, wp: wp, fl: fl, wl: wl, put: [] };
+}
 
 function cleanPut(own, pl, list) {
   const put = [], count = {}, taken = {}, flatTaken = {}, wallTaken = {};
@@ -1141,20 +1407,22 @@ function normItems(a) {
   let h = it.house && typeof it.house === 'object' ? it.house : null;
   if (!h) {
     const r = it.room && typeof it.room === 'object' ? it.room : {};
-    h = { plan: 'm', fl: {}, wl: {}, put: [] };
     const fl = CATMAP[r.floor] && CATMAP[r.floor].cat === 'piso' ? r.floor : '', wl = CATMAP[r.wall] && CATMAP[r.wall].cat === 'parede' ? r.wall : '';
-    PLANS.m.zones.forEach(function (z) { if (fl) h.fl[z.id] = fl; if (wl) h.wl[z.id] = wl; });
-    h.put = cleanPut(it.own, PLANS.m, r.put);
+    const fz = {}, wz = {};
+    PLANS.p.zones.forEach(function (z) { if (fl) fz[z.id] = fl; if (wl) wz[z.id] = wl; });
+    h = plan2house('p', fz, wz, it.room && Array.isArray(r.put) ? cleanPut(it.own, PLANS.m, r.put) : []);
+  } else if (h.v !== 2) {
+    h = plan2house(PLANS[h.plan] ? h.plan : 'm', h.fl && typeof h.fl === 'object' ? h.fl : {}, h.wl && typeof h.wl === 'object' ? h.wl : {}, Array.isArray(h.put) ? h.put : []);
   }
-  h.plan = PLANS[h.plan] ? h.plan : 'm';
-  h.fl = h.fl && typeof h.fl === 'object' ? h.fl : {};
-  h.wl = h.wl && typeof h.wl === 'object' ? h.wl : {};
-  h.put = Array.isArray(h.put) ? h.put : [];
+  h.fp = Array.isArray(h.fp) ? h.fp : []; h.wp = Array.isArray(h.wp) ? h.wp : [];
+  h.fl = Array.isArray(h.fl) && h.fl.length === LOT_H ? h.fl : plan2house('p').fl;
+  h.wl = Array.isArray(h.wl) && h.wl.length === LOT_H ? h.wl : plan2house('p').wl;
+  h.put = cleanPut2(it.own, h, Array.isArray(h.put) ? h.put : []);
   it.house = h; delete it.room;
   it.pet = typeof it.pet === 'string' && CATMAP[it.pet] && CATMAP[it.pet].cat === 'pet' ? it.pet : '';
   it.likes = it.likes && typeof it.likes === 'object' ? it.likes : {};
   it.visits = it.visits && typeof it.visits === 'object' ? it.visits : {};
-  it.starter = it.starter ? 1 : 0;
+  it.starter = it.starter ? 1 : 0; it.starter2 = it.starter2 ? 1 : 0;
   it.gal = Object.assign({ d: '', n: 0, total: 0, likes: 0 }, it.gal && typeof it.gal === 'object' ? it.gal : {});
   a.items = it;
   return it;
@@ -1168,15 +1436,10 @@ function ownedOk(a, id) { const it = CATMAP[id]; return !!it && (it.free || (a.i
 // valida e limpa a casa enviada pelo cliente; devolve { house, pet } ou { err }
 function cleanHouse(a, m) {
   if (!m || typeof m !== 'object') return { err: 'Casa inválida.' };
-  const cur = a.items.house, plan = PLANS[m.plan] ? m.plan : cur.plan, pl = PLANS[plan];
-  const fl = {}, wl = {};
-  pl.zones.forEach(function (z) {
-    const f = m.fl && m.fl[z.id], w = m.wl && m.wl[z.id];
-    fl[z.id] = ownedOk(a, f) && CATMAP[f].cat === 'piso' ? f : (ownedOk(a, cur.fl[z.id]) && CATMAP[cur.fl[z.id]].cat === 'piso' ? cur.fl[z.id] : 'piso_xadrez');
-    wl[z.id] = ownedOk(a, w) && CATMAP[w].cat === 'parede' ? w : (ownedOk(a, cur.wl[z.id]) && CATMAP[cur.wl[z.id]].cat === 'parede' ? cur.wl[z.id] : 'par_roxa');
-  });
+  const base = houseBase(a, m);
+  base.put = cleanPut2(a.items.own, base, m.put);
   const pet = m.pet === '' ? '' : (typeof m.pet === 'string' && CATMAP[m.pet] && CATMAP[m.pet].cat === 'pet' && (a.items.own[m.pet] || 0) > 0 ? m.pet : a.items.pet);
-  return { house: { plan: plan, fl: fl, wl: wl, put: cleanPut(a.items.own, pl, m.put) }, pet: pet };
+  return { house: base, pet: pet };
 }
 
 /* ---------- ações sobre contas, em memória ou no banco ---------- */
@@ -1206,8 +1469,10 @@ async function roomsList() {
     const mem = playerByKey(r.key), a = mem && mem.acct ? mem.acct : null;
     const it = a ? a.items : (r.items && typeof r.items === 'object' ? r.items : {});
     const hh = it.house || it.room, put = hh && Array.isArray(hh.put) ? hh.put.length : 0;
+    let pln = 'm';
+    if (hh && hh.v === 2 && Array.isArray(hh.fl)) { const t = hh.fl.join('').replace(/\./g, '').length; pln = t < 70 ? 'p' : t < 130 ? 'm' : 'g'; } else if (hh && PLANS[hh.plan]) pln = hh.plan;
     const likes = it.likes && typeof it.likes === 'object' ? Object.keys(it.likes).length : 0;
-    return { key: r.key, nick: a ? a.nick : r.nick, av: r.av || '', lv: lvOf(a ? a.xp : (r.xp | 0)), n: put, likes: likes, plan: hh && PLANS[hh.plan] ? hh.plan : 'm' };
+    return { key: r.key, nick: a ? a.nick : r.nick, av: r.av || '', lv: lvOf(a ? a.xp : (r.xp | 0)), n: put, likes: likes, plan: pln };
   });
   out.sort(function (x, y) { return (y.likes - x.likes) || (y.n - x.n) || (y.lv - x.lv); });
   roomsCache = { t: Date.now(), v: out };

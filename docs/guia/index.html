@@ -1,0 +1,1725 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Guia de Entregas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Guia de bolso somente leitura, arquivo unico. Coluna unica (max 760px). Cliente no topo, navegacao (Hoje, Mes, Regras) na base. */
+:root{
+  color-scheme:light;
+  --bg:#F3F6F8; --surface:#FFFFFF; --ink:#12202A; --muted:#566874; --line:#D9E2E8;
+  --accent:#0A5F7A; --accent-ink:#FFFFFF; --accent-soft:#DCEFF5;
+  --ok:#1B6B45; --ok-soft:#DDF1E6;
+  --warn:#7A4A00; --warn-soft:#FBEBCB; --bad:#A3281F; --bad-soft:#FBE1DE;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.head{padding-block:14px 2px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
+h1{font:600 1.55rem/1.1 var(--f-display);letter-spacing:.01em;margin:0}
+.sub{font-size:.8rem;color:var(--muted)}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.scopes{display:flex;gap:8px;overflow-x:auto;padding:8px 28px 8px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
+.scopes::-webkit-scrollbar{display:none}
+.sc{flex:none;appearance:none;cursor:pointer;min-height:44px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;font-size:.92rem;font-weight:600;white-space:nowrap}
+.sc[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.sc.all{border-style:dashed}
+.sc.all[aria-pressed="true"]{border-style:solid}
+
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr)}
+.tab{appearance:none;background:none;border:0;border-top:3px solid transparent;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font:600 .78rem var(--f-body);letter-spacing:.04em;color:var(--muted)}
+.tab svg{width:24px;height:24px}
+.tab[aria-selected="true"]{color:var(--accent);border-top-color:var(--accent)}
+
+main.wrap{padding-block:16px calc(96px + env(safe-area-inset-bottom,0px));display:block;min-height:60vh}
+.lab{font:600 .75rem var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px}
+.lab.first{margin-top:0}
+.lab.late{color:var(--bad)}
+
+/* cabecalho do cliente */
+.chead{margin-bottom:14px}
+.crumb{appearance:none;background:none;border:0;padding:8px 0;min-height:44px;cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:600}
+.chead h2{font:700 2rem/1.05 var(--f-display);letter-spacing:.01em;margin:0}
+.full{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lnk{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;font-size:.9rem;font-weight:600;border:1px solid var(--accent);color:var(--accent);background:var(--surface);padding:8px 14px;border-radius:8px}
+.lnk.pri{background:var(--accent);color:var(--accent-ink)}
+
+/* Hoje */
+.picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.picker label{font-size:.85rem;color:var(--muted)}
+.picker input{font:inherit;min-height:44px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.btn{appearance:none;min-height:44px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.9rem}
+.btn:hover{border-color:var(--accent)}
+.datebar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;padding-bottom:12px}
+.wd{display:block;font-size:.85rem;color:var(--muted)}
+.dd{display:block;font:600 2rem/1.05 var(--f-display)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:.8rem;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.tag.acc{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tag.hol{background:var(--bad-soft);border-color:transparent;color:var(--bad)}
+.tag.plt{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.clock{font-size:.85rem;color:var(--muted);text-align:right}
+.clock b{display:block;font:600 1.6rem/1 var(--f-mono);color:var(--ink)}
+
+.sumb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sumt{font-size:1rem}
+.sumt b{font:700 1.6rem/1 var(--f-display);margin-right:4px}
+.prog{height:8px;background:var(--bg);border-radius:999px;overflow:hidden;margin:8px 0;border:1px solid var(--line)}
+.prog i{display:block;height:100%;background:var(--ok)}
+.sums{font-size:.88rem;color:var(--muted)}
+.sums .bad{color:var(--bad);font-weight:700}
+.note2{font-size:.82rem;color:var(--muted);margin:6px 2px 0}
+.note2.warn{color:var(--warn)}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{appearance:none;text-align:left;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:3px;min-width:0;min-height:84px}
+.tile:hover{border-color:var(--accent)}
+.tile b{font:700 1.3rem/1.05 var(--f-display);letter-spacing:.01em}
+.tile span{font-size:.78rem;color:var(--muted);line-height:1.25}
+.tile .tdue{color:var(--accent);font-weight:700}
+.tile .tbad{color:var(--bad);font-weight:700}
+.tile .tok{color:var(--ok);font-weight:700}
+
+.due{background:var(--accent-soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:14px}
+.due h3{margin:0;font:600 1.05rem var(--f-display);letter-spacing:.02em;color:var(--accent)}
+.dueitem{display:flex;flex-direction:column;gap:5px}
+.dueitem b{font-weight:600}
+.dq{font-size:.82rem;color:var(--muted)}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{font-size:.78rem;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.susp{background:var(--bad-soft);color:var(--bad);border:2px solid var(--bad);border-radius:10px;padding:10px 14px;font-weight:700;margin:10px 0}
+.pill.psusp{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+/* tudo que e clicavel fica evidente: borda, sombra, seta */
+.sc{border-color:#B7C5CE;box-shadow:0 1px 2px rgba(18,32,42,.10)}
+.sc[aria-pressed="false"]:hover{background:var(--accent-soft)}
+.btn{border-color:var(--accent);color:var(--accent);font-weight:600;box-shadow:0 1px 2px rgba(18,32,42,.10)}
+.btn:hover{background:var(--accent-soft)}
+.tile{position:relative;padding-right:26px;border-color:#B7C5CE;box-shadow:0 1px 3px rgba(18,32,42,.12)}
+.tile::after{content:"\203A";position:absolute;right:9px;top:8px;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 1.05rem/18px var(--f-body);text-align:center}
+.tile:hover,.tile:active{background:var(--accent-soft)}
+.nmb{color:var(--accent);text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.cell{border-color:#B7C5CE;box-shadow:0 1px 2px rgba(18,32,42,.08)}
+.cell:hover,.cell:active{background:var(--accent-soft)}
+.cell.blank{box-shadow:none}
+.daybtn b{color:var(--accent);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.lnk[target="_blank"]::after{content:"\2197";margin-left:8px;font-weight:700}
+.lnk{box-shadow:0 1px 2px rgba(18,32,42,.12)}
+.lnk:hover{background:var(--accent-soft)}
+.lnk.pri:hover{background:#084E64}
+.lnk.sm{min-height:40px;padding:4px 12px;font-size:.84rem}
+.lnk.off{border-style:dashed;color:var(--muted);box-shadow:none;cursor:default;background:transparent}
+details.dn summary,details.acc summary{list-style:none;cursor:pointer;border:1px solid #B7C5CE;background:var(--surface);border-radius:10px;padding:12px 40px 12px 14px;min-height:48px;position:relative;box-shadow:0 1px 2px rgba(18,32,42,.10)}
+details.dn summary::-webkit-details-marker,details.acc summary::-webkit-details-marker{display:none}
+details.dn summary::after,details.acc summary::after{content:"+";position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 1.1rem/24px var(--f-body);text-align:center}
+details[open].dn>summary::after,details[open].acc>summary::after{content:"\2212"}
+details.dn summary{color:var(--ink)}
+details.acc{margin-top:8px}
+details.acc summary{font-weight:600;font-size:1rem}
+details.acc summary small{display:block;font-weight:400;font-size:.82rem;color:var(--muted);margin-top:2px}
+details.acc[open]>summary{border-color:var(--accent)}
+.protobtn{appearance:none;width:100%;min-height:48px;text-align:left;cursor:pointer;margin:2px 0 14px;padding:10px 14px;border:2px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:10px;font:600 .95rem var(--f-body);box-shadow:0 1px 3px rgba(18,32,42,.12)}
+.protobtn.plt{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.env{display:inline-flex;font-size:.8rem;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.env.mc{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.env.ol{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.env.wa{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.envrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 6px}
+.chead .env{margin-top:10px}
+.rulebox{background:var(--surface);border:2px solid var(--warn);border-radius:12px;padding:12px 14px}
+.rulebox ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:8px;font-size:.95rem}
+.rulebox li.stop{color:var(--bad)}
+.ans{list-style:none;margin:0;padding:10px 4px 2px;display:flex;flex-direction:column;gap:12px}
+.ans li{display:flex;flex-direction:column;gap:2px;font-size:.92rem}
+.ans li b{font:600 1.05rem var(--f-display);letter-spacing:.02em}
+em.tbdx{font-style:normal;font-size:.75rem;font-weight:700;color:var(--warn);background:var(--warn-soft);border:1px dashed var(--warn);border-radius:6px;padding:0 6px;margin-left:4px}
+em.sus{font-style:normal;font-weight:700;color:var(--bad)}
+.ptab{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:10px}
+.ptab th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.ptab td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.ptab td:first-child{font:600 1rem var(--f-display)}
+.ptab small{display:block;color:var(--muted);font-size:.74rem}
+.ptab tr.s td{color:var(--bad)}
+.ck{list-style:none;margin:0;padding:6px 2px 2px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+.ck li{display:grid;grid-template-columns:22px 1fr;gap:10px}
+.ck li::before{content:"";width:18px;height:18px;border:2px solid var(--accent);border-radius:5px;margin-top:2px}
+.pnote{font-size:.85rem;color:var(--muted);margin:8px 2px 0}
+.bar #modebar{display:flex;gap:8px;align-items:center;padding-top:8px}
+.bar #modebar:empty{display:none}
+.hero{appearance:none;width:100%;cursor:pointer;min-height:56px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:700 1.2rem/1.1 var(--f-display);letter-spacing:.06em;padding:8px 14px;box-shadow:0 2px 8px rgba(10,95,122,.35);text-align:center}
+.hero small{display:block;font:500 .78rem var(--f-body);letter-spacing:0;margin-top:2px;opacity:.92}
+.seg{flex:1;display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--accent);border-radius:12px;overflow:hidden;background:var(--surface)}
+.seg button{appearance:none;border:0;background:transparent;min-height:44px;font:600 .92rem var(--f-body);color:var(--accent);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.editbtn{appearance:none;flex:none;min-height:44px;padding:0 14px;border:2px solid var(--accent);border-radius:12px;background:var(--surface);color:var(--accent);font:600 .92rem var(--f-body);cursor:pointer}
+.editbtn::before{content:"\270E";margin-right:6px}
+.eh{font:700 1.8rem/1.05 var(--f-display);margin:0 0 6px}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pk{appearance:none;text-align:left;cursor:pointer;min-height:52px;display:flex;align-items:center;gap:10px;padding:8px 12px;border:2px solid #B7C5CE;border-radius:10px;background:var(--surface);font:600 1rem var(--f-body);box-shadow:0 1px 2px rgba(18,32,42,.10)}
+.pk .bx{width:22px;height:22px;border:2px solid var(--muted);border-radius:6px;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:.95rem;line-height:1;color:transparent}
+.pk[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pk[aria-pressed="true"] .bx{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pk[aria-pressed="true"] .bx::after{content:"\2713";font-weight:700}
+.pk small{display:block;font-weight:700;font-size:.72rem}
+.same{margin-top:8px}
+.savebar{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:15;margin-top:18px;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 -2px 10px rgba(18,32,42,.10)}
+.savebar .go{appearance:none;min-height:52px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font:700 1.05rem var(--f-body);cursor:pointer}
+.savebar .btn{width:100%}
+.linkbox{display:flex;gap:8px;margin-top:8px}
+.linkbox input{flex:1;min-width:0;font:.8rem var(--f-mono);padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.notice{background:var(--warn-soft);border:2px solid var(--warn);color:var(--warn);border-radius:10px;padding:10px 14px;font-weight:600;margin-bottom:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.notice .btn{background:var(--surface)}
+.acard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px;margin-bottom:8px}
+.none{color:var(--muted);font-size:.92rem;margin:0}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:14px}
+
+.list{display:flex;flex-direction:column;gap:8px}
+.row{width:100%;text-align:left;display:grid;grid-template-columns:5.4rem 1fr;gap:12px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.when{display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--line);padding-right:10px;min-width:0}
+.when .l{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.when .t{font:600 1.3rem/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.when .t.sm{font-size:.85rem;line-height:1.2}
+.when .left{font-size:.78rem;color:var(--accent);font-weight:600}
+.when .left.soon{color:var(--warn)}
+.what{min-width:0}
+.what .nm{font:600 1.15rem/1.2 var(--f-display);letter-spacing:.01em}
+.nmb{appearance:none;background:none;border:0;padding:6px 0;min-height:32px;cursor:pointer;font:600 1.15rem/1.2 var(--f-display);letter-spacing:.01em;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.what .ed{color:var(--muted);font-size:.88rem;margin-left:6px}
+.what .ed.solo{margin-left:0;color:var(--ink);font:600 1.15rem/1.2 var(--f-display)}
+.rec{font-size:.88rem;color:var(--muted);margin:2px 0 7px}
+.row.next{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.row.next .when .t{color:var(--accent)}
+.row.late{border-color:var(--bad);background:var(--bad-soft)}
+.row.late .when .t,.row.late .when .l{color:var(--bad)}
+.row.ok{border-color:var(--ok);background:var(--ok-soft)}
+.row.ok .when .t,.row.ok .when .l{color:var(--ok)}
+.row.done{opacity:.6}
+.nextbadge{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:1px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+details.dn{margin-top:12px}
+details.dn summary{cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);padding:10px 0;min-height:44px}
+details.dn .list{margin-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;gap:6px;align-items:baseline;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:.8rem;background:var(--bg)}
+.chip i{font-style:normal;color:var(--muted)}
+.chip b{font:500 .82rem var(--f-mono);font-variant-numeric:tabular-nums}
+.chip.tbd{border-style:dashed;color:var(--warn);background:var(--warn-soft);border-color:var(--warn)}
+.note{font-size:.82rem;color:var(--warn);margin-top:5px}
+.semlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.semlist li{font-size:.9rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+.semlist b{color:var(--ink);min-width:4.5rem}
+.rules{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:5px;font-size:.92rem}
+.nx{display:grid;grid-template-columns:4.2rem 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.nx:first-of-type{border-top:0}
+.nx .nd{font:600 .95rem var(--f-mono)}
+.nx .nd small{display:block;font:500 .75rem var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* Mes */
+.monthbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mlabel{flex:1;text-align:center;font:600 1.4rem var(--f-display)}
+.mlabel::first-letter{text-transform:uppercase}
+.monthbar .btn{min-width:48px;min-height:48px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cwd{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding:2px 0}
+.cell{appearance:none;cursor:pointer;width:100%;max-width:100%;min-height:48px;border:1px solid var(--line);background:var(--surface);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 .95rem/1 var(--f-mono);padding:4px 0}
+.cell:hover{border-color:var(--accent)}
+.cell.blank{visibility:hidden;border:0;cursor:default}
+.cell.wk{color:var(--muted);background:transparent}
+.cell.hol{color:var(--bad);background:var(--bad-soft);border-color:transparent}
+.cell.today{border:2px solid var(--accent)}
+.cell.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:block}
+.dot.off{background:transparent}
+.dot.ok{background:var(--ok)}
+.dot.late{background:var(--bad)}
+.cell.sel .dot{box-shadow:0 0 0 2px var(--accent-ink)}
+.legend{font-size:.8rem;color:var(--muted);margin:8px 0 0;display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center}
+.legend .dot{display:inline-block;margin-right:4px}
+.hols{font-size:.85rem;color:var(--muted);margin:10px 0 0}
+.days{list-style:none;margin:0;padding:0}
+.day{display:grid;grid-template-columns:3.8rem 1fr;gap:12px;padding:14px 8px;border-top:1px solid var(--line)}
+.day.today{background:var(--accent-soft);border-radius:10px;border-top-color:transparent}
+.dn2{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.dn2 b{font:600 2rem/1 var(--f-display)}
+.dn2 span{font-size:.78rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.dtag{font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.its{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.it b{font-weight:600}
+.it .pills{margin:4px 0}
+.it a{font-size:.9rem}
+.daybtn{appearance:none;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:inherit}
+
+/* Regras */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card + .card{margin-top:12px}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:2px}
+.ch h2{font:700 1.5rem/1.1 var(--f-display);letter-spacing:.01em;margin:0}
+.ch .btn{font-weight:600;color:var(--accent);border-color:var(--accent)}
+.ent{padding:10px 0;border-top:1px solid var(--line)}
+.ent.f{border-top:0}
+.ent-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline;margin-bottom:3px}
+.ent-h b{font:600 1.05rem var(--f-display);letter-spacing:.02em}
+.ent-h span{font-size:.8rem;color:var(--muted)}
+.rl{font-size:.88rem;color:var(--muted);margin:0 0 1px}
+.rl em{font-style:normal;color:var(--ink);font-weight:600}
+.ent .chips{margin-top:7px}
+.ent .inline{margin-top:6px}
+ul.att{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:4px;font-size:.92rem}
+details.tbd{margin-top:12px;border:1px dashed var(--warn);background:var(--warn-soft);border-radius:8px;padding:6px 10px}
+details.tbd summary{cursor:pointer;font-size:.88rem;font-weight:600;color:var(--warn);min-height:36px;display:flex;align-items:center}
+details.tbd ul{margin:6px 0 2px;padding-left:1.1rem;font-size:.9rem;color:var(--ink)}
+.inline a{font-size:.9rem}
+.lab#como{scroll-margin-top:200px}
+.cmint{font-size:.9rem;color:var(--muted);margin:0 0 8px}
+details.cm{margin-top:8px}
+details.cm summary{list-style:none;cursor:pointer;border:1px solid #B7C5CE;background:var(--surface);border-radius:10px;padding:12px 40px 12px 14px;min-height:48px;position:relative;box-shadow:0 1px 2px rgba(18,32,42,.10);font-weight:600}
+details.cm summary::-webkit-details-marker{display:none}
+details.cm summary::after{content:"+";position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 1.1rem/24px var(--f-body);text-align:center}
+details.cm[open]>summary{border-color:var(--accent)}
+details.cm[open]>summary::after{content:"\2212"}
+details.cm summary small{display:block;font-weight:400;font-size:.82rem;color:var(--muted);margin-top:2px}
+.cmb{padding:10px 4px 4px;font-size:.93rem;line-height:1.5}
+.cmb p{margin:0 0 8px}
+.cmb ul,.cmb ol{margin:0;padding-left:1.15rem;display:flex;flex-direction:column;gap:6px}
+.cmb code{font-size:.82rem;background:var(--accent-soft);padding:1px 4px;border-radius:4px;word-break:break-word}
+.ch .bs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+footer.wrap{padding-block:0 120px}
+.foot{border-top:1px solid var(--line);padding-top:14px;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+@media (max-width:420px){
+  .row{grid-template-columns:4.6rem 1fr;gap:10px}
+  .when .t{font-size:1.15rem}
+  .dd{font-size:1.75rem}
+  .tile b{font-size:1.2rem}
+}
+@media (prefers-reduced-motion:no-preference){
+  .tab,.row,.btn,.sc,.tile,.cell,.lnk{transition:border-color .15s,background-color .15s,color .15s}
+}
+/* ===== Perfil, calendario, plantao ===== */
+.tabs{grid-template-columns:repeat(5,1fr)}
+.tab{font-size:.68rem;letter-spacing:.01em}
+.tab svg{width:22px;height:22px}
+body.wiz .dock{display:none}
+body.wiz main.wrap{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.bar #modebar{display:block;padding-top:0}
+.bar #modebar:empty{display:none}
+.hero{margin-top:8px}
+.hello{display:flex;gap:10px;align-items:center;padding-top:8px}
+.avt{width:42px;height:42px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 1.25rem var(--f-display);display:flex;align-items:center;justify-content:center;flex:none}
+.hw{flex:1;min-width:0}
+.hw b{display:block;font:700 1.45rem/1 var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hw small{color:var(--muted);font-size:.82rem}
+.hello .editbtn{min-height:40px;padding:0 12px;border-width:1.5px}
+.hello.big{padding:0 0 10px}
+.nmin{font:700 1.5rem/1.1 var(--f-display);border:0;border-bottom:2px dashed var(--line);background:transparent;color:var(--ink);width:100%;padding:2px 0}
+.nmbig{width:100%;height:56px;border:2px solid var(--accent);border-radius:12px;padding:0 14px;font:600 1.2rem var(--f-body);background:var(--surface);color:var(--ink)}
+.alltop{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:4px 6px 4px 12px;margin-top:8px;font-weight:600;font-size:.88rem}
+.alltop button{appearance:none;border:0;background:var(--surface);color:var(--accent);font:600 .85rem var(--f-body);border-radius:8px;padding:6px 10px;min-height:36px;cursor:pointer}
+.dots{display:flex;gap:6px;margin-bottom:14px}
+.dots i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--accent)}
+.step{font:600 .78rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wl{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+.wl.sm{font-size:.85rem;margin-top:12px}
+.errt{color:var(--bad);font-weight:700;margin:10px 0 0}
+.gridc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cc{appearance:none;text-align:left;position:relative;cursor:pointer;min-height:92px;border:2px solid #B7C5CE;background:var(--surface);border-radius:14px;padding:12px;font:inherit;color:var(--ink);box-shadow:0 1px 2px rgba(18,32,42,.10);display:block;width:100%}
+.cc .av{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font:700 .95rem var(--f-display);display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
+.cc b{display:block;font:700 1.15rem/1.1 var(--f-display);margin-top:8px}
+.cc small{display:block;color:var(--muted);font-size:.78rem;margin-top:1px}
+.cc small.sus{color:var(--bad);font-weight:700}
+.cc .ck{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;border:2px solid #B7C5CE;background:var(--surface);color:var(--accent-ink);font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.cc.on{border-color:var(--accent);background:var(--accent-soft)}
+.cc.on .av{background:var(--accent);color:var(--accent-ink)}
+.cc.on .ck{background:var(--accent);border-color:var(--accent)}
+.same{margin-top:10px;width:100%}
+.wfoot{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:18px 16px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(243,246,248,0),var(--bg) 26%);display:flex;flex-direction:column;gap:2px;align-items:center}
+.wfoot>*{width:100%;max-width:560px}
+.go2{appearance:none;min-height:52px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:700 1.05rem var(--f-body);cursor:pointer;width:100%;box-shadow:0 2px 8px rgba(10,95,122,.3)}
+.tlink{appearance:none;background:none;border:0;color:var(--accent);font:600 .92rem var(--f-body);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:8px;min-height:44px}
+.allink{margin:26px 0 0;text-align:center}
+.allink .tlink{color:var(--muted);font-weight:500;font-size:.82rem}
+.sum{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.sum h3{margin:0 0 8px;font:600 .75rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.chip2{background:var(--accent-soft);color:var(--accent);font:700 1rem var(--f-display);padding:4px 10px;border-radius:999px}
+.chip2.a{background:var(--warn-soft);color:var(--warn)}
+.chip2.m{background:var(--ok-soft);color:var(--ok)}
+.mx{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.mxh,.mxr{display:grid;grid-template-columns:1fr 58px 58px 58px;align-items:center;padding:0 10px;justify-items:center}
+.mxh{height:36px;background:#EDF2F5;font:600 .68rem var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.mxh span:first-child,.mxr b{justify-self:start}
+.mxr{min-height:52px;border-top:1px solid var(--line)}
+.mxr b{font:700 1.1rem var(--f-display)}
+.mxr b small{display:block;color:var(--bad);font:700 .68rem var(--f-body)}
+.tg{width:44px;height:28px;border-radius:14px;border:0;background:#9FB1BC;position:relative;cursor:pointer;padding:0;display:block}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.tg.on{background:var(--accent)}
+.tg.on::after{left:19px}
+.tg.x{background:#E5EBEF;cursor:default}
+.tg.x::after{display:none}
+.news{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+.newsh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.newsh b{font:700 1.15rem var(--f-display)}
+.newsh .btn{min-height:36px;padding:2px 12px}
+.news ul{margin:6px 0 0;padding-left:1.1rem;font-size:.9rem;display:flex;flex-direction:column;gap:4px}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mwd{text-align:center;font:600 .72rem var(--f-body);color:var(--muted);padding:4px 0;text-transform:uppercase}
+.mc{appearance:none;cursor:pointer;width:100%;min-height:50px;border:1px solid #B7C5CE;background:var(--surface);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 .95rem/1 var(--f-mono);padding:4px 0;color:var(--ink)}
+.mc.blank{visibility:hidden;border:0;cursor:default}
+.mc.wk{color:var(--muted);background:transparent}
+.mc.hol{color:var(--bad);background:var(--bad-soft);border-color:transparent}
+.mc.today{border:2px solid var(--accent)}
+.mc.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mc i{display:flex;gap:3px;height:6px}
+.mc s,.legend s{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.mc s.a,.legend s.a{background:#C98A1B}
+.mc s.m,.legend s.m{background:var(--ok)}
+.mc.sel s{box-shadow:0 0 0 1.5px var(--accent-ink)}
+.legend s{margin-right:4px}
+.dpanel{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.dph{margin-bottom:6px}
+.dph b{font:700 1.35rem/1.1 var(--f-display);display:block}
+.dc{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.dct{font:600 1rem var(--f-mono);color:var(--accent)}
+.dc.a .dct{color:var(--warn)}
+.dc.m .dct{color:var(--ok)}
+.dcn{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dcn b{font:700 1.2rem var(--f-display)}
+.tag.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.tag.wrn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.btn.full{width:100%;margin-top:10px}
+.icsbox{width:100%;min-height:120px;font:.7rem var(--f-mono);margin-top:8px;border:1px solid var(--line);border-radius:8px;padding:8px}
+.card .go2{margin-top:6px}
+.plb{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:16px}
+.plh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:6px}
+.plt2{font:700 1.4rem/1.05 var(--f-display);margin:0}
+.plsub{margin:2px 0 0;color:var(--muted);font-size:.88rem}
+.plh3{font:700 1.15rem var(--f-display);margin:18px 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+.plcount{font:600 .8rem var(--f-body);color:var(--muted)}
+.plc{border-left-color:var(--warn)}
+.ckl{list-style:none;margin:0;padding:6px 0 2px;display:flex;flex-direction:column;gap:2px}
+.ckb{appearance:none;width:100%;text-align:left;display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;background:none;border:0;padding:8px 2px;min-height:44px;font:.92rem/1.35 var(--f-body);color:var(--ink);cursor:pointer}
+.ckb .bx{width:22px;height:22px;border:2px solid var(--accent);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:transparent;margin-top:1px}
+.ckb[aria-pressed="true"] .bx{background:var(--accent);color:var(--accent-ink)}
+.ckb[aria-pressed="true"] .bx::after{content:"\2713";font-weight:700}
+.ckb[aria-pressed="true"]>span:last-child{color:var(--muted);text-decoration:line-through}
+button.lnk{font:inherit;cursor:pointer}
+.scopes[hidden]{display:none}
+body.wiz .savebar{bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+details.news{padding:0}
+details.news>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;min-height:48px}
+details.news>summary::-webkit-details-marker{display:none}
+details.news>summary b{font:700 1.15rem var(--f-display)}
+details.news .nb{font:600 .8rem var(--f-body);color:var(--accent-ink);background:var(--accent);border-radius:999px;padding:2px 10px}
+details.news>ul,details.news>button{margin:0 12px 12px}
+details.news>ul{padding-left:1.1rem;margin-top:0}
+details.news>button{width:calc(100% - 24px)}
+</style>
+</head>
+<body>
+<header class="head wrap">
+  <div class="brand">
+    <h1>Guia de Entregas</h1>
+    <span class="sub">Horários e obrigações por cliente · Brasília</span>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div id="modebar"></div>
+    <div class="scopes" id="scopes" role="group" aria-label="Escolha o cliente"></div>
+  </div>
+</div>
+
+<main class="wrap" id="main"></main>
+
+<footer class="wrap">
+  <div class="foot">
+    <span>Versão de 05/11/2026. Base: manuais de cada conta e ajustes combinados com a liderança. Para a versão mais recente, peça o arquivo atualizado ao líder do time.</span>
+    <span>Dia útil: segunda a sexta, sem feriado nacional ou Sexta-feira Santa. Feriados locais, Carnaval e Corpus Christi não entram na conta.</span>
+    <span>Em feriado nacional, todos os clientes operam em modo plantão.</span>
+    <span>Mensal ou obrigação que cai em feriado vai para o dia útil seguinte. Dia 15 e dia 27 em fim de semana: vale o dia útil mais próximo.</span>
+    <span>"A confirmar" indica regra que ainda não está escrita nos manuais.</span>
+  </div>
+</footer>
+
+<nav class="dock" aria-label="Visão">
+  <div class="wrap">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="t-hoje" data-view="hoje" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span id="lbl-hoje">Hoje</span>
+      </button>
+      <button class="tab" role="tab" id="t-cal" data-view="cal" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+        <span>Calendário</span>
+      </button>
+      <button class="tab" role="tab" id="t-plantao" data-view="plantao" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+        <span>Plantão</span>
+      </button>
+      <button class="tab" role="tab" id="t-protocolo" data-view="protocolo" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9.5 16.5h-19L12 3.5z"/><path d="M12 10v4.5M12 17.4v.2"/></svg>
+        <span>Protocolo</span>
+      </button>
+      <button class="tab" role="tab" id="t-regras" data-view="regras" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+        <span>Regras</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+(function(){
+'use strict';
+
+var TZ='America/Sao_Paulo';
+var WDS=['dom','seg','ter','qua','qui','sex','sáb'];
+var WDL=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+var DN=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+var MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var VOL='https://inpactoco-my.sharepoint.com/:x:/g/personal/erica_abe_listeningdados_co/IQA7kGHInCIMR763Q0DeClqlAW4zcrVpOed8c9x9MXGoY9k?e=SgaePy';
+var SEMP='Sem relatório de plantão. Somente alertas.';
+var L_DAILY={mark:'Marcar como entregue ao cliente',done:'Entregue'};
+
+/* ---------- Dados ---------- */
+var CL=[
+ {id:'alema',nome:'Alema',full:'Assembleia Legislativa do Maranhão',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgDg7RrDVZyYSrpBBVnn6sFKASyDb-En7DkDcmCCNa-adlM?e=ztdHf0',
+  ent:[
+   {ed:'Relatório diário',quando:'Todos os dias, inclusive plantão e feriado',on:['util','sab','dom','fer'],
+    rec:[['','11h de ontem até 11h']],
+    rev:780,rl:'Revisão',rt:'11h30 a 13h00',env:840}
+  ],
+  sem:{},
+  att:['Só monte no Mailchimp depois da liberação da revisão (grupo Revisão-Alema, marcando a Selma).','Depois do envio, gere o PDF e poste no grupo de alertas com resumo e link do Mailchimp.','Não há relatório semanal nem mensal.'],
+  tbd:[]},
+ {id:'anp',nome:'ANP',full:'Agência Nacional do Petróleo, Gás Natural e Biocombustíveis',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgDFlHie7D9GSqdPjBYv2PfQAdmd6_bMY5OK28lM5MNJENE?e=au77DE',
+  ent:[
+   {ed:'Boletim 1ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','16h de ontem até 8h'],['Após fim de semana ou feriado','16h do último dia útil até 8h']],
+    calc:{h0:16,h1:'8h',ref:'pb'},
+    rev:500,env:570,el:'Envio',et:'09h30 em ponto',note:'Nunca enviar antes do horário.'},
+   {ed:'Boletim 2ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['','8h até 16h']],
+    rev:960,env:1020}
+  ],
+  sem:{all:'Sem boletim. O primeiro boletim depois cobre o período.'},
+  att:['1ª edição sai às 09h30 em ponto, nunca antes.','Só coloque o texto no Mailchimp depois da revisão sinalizada no grupo (marcando a Priscila).','O primeiro boletim depois de fim de semana ou feriado cobre todo o período sem boletim.'],
+  tbd:[]},
+ {id:'cfq',nome:'CFQ',full:'Conselho Federal de Química',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgA7YGPFJBEdTZ2eyut5bNv1AbjlYESUp6DVO9DMBLXMwVM?e=5TO4f4',
+  ent:[
+   {ed:'1ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','16h de ontem até 7h'],['Após fim de semana ou feriado','11h de ontem até 7h']],
+    calc:{h0:16,h0a:11,h1:'7h',ref:'y'},
+    rev:480,env:540},
+   {ed:'2ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['','7h até 16h']],
+    rev:1020,env:1080},
+   {ed:'Plantão',quando:'Sábado, domingo e feriado',on:['sab','dom','fer'],
+    rec:[['Sábado','16h de sexta até 11h'],['Domingo','11h de sábado até 11h'],['Feriado','Do fim do período anterior até 11h']],
+    calc:{h0:16,h0a:11,h1:'11h',ref:'y'},
+    rev:720,env:840,el:'Envio',et:'12h00 a 14h00'}
+  ],
+  sem:{},
+  att:['Atraso não é tolerado.','Datas no assunto do e-mail com pontos: 06.05.2026, nunca com barras.','Alerta vermelho de acidente químico vale também no plantão.'],
+  tbd:[]},
+ {id:'ghc',nome:'GHC',full:'Grupo Hospitalar Conceição',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgCzbrY1IIJsS6MV2Nxu-KFaAQUX5leJUOYYr25QyOMECEY?e=hnphkt',
+  ent:[
+   {ed:'1ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','16h de ontem até 5h'],['Após fim de semana ou feriado','10h de ontem até 5h']],
+    calc:{h0:16,h0a:10,h1:'5h',ref:'y'},
+    rev:370,env:420},
+   {ed:'2ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['','5h até 16h']],
+    rev:1030,env:1080},
+   {ed:'Plantão, edição única',quando:'Sábado, domingo e feriado',on:['sab','dom','fer'],
+    rec:[['Sábado','16h de sexta até 10h'],['Domingo','10h de sábado até 10h'],['Feriado','Do fim do período anterior até 10h']],
+    calc:{h0:16,h0a:10,h1:'10h',ref:'y'},
+    rev:720,env:840,el:'Envio',et:'12h00 a 14h00',note:'Nunca enviar antes das 12h, mesmo com a revisão pronta.'}
+  ],
+  sem:{},
+  att:['Plantão: só envie depois das 12h, mesmo que a revisão termine antes.','Radar News é a última seção a montar.','Confira o endereço das menções: há hospitais com o mesmo nome em outras regiões.'],
+  tbd:[]},
+ {id:'infra',nome:'Infra S.A.',full:'Infra S.A.',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgD-J_83kGvXTpt47ZqyaWdMAWWTEOPzWwVJhJICFMXnbcM?e=CN6VXa',
+  ent:[],
+  sem:{all:'Somente alertas, feitos ao longo do dia, sem horário fixo. Não há relatório diário.'},
+  att:['Somente alertas, feitos ao longo do dia, sem horário fixo. Não há relatório diário.','Os alertas são enviados somente pelo WhatsApp.','Relatório mensal no 3º dia útil.'],
+  tbd:[]},
+ {id:'mcti',nome:'MCTI',full:'Ministério da Ciência, Tecnologia e Inovação',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgDCrsUW2a2ySYi2q5b50e_lAWgfo1tfBwDH5Vgv4cutmrE?e=qdhmH3',
+  ent:[
+   {ed:'Boletim diário',quando:'Dias úteis',on:['util'],
+    rec:[['','14h de ontem até 7h']],
+    rev:450,env:510},
+   {ed:'Relatório diário',quando:'Todos os dias, inclusive plantão e feriado',on:['util','sab','dom','fer'],
+    rec:[['','14h de ontem até 14h']],
+    rev:900,env:960}
+  ],
+  sem:{},
+  att:['Duplique o arquivo do dia anterior (OneDrive e Mailchimp). Nunca edite por cima.','Relatório diário roda todos os dias; boletim só em dias úteis.','Recortes fixos, sempre: o relatório pega das 14h de ontem até as 14h de hoje, mesmo em plantão e feriado. O boletim pega das 14h de ontem até as 7h de hoje.','Revisão: boletim marca Mateus Ferraz, relatório marca Tiago.'],
+  tbd:[]},
+ {id:'mda',nome:'MDA',full:'Ministério do Desenvolvimento Agrário',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgCJ7crlw92oSpcUdVSboKCMAchiGZG6TrU1ANs9HOyoH-8?e=Z1vs7P',
+  ent:[
+   {ed:'1ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','15h de ontem até 5h'],['Após fim de semana ou feriado','10h de ontem até 5h']],
+    calc:{h0:15,h0a:10,h1:'5h',ref:'y'},
+    rev:420,env:480},
+   {ed:'2ª edição',quando:'Dias úteis',on:['util'],
+    rec:[['','5h até 15h']],
+    rev:1020,env:1080},
+   {ed:'Plantão, edição única',quando:'Sábado, domingo e feriado',on:['sab','dom','fer'],
+    rec:[['Sábado','15h de sexta até 10h'],['Domingo','10h de sábado até 10h'],['Feriado','Do fim do período anterior até 10h']],
+    calc:{h0:15,h0a:10,h1:'10h',ref:'y'},
+    rev:720,env:840}
+  ],
+  sem:{},
+  att:['Mudou a data na Brandwatch? Troque também no título e no assunto do Mailchimp e dentro do relatório.','Revisão obrigatória: marque a Vitória no grupo interno.','Nunca use o termo "invasões".'],
+  tbd:[]},
+ {id:'midr',nome:'MIDR',full:'Ministério da Integração e do Desenvolvimento Regional',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgBBCmbnxeGNT7fYOLitCHHxAdRecAqBD8ZwHdVojAL9bXM?e=il2dm1',
+  ent:[
+   {ed:'Manhã',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','18h de ontem até 6h'],['Após fim de semana ou feriado','12h de ontem até 6h']],
+    calc:{h0:18,h0a:12,h1:'6h',ref:'y'},
+    rev:420,env:480},
+   {ed:'Tarde',quando:'Dias úteis',on:['util'],
+    rec:[['','6h até 18h']],
+    rev:1080,env:1140},
+   {ed:'Plantão',quando:'Sábado, domingo e feriado',on:['sab','dom','fer'],
+    rec:[['Sábado','18h de sexta até 12h'],['Domingo','12h de sábado até 12h'],['Feriado','Do fim do período anterior até 12h']],
+    calc:{h0:18,h0a:12,h1:'12h',ref:'y'},
+    rev:780,rl:'Revisão',rt:'por volta de 13h00',env:840}
+  ],
+  sem:{},
+  att:['Monitoramento 24h: cada recorte começa onde o anterior terminou.','Confira a data em todos os campos do Mailchimp antes de enviar.','Depois do envio no Mailchimp, mande o PDF no grupo interno.'],
+  tbd:[]},
+ {id:'mjsp',nome:'MJSP',full:'Ministério da Justiça e Segurança Pública',
+  pasta:'https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgBe1ltzYtyEQLJZawL70GWVAQdUwi2KHuxPvTUHtcMJlCE?e=K8PR4q',
+  ent:[
+   {ed:'Relatório diário',quando:'Dias úteis',on:['util'],
+    rec:[['Normal','17h de ontem até 16h59'],['Segunda e após feriado','17h do último dia útil até 16h59. Pega o fim de semana inteiro.']],
+    calc:{h0:17,h1:'16h59',ref:'pb'},
+    rev:1080,env:1140,note:'Envie só depois da revisão. Limite: 19h00.'}
+  ],
+  sem:{all:SEMP},
+  att:['Nunca envie sem revisão (grupo MONITOR MJSP).','Fim de semana e feriado: só alertas, sem relatório.','O e-mail ao cliente sai da caixa MJSP Monitoramento, no Outlook.'],
+  tbd:[]}
+];
+var BYID={};CL.forEach(function(c){BYID[c.id]=c;});
+var ALR={"cfq": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgAmiBNa7yGVQLnJoRgidFQlASbbRi92cpBhSh6E-A8ub7w?e=yjhUJn", "ghc": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgAYIXVxbh2xSau9X44SWuCoARcVjvodPcBwU1BcK_D8Mj4?e=OzDnbn", "infra": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgBWwN8vWs_jQas2lqXzDaY7AZdoyCX_GYIluYqX_Hll32I?e=JzoK6x", "mcti": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgC-kQwEBhjlS4F43rw81Q2lATirfcHWFfJJvyxwSvjg0T4?e=rmRwWP", "mda": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgB-YfkRUhHuSrauUCgwoKG3AbAr7yw6oD8nifE3XqlQSzc?e=VOE8fb", "midr": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgC7jojPuE9_SYgSA1SQlA0vARqdZHPsJJ79AknzeUUFMuA?e=dwazHM", "mjsp": "https://inpactoco-my.sharepoint.com/:f:/g/personal/erica_abe_listeningdados_co/IgBtulnJJxffTIwKlRT-v3cKAdZiV-8NP65UVWbLXP5rw8A?e=2HwUdz", "alema": "https://inpactoco-my.sharepoint.com/personal/erica_abe_listeningdados_co/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Ferica%5Fabe%5Flisteningdados%5Fco%2FDocuments%2F%C3%81rea%20de%20Trabalho%2FSocial%20listening%202026%2FClientes%20P%C3%BAblicos%2FClientes%2FClientes%20Recorrentes%2FALEMA%2FAlertas%2FHist%C3%B3rico%20de%20Alertas%2F2026&viewid=7ad0493e%2D6ad2%2D4f76%2D9971%2D81417d5fe6d1"};
+var ACESSOS='https://inpactoco-my.sharepoint.com/:x:/g/personal/erica_abe_listeningdados_co/IQA0obQV7gykSokX-RgX4PU4Abba_-LSfbE23aw1rwj_Gc0?e=LkVNiR';
+var MAIL='https://inpactoco-my.sharepoint.com/:x:/g/personal/erica_abe_listeningdados_co/IQBcDdPGwpaDQrx_b27DA2DRAeBb-_b4X8vzCUWB2p_VwI8?e=O4Ye8x';
+var ENVIO={alema:'mc',anp:'mc',cfq:'ol',ghc:'ol',infra:'wa',mcti:'mc',mda:'mc',midr:'mc',mjsp:'ol'};
+function envLong(id){var v=ENVIO[id];return v==='mc'?'<span class="env mc">Envio: Mailchimp</span>':v==='ol'?'<span class="env ol">Envio: Outlook com Central de Mailing</span>':v==='wa'?'<span class="env wa">Alertas só por WhatsApp</span>':'';}
+function mailBtn(cls){return '<a class="lnk'+(cls?' '+cls:'')+'" href="'+MAIL+'" target="_blank" rel="noopener">Central de Mailing</a>';}
+var SUSP={alema:{y:2027,m:2,d:3}};
+function isSusp(id,o){var e=SUSP[id];return !!e&&key(o)<key(e);}
+var DIV_V='2026-11-05';
+var PUBLIC_URL='https://claude.ai/artifact/JY5rkoR6tHvHtCHUrP4cmo';
+/* Reset geral: mude RESET_V para zerar perfil, plantão e avisos de quem já abriu o guia. */
+var RESET_V='2026-11-05-r1';
+(function(){try{
+  if(localStorage.getItem('guia-entregas-rv')!==RESET_V){
+    ['sel','mode','scope','pl','plchk','news'].forEach(function(k){localStorage.removeItem('guia-entregas-'+k);});
+    try{sessionStorage.removeItem('guia-entregas-skip');}catch(e){}
+    localStorage.setItem('guia-entregas-rv',RESET_V);
+  }
+}catch(e){}})();
+var SEL=null;
+function obCat(ob){return ob.t==='Relatório mensal'?'men':'ale';}
+function isMeus(){return S.mode==='meus'&&!!SEL;}
+function mine(ob,id){var l=obCat(ob)==='men'?SEL.men:SEL.ale;return l.indexOf(id)>=0;}
+function aleIds(){return allIds().filter(function(i){return i!=='anp';});}
+function allIds(){return CL.map(function(c){return c.id;});}
+function relIds(){return CL.filter(function(c){return c.ent.length;}).map(function(c){return c.id;});}
+function menIds(){var o={};OBS.forEach(function(ob){if(obCat(ob)==='men')obClients(ob).forEach(function(i){o[i]=1;});});return allIds().filter(function(i){return o[i];});}
+function baseIds(){var o={};['rel','ale','men'].forEach(function(k){SEL[k].forEach(function(i){o[i]=1;});});return allIds().filter(function(i){return o[i];});}
+function myIds(){var o={};baseIds().forEach(function(i){o[i]=1;});plAllIds().forEach(function(i){o[i]=1;});return allIds().filter(function(i){return o[i];});}
+function relFor(c){return c.type==='util'?SEL.rel:plIds(c.o);}
+function aleFor(c){return c.type==='util'?SEL.ale:plIds(c.o);}
+function inMine(id){return !isMeus()||myIds().indexOf(id)>=0;}
+function cleanSel(v){
+  if(!v||!v.rel||!v.ale||!v.men)return null;
+  var ok=function(l){return allIds().filter(function(i){return l.indexOf(i)>=0;});};
+  return {v:v.v||'',name:String(v.name||'').trim().slice(0,30),rel:ok(v.rel),ale:ok(v.ale).filter(function(i){return i!=='anp';}),men:ok(v.men)};
+}
+function loadSel(){try{return cleanSel(JSON.parse(localStorage.getItem('guia-entregas-sel')||'null'));}catch(e){return null;}}
+function saveSel(){try{localStorage.setItem('guia-entregas-sel',JSON.stringify(SEL));}catch(e){}}
+function loadMode(){try{return localStorage.getItem('guia-entregas-mode');}catch(e){return null;}}
+function saveMode(){try{localStorage.setItem('guia-entregas-mode',S.mode);}catch(e){}}
+function skipped(){try{return sessionStorage.getItem('guia-entregas-skip')==='1';}catch(e){return false;}}
+function setSkip(){try{sessionStorage.setItem('guia-entregas-skip','1');}catch(e){}}
+function selLink(v){return PUBLIC_URL+'#todos-hoje?r='+v.rel.join('.')+'&a='+v.ale.join('.')+'&m='+v.men.join('.')+'&n='+encodeURIComponent(v.name||'');}
+function selFromHash(){
+  var m=/\?(.*)$/.exec(location.hash);
+  if(!m)return null;
+  var o={},nm='';
+  m[1].split('&').forEach(function(kv){
+    var a=kv.split('=');
+    if(a[0]==='n'){try{nm=decodeURIComponent(a[1]||'');}catch(e){nm='';}}
+    else o[a[0]]=(a[1]||'').split('.').filter(Boolean);
+  });
+  var v=cleanSel({v:DIV_V,name:nm,rel:o.r||[],ale:o.a||[],men:o.m||[]});
+  return v&&(v.rel.length+v.ale.length+v.men.length)?v:null;
+}
+function suspTxt(id){var e=SUSP[id];return 'Suspenso até '+pad(e.d)+'/'+pad(e.m)+'/'+e.y;}
+
+var Q={u1:'1º dia útil',u3:'3º dia útil',ult:'Último dia útil',d15:'Dia 15 ou dia útil mais próximo',d27:'Dia 27 ou dia útil mais próximo',dia:'Todo dia'};
+var L_ALERT={mark:'Marcar como enviado no grupo',done:'Enviado'};
+var OBS=[
+ {q:'u1',t:'Volumetria de alertas',d:'Controle interno. Preencher a planilha. Não é enviada ao cliente.',cl:['alema','cfq','ghc','infra','mcti','mda','midr','mjsp'],env:1080,el:'Preencher até',link:VOL,linkTxt:'Abrir planilha',lb:{mark:'Marcar como preenchida',done:'Preenchida'}},
+ {q:'u1',t:'Relatório de alertas e pasta de comprovantes',d:'Enviado no grupo interno do cliente.',cl:['mda'],env:720,el:'Enviar até',lb:L_ALERT},
+ {q:'u1',t:'Relatório de alertas',d:'Enviado no grupo interno do cliente.',cl:['midr'],env:720,el:'Enviar até',lb:L_ALERT},
+ {q:'u1',t:'Relatório de alertas',d:'Enviado no grupo interno do cliente.',cl:['mcti'],env:720,el:'Enviar até',lb:L_ALERT},
+ {q:'d15',t:'Relatório de alertas',d:'Enviado no grupo interno do cliente.',cl:['mcti'],env:720,el:'Enviar até',lb:L_ALERT},
+ {q:'d27',t:'Relatório de alertas',d:'Enviado no grupo interno do cliente.',cl:['ghc'],env:720,el:'Enviar até',lb:L_ALERT},
+ {q:'u3',t:'Relatório mensal',cl:['anp','cfq','infra','mda','mjsp'],rev:720,env:840,lb:L_DAILY},
+ {q:'ult',t:'Relatório mensal',cl:['ghc'],rev:720,env:840,lb:L_DAILY},
+ {q:'dia',t:'Relatório de alertas por e-mail',d:'Todo dia em que houver alerta enviado. Enviado por e-mail.',cl:['cfq'],env:1080,el:'Enviar até'}
+];
+function obClients(ob){return ob.cl==='all'?CL.map(function(c){return c.id;}):ob.cl;}
+function obHas(ob,id){return obClients(ob).indexOf(id)>=0;}
+
+/* ---------- Texto e datas ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function slug(s){return String(s).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+function pad(n){return String(n).padStart(2,'0');}
+function key(o){return o.y+'-'+pad(o.m)+'-'+pad(o.d);}
+function mk(y,m,d){var t=new Date(Date.UTC(y,m-1,d));return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate()};}
+function add(o,n){return mk(o.y,o.m,o.d+n);}
+function dow(o){return new Date(Date.UTC(o.y,o.m-1,o.d)).getUTCDay();}
+function dim(y,m){return new Date(Date.UTC(y,m,0)).getUTCDate();}
+function fmt(min){return pad(Math.floor(min/60))+'h'+pad(min%60);}
+function parseKey(s){var v=String(s).split('-');return v.length===3?{y:+v[0],m:+v[1],d:+v[2]}:null;}
+function spAt(dt){
+  var p=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(dt);
+  var g=function(t){return +p.filter(function(x){return x.type===t;})[0].value;};
+  return {y:g('year'),m:g('month'),d:g('day'),min:g('hour')*60+g('minute')};
+}
+function spNow(){return spAt(new Date());}
+function easter(y){
+  var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+  h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+  mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
+  return {y:y,m:mo,d:da};
+}
+var HC={};
+function holMap(y){
+  if(HC[y])return HC[y];
+  var m={};
+  [[1,1,'Confraternização Universal'],[4,21,'Tiradentes'],[5,1,'Dia do Trabalho'],[9,7,'Independência'],[10,12,'Nossa Senhora Aparecida'],[11,2,'Finados'],[11,15,'Proclamação da República'],[11,20,'Consciência Negra'],[12,25,'Natal']]
+   .forEach(function(h){m[key({y:y,m:h[0],d:h[1]})]=h[2];});
+  m[key(add(easter(y),-2))]='Sexta-feira Santa';
+  HC[y]=m;return m;
+}
+function holName(o){return holMap(o.y)[key(o)]||null;}
+function isBiz(o){var w=dow(o);return w>0&&w<6&&!holName(o);}
+function bizDays(y,m){var r=[];for(var d=1;d<=dim(y,m);d++){if(isBiz({y:y,m:m,d:d}))r.push(d);}return r;}
+function nextBiz(o){var n=add(o,1);while(!isBiz(n))n=add(n,1);return n;}
+function adjust(y,m,d){
+  var o={y:y,m:m,d:d};
+  if(holName(o))return nextBiz(o);
+  if(isBiz(o))return o;
+  for(var k=1;k<12;k++){
+    var b=add(o,-k);if(isBiz(b))return b;
+    var a=add(o,k);if(isBiz(a))return a;
+  }
+  return o;
+}
+function ctxOf(o){
+  var w=dow(o),hol=holName(o),y=add(o,-1);
+  var type=w===6?'sab':w===0?'dom':hol?'fer':'util';
+  var pb=y;while(!isBiz(pb))pb=add(pb,-1);
+  return {o:o,w:w,hol:hol,type:type,y:y,yBiz:isBiz(y),pb:pb};
+}
+function dueMap(y,m,id){
+  var biz=bizDays(y,m),map={};
+  OBS.forEach(function(ob){
+    if(ob.q==='dia')return;
+    if(id&&!obHas(ob,id))return;
+    var o=null,tag=Q[ob.q];
+    if(ob.q==='u1')o={y:y,m:m,d:biz[0]};
+    else if(ob.q==='u3')o={y:y,m:m,d:biz[2]};
+    else if(ob.q==='ult')o={y:y,m:m,d:biz[biz.length-1]};
+    else if(ob.q==='d15'){o=adjust(y,m,15);tag=o.d!==15?'Dia 15, ajustado':'Dia 15';}
+    else if(ob.q==='d27'){o=adjust(y,m,27);tag=o.d!==27?'Dia 27, ajustado':'Dia 27';}
+    if(!o)return;
+    if(id&&isSusp(id,o))return;
+    if(id&&isMeus()&&!mine(ob,id))return;
+    if(!id&&isMeus()&&!obClients(ob).some(function(x){return mine(ob,x);}))return;
+    var k=key(o);
+    if(!map[k])map[k]={o:o,items:[]};
+    map[k].items.push({ob:ob,tag:tag});
+  });
+  return Object.keys(map).sort().map(function(k){return map[k];});
+}
+function dueOn(o,id){
+  var arr=dueMap(o.y,o.m,id),k=key(o);
+  for(var i=0;i<arr.length;i++){if(key(arr[i].o)===k)return arr[i];}
+  return null;
+}
+function nextDues(o,id,limit){
+  var y=o.y,m=o.m,k=key(o),out=[];
+  for(var n=0;n<6&&out.length<limit;n++){
+    dueMap(y,m,id).forEach(function(g){if(key(g.o)>k&&out.length<limit)out.push(g);});
+    m++;if(m>12){m=1;y++;}
+  }
+  return out;
+}
+
+/* ---------- Recorte e estado de horario ---------- */
+function yRef(c,always){return (c.yBiz&&!always)?'ontem':'ontem ('+DN[dow(c.y)]+')';}
+function pbRef(c){return c.yBiz?'ontem':DN[dow(c.pb)]+' ('+pad(c.pb.d)+'/'+pad(c.pb.m)+')';}
+function recDated(e,c){
+  var k=e.calc;
+  if(!k)return e.rec[0][1];
+  if(k.ref==='pb')return k.h0+'h de '+pbRef(c)+' até '+k.h1;
+  var h=c.yBiz?k.h0:(k.h0a!=null?k.h0a:k.h0);
+  return h+'h de '+yRef(c,c.type!=='util')+' até '+k.h1;
+}
+function stateOf(e,nm){
+  var first=e.rev!=null?{k:'rev',t:e.rev}:{k:'env',t:e.env};
+  if(nm==null)return {k:first.k,t:first.t,done:false};
+  if(e.rev!=null&&nm<=e.rev)return {k:'rev',t:e.rev,done:false};
+  if(e.env!=null)return {k:'env',t:e.env,done:nm>e.env};
+  return {k:'env',t:null,done:false};
+}
+function semText(cl,type){return cl.sem.all||cl.sem[type]||'Sem entrega neste dia.';}
+function itemsOn(c,only){
+  var items=[];
+  CL.forEach(function(cl){
+    if(only&&cl.id!==only.id)return;
+    if(isMeus()&&relFor(c).indexOf(cl.id)<0)return;
+    if(isSusp(cl.id,c.o))return;
+    cl.ent.forEach(function(e){if(e.on.indexOf(c.type)>=0)items.push({cl:cl,e:e});});
+  });
+  return items;
+}
+
+/* ---------- Pecas de HTML ---------- */
+function chipsOf(e){
+  var h='';
+  if(e.rev!=null||e.rt){
+    var rt=e.rt||fmt(e.rev),tbd=(e.rev==null&&e.rt==='a definir');
+    h+='<span class="chip'+(tbd?' tbd':'')+'"><i>'+(e.rl||'Revisão até')+'</i><b>'+rt+'</b></span>';
+  }
+  if(e.env!=null||e.et){
+    h+='<span class="chip"><i>'+(e.el||'Envio até')+'</i><b>'+(e.et||fmt(e.env))+'</b></span>';
+  }
+  return '<div class="chips">'+h+'</div>'+(e.note?'<div class="note">'+e.note+'</div>':'');
+}
+function obChips(ob){
+  if(ob.rev!=null)return '<div class="chips"><span class="chip"><i>Revisão até</i><b>'+fmt(ob.rev)+'</b></span><span class="chip"><i>Envio até</i><b>'+fmt(ob.env)+'</b></span></div>';
+  if(ob.env!=null)return '<div class="chips"><span class="chip"><i>'+(ob.el||'Envio até')+'</i><b>'+fmt(ob.env)+'</b></span></div>';
+  return '<div class="chips"><span class="chip tbd"><i>Horário</i><b>a definir</b></span></div>';
+}
+function dHtml(ob){return ob.d?'<p class="rl">'+ob.d+'</p>':'';}
+function prazosMap(){
+  var order=['u1','d15','d27','u3','ult'],extra={ult:'Único em data diferente'};
+  return '<div class="card">'+order.map(function(q,i){
+    var its=OBS.filter(function(ob){return ob.q===q;});
+    return '<div class="ent'+(i===0?' f':'')+'"><div class="ent-h"><b>'+Q[q]+'</b>'+(extra[q]?'<span>'+extra[q]+'</span>':'')+'</div>'+its.map(function(ob){
+      var who=isMeus()?obClients(ob).filter(function(id){return mine(ob,id);}).map(function(id){return BYID[id].nome;}).join(', '):(ob.cl==='all'?'todos os clientes. Interna, até '+fmt(ob.env):ob.cl.map(function(id){return BYID[id].nome;}).join(', '));
+      if(!who)return '';
+      return '<p class="rl"><em>'+ob.t+':</em> '+who+'</p>';
+    }).join('')+'</div>';
+  }).join('')+'</div>';
+}
+function pillsOf(ob){
+  var now=spNow();
+  if(isMeus())return '<div class="pills">'+obClients(ob).filter(function(id){return mine(ob,id);}).map(function(id){return isSusp(id,now)?'<span class="pill psusp">'+BYID[id].nome+' suspenso</span>':'<span class="pill">'+BYID[id].nome+'</span>';}).join('')+'</div>';
+  if(ob.cl==='all'){
+    var sp=CL.filter(function(c){return isSusp(c.id,now);}).map(function(c){return '<span class="pill psusp">'+c.nome+' suspenso</span>';}).join('');
+    return '<div class="pills"><span class="pill">Todos os clientes</span>'+sp+'</div>';
+  }
+  return '<div class="pills">'+ob.cl.map(function(id){return isSusp(id,now)?'<span class="pill psusp">'+BYID[id].nome+' suspenso</span>':'<span class="pill">'+BYID[id].nome+'</span>';}).join('')+'</div>';
+}
+function recLines(e){
+  var r=e.rec;
+  if(r.length===1&&!r[0][0])return '<p class="rl">'+r[0][1]+'</p>';
+  return r.map(function(x){return '<p class="rl"><em>'+x[0]+':</em> '+x[1]+'</p>';}).join('');
+}
+function entHtml(e,first){
+  return '<div class="ent'+(first?' f':'')+'"><div class="ent-h"><b>'+e.ed+'</b><span>'+e.quando+'</span></div>'+recLines(e)+chipsOf(e)+'</div>';
+}
+function obHtml(ob,first){
+  return '<div class="ent'+(first?' f':'')+'"><div class="ent-h"><b>'+ob.t+'</b><span>'+Q[ob.q]+'</span></div>'+(ob.d?'<p class="rl">'+ob.d+'</p>':'')+obChips(ob)+
+    (ob.link?'<div class="inline"><a href="'+ob.link+'" target="_blank" rel="noopener">'+ob.linkTxt+'</a></div>':'')+'</div>';
+}
+function obControl(ob,only){return only?'':pillsOf(ob);}
+
+/* ---------- Plantao: periodos e armazenamento ---------- */
+var PLK='guia-entregas-pl',CKK='guia-entregas-plchk',NWK='guia-entregas-news';
+var PL={},CHK={};
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function plSave(){lsSet(PLK,JSON.stringify(PL));lsSet(CKK,JSON.stringify(CHK));}
+function plEnd(k){var p=parseKey(String(k).slice(1));if(!p)return null;return String(k).charAt(0)==='w'?add(p,1):p;}
+function plClean(){
+  var t=key(spNow()),ch=false;
+  [PL,CHK].forEach(function(M){Object.keys(M).forEach(function(k){var e=plEnd(k);if(!e||key(e)<t){delete M[k];ch=true;}});});
+  if(ch)plSave();
+}
+function plLoad(){
+  try{PL=JSON.parse(lsGet(PLK)||'{}')||{};}catch(e){PL={};}
+  try{CHK=JSON.parse(lsGet(CKK)||'{}')||{};}catch(e){CHK={};}
+  plClean();
+}
+function satOf(o){var w=dow(o);return w===6?o:(w===0?add(o,-1):add(o,6-w));}
+function plPeriod(o){
+  var c=ctxOf(o);
+  if(c.type==='sab'||c.type==='dom'){var s=satOf(o);return {key:'w'+key(s),days:[s,add(s,1)],kind:'w'};}
+  if(c.type==='fer')return {key:'f'+key(o),days:[o],kind:'f'};
+  return null;
+}
+function plIds(o){var p=plPeriod(o);return p?relIdsSorted(PL[p.key]||[]):[];}
+function plAllIds(){var r={};Object.keys(PL).forEach(function(k){(PL[k]||[]).forEach(function(i){if(BYID[i])r[i]=1;});});return allIds().filter(function(i){return r[i];});}
+function plActive(now){
+  var s=satOf(now),out=[{key:'w'+key(s),days:[s,add(s,1)],kind:'w'}];
+  for(var i=0;i<=21;i++){var d=add(now,i),w=dow(d);if(w>0&&w<6&&holName(d))out.push({key:'f'+key(d),days:[d],kind:'f'});}
+  out.sort(function(a,b){return key(a.days[0])<key(b.days[0])?-1:1;});
+  return out;
+}
+function plEligible(o){
+  return CL.filter(function(cl){
+    return !isSusp(cl.id,o)&&cl.ent.some(function(e){return e.on.indexOf('sab')>=0||e.on.indexOf('dom')>=0||e.on.indexOf('fer')>=0;});
+  });
+}
+function dayDiff(a,b){return Math.round((Date.UTC(b.y,b.m-1,b.d)-Date.UTC(a.y,a.m-1,a.d))/864e5);}
+
+/* ----- Plantao: tela ----- */
+function ckItem(pk,id,text){
+  var on=!!(CHK[pk]&&CHK[pk][id]);
+  return '<li><button type="button" class="ckb" data-chk="'+pk+'|'+id+'" aria-pressed="'+on+'"><span class="bx" aria-hidden="true"></span><span>'+text+'</span></button></li>';
+}
+function ckList(arr){return '<ul class="ckl">'+arr.join('')+'</ul>';}
+function plClient(cl,p){
+  var h='<div class="acard plc"><div class="ent-h"><b>'+cl.nome+'</b>'+(ENVIO[cl.id]==='ol'?'<span class="env ol">Outlook</span>':'<span class="env mc">Mailchimp</span>')+'</div>';
+  p.days.forEach(function(d){
+    var c=ctxOf(d),es=cl.ent.filter(function(e){return e.on.indexOf(c.type)>=0;});
+    es.forEach(function(e){
+      h+='<div class="ent"><div class="ent-h"><b>'+DN[c.w].charAt(0).toUpperCase()+DN[c.w].slice(1)+' '+pad(d.d)+'/'+pad(d.m)+'</b><span>'+e.ed+'</span></div><p class="rl">Recorte: '+recDated(e,c)+'</p>'+chipsOf(e)+'</div>';
+    });
+  });
+  h+='<p class="rl"><em>Alertas:</em> no plantão você fica também com os alertas do '+cl.nome+'. Registre cada alerta enviado na pasta de alertas, no formato que ela pede.</p>';
+  h+='<div class="btns">'+(ALR[cl.id]?'<a class="lnk" href="'+esc(ALR[cl.id])+'" target="_blank" rel="noopener">Pasta de alertas</a>':'')+'<a class="lnk" href="'+cl.pasta+'" target="_blank" rel="noopener">Pasta do cliente</a>'+(ENVIO[cl.id]==='ol'?mailBtn():'')+'</div>';
+  h+='<details class="acc"><summary>Revisor não respondeu?<small>Quando o envio sem revisão vale</small></summary><p class="rl" style="margin:8px 2px 0">Acione o supervisor do plantão (o nome está no card Stand By, no grupo de WhatsApp). Se ninguém revisar até 15 minutos antes do limite, envie sem revisão.</p>'+semRevHtml(cl)+'</details>';
+  h+='<details class="acc"><summary>Se der problema<small>Mailchimp, Outlook, crise</small></summary>'+probHtml(cl)+'</details>';
+  if(cl.att&&cl.att.length)h+='<details class="acc"><summary>Atenção neste cliente</summary><ul class="att" style="margin-top:8px">'+cl.att.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul></details>';
+  return h+'</div>';
+}
+function plBlock(p,now){
+  var d0=p.days[0],dl=p.days[p.days.length-1],sel=relIdsSorted(PL[p.key]||[]);
+  var elig=plEligible(d0),diff=dayDiff(now,d0),inside=key(now)>=key(d0)&&key(now)<=key(dl);
+  var title,sub;
+  if(p.kind==='w'){title='Fim de semana';sub='Sábado '+pad(d0.d)+'/'+pad(d0.m)+' e domingo '+pad(dl.d)+'/'+pad(dl.m);}
+  else{title='Feriado: '+holName(d0);sub=DN[dow(d0)].charAt(0).toUpperCase()+DN[dow(d0)].slice(1)+' '+pad(d0.d)+'/'+pad(d0.m)+'. Exceção só deste dia.';}
+  var st=inside?'<span class="tag plt">Em andamento</span>':'<span class="tag acc">'+(diff===1?'Começa amanhã':'Começa em '+diff+' dias')+'</span>';
+  var h='<section class="plb"><div class="plh"><div><h2 class="plt2">'+title+'</h2><p class="plsub">'+sub+'</p></div>'+st+'</div>';
+  h+='<p class="pnote" style="margin:0 0 10px">Marque os clientes que você pega'+(p.kind==='w'?' neste plantão':' neste feriado')+'. Quem pega o relatório fica também com os alertas do cliente.'+(p.kind==='w'?' Os alertas do MJSP ficam com o TL.':'')+'</p>';
+  h+='<div class="gridc">'+elig.map(function(cl){
+    var on=sel.indexOf(cl.id)>=0;
+    return '<button type="button" class="cc'+(on?' on':'')+'" data-plsel="'+p.key+'|'+cl.id+'" aria-pressed="'+on+'"><span class="av">'+cl.id.slice(0,2).toUpperCase()+'</span><span class="ck">'+(on?'✓':'')+'</span><b>'+cl.nome+'</b><small>relatório + alertas</small></button>';
+  }).join('')+'</div>';
+  if(!sel.length){
+    h+='<p class="none" style="margin-top:10px">Nenhum cliente marcado. Ao marcar, as entregas aparecem no seu Calendário e em Hoje nos dias do plantão.</p></section>';
+    return h;
+  }
+  h+='<h3 class="plh3">Meus clientes no plantão</h3>'+sel.map(function(id){return plClient(BYID[id],p);}).join('');
+  var needMail=sel.some(function(id){return ENVIO[id]==='ol';});
+  var pre=[
+    ckItem(p.key,'a1','Estou no grupo de WhatsApp Plantão - Monitoramento (os escalados entram na segunda).'),
+    ckItem(p.key,'a2','Vi o card Stand By: revisor de cada conta, supervisor do plantão e account managers.'),
+    ckItem(p.key,'a3','Testei meu acesso ao Mailchimp e ao Outlook (planilha Acesso às Ferramentas).'),
+    ckItem(p.key,'a4','Confirmei o código de autenticação com o analista indicado na planilha.')
+  ];
+  if(needMail)pre.push(ckItem(p.key,'a5','Consultei a Central de Mailing e testei o e-mail corporativo do cliente (Outlook).'));
+  pre.push(ckItem(p.key,'a6','Li o Manual da Conta e os relatórios anteriores dos meus clientes.'));
+  var dur=[];
+  sel.forEach(function(id){
+    var cl=BYID[id];
+    p.days.forEach(function(d){
+      var c=ctxOf(d),es=cl.ent.filter(function(e){return e.on.indexOf(c.type)>=0;});
+      if(!es.length)return;
+      var e=es[0],lim=e.et||(e.env!=null?fmt(e.env):'');
+      dur.push(ckItem(p.key,'s:'+id+':'+key(d),'Enviei '+cl.nome+', '+DN[c.w]+' '+pad(d.d)+'/'+pad(d.m)+(lim?' (envio até '+lim+')':'')+'.'));
+    });
+    dur.push(ckItem(p.key,'l:'+id,'Registrei cada alerta enviado do '+cl.nome+' na pasta de alertas.'));
+  });
+  var pos=[
+    ckItem(p.key,'p1','Confirmei no grupo que terminei (por exemplo "CFQ check" ou "Alertas ✅").'),
+    ckItem(p.key,'p2','Participei do espaço de feedback e reports com os supervisores, se houve.')
+  ];
+  var tot=pre.length+dur.length+pos.length,done=0,m=CHK[p.key]||{};
+  Object.keys(m).forEach(function(k){if(m[k])done++;});
+  h+='<h3 class="plh3">Checklist <span class="plcount">'+Math.min(done,tot)+' de '+tot+'</span></h3><p class="pnote" style="margin:0 0 8px">Só para ajudar. Não é obrigatório e zera junto com o plantão.</p>';
+  h+='<details class="acc" open><summary>Antes do plantão</summary>'+ckList(pre)+'</details>';
+  h+='<details class="acc" open><summary>Durante</summary>'+ckList(dur)+'</details>';
+  h+='<details class="acc" open><summary>Depois</summary>'+ckList(pos)+'</details>';
+  return h+'</section>';
+}
+function viewPlantao(){
+  var now=spNow(),h='<h1 class="eh">Plantão</h1><p class="pnote" style="margin-top:0">Plantão é sábado, domingo e feriado. Você pode marcar seus clientes em qualquer dia da semana. No domingo à noite a escolha zera sozinha, para não sobrar obrigação de um plantão que já passou.</p>';
+  h+=plActive(now).map(function(p){return plBlock(p,now);}).join('');
+  h+='<div class="btns" style="margin-top:14px"><a class="lnk" href="'+ACESSOS+'" target="_blank" rel="noopener">Acesso às Ferramentas</a>'+mailBtn()+'<button type="button" class="lnk" data-view="protocolo" data-scope="todos">Protocolo do Caos</button></div>';
+  return h;
+}
+
+/* ---------- Estado e navegacao ---------- */
+var S={scope:'todos',view:'hoje',pick:null,month:null,mode:'todos',draft:null,err:false,copied:false,step:1,calDay:null,newsHide:false,icsMsg:'',icsText:''};
+var $=function(id){return document.getElementById(id);};
+var VIEWS=['hoje','cal','plantao','protocolo','regras'];
+function relIdsSorted(l){return CL.map(function(c){return c.id;}).filter(function(i){return l.indexOf(i)>=0;});}
+
+function parseHash(){
+  var m=/^#([a-z0-9]+)-(hoje|mes|cal|plantao|protocolo|regras|escolha)(\?.*)?$/.exec(location.hash);
+  if(!m)return null;
+  if(m[1]!=='todos'&&!BYID[m[1]])return null;
+  return {scope:m[1],view:m[2]==='mes'?'cal':m[2]};
+}
+function save(){try{localStorage.setItem('guia-entregas-scope',S.scope);}catch(e){}}
+function saved(){try{var v=localStorage.getItem('guia-entregas-scope');return (v&&BYID[v])?v:null;}catch(e){return null;}}
+function go(scope,view){
+  S.scope=scope;S.view=view;save();
+  var h='#'+scope+'-'+view;
+  if(location.hash===h){render();window.scrollTo(0,0);}else location.hash=h;
+}
+
+function renderBar(){
+  var meus=isMeus(),v=S.view,now=spNow();
+  var noChips=(v==='escolha'||v==='plantao');
+  var h='';
+  if(v==='escolha')h='';
+  else if(!SEL)h='<button type="button" class="hero" data-scope="todos" data-view="escolha">ESCOLHA SEUS CLIENTES<small>Crie seu perfil e veja só o que é seu</small></button>';
+  else{
+    h='<div class="hello"><div class="avt" aria-hidden="true">'+esc(avatarOf(SEL.name))+'</div><div class="hw"><b>'+(SEL.name?'Olá, '+esc(SEL.name):'Meu guia')+'</b><small>'+WDL[dow(now)]+', '+now.d+' de '+MESES[now.m-1]+'</small></div><button type="button" class="editbtn" data-scope="todos" data-view="escolha">Perfil</button></div>';
+    if(!meus)h+='<div class="alltop"><span>Vendo todos os clientes</span><button type="button" data-mode="meus">Voltar para os meus</button></div>';
+  }
+  $('modebar').innerHTML=h;
+  $('scopes').hidden=noChips;
+  var c='<button type="button" class="sc all" data-scope="todos" aria-pressed="'+(S.scope==='todos')+'">'+(meus?'Todos os meus':'Todos')+'</button>'+
+    CL.filter(function(cl){return inMine(cl.id);}).map(function(cl){return '<button type="button" class="sc" data-scope="'+cl.id+'" aria-pressed="'+(S.scope===cl.id)+'">'+cl.nome+'</button>';}).join('');
+  $('scopes').innerHTML=c;
+  var act=$('scopes').querySelector('[aria-pressed="true"]');
+  if(act&&act.scrollIntoView){try{act.scrollIntoView({inline:'center',block:'nearest'});}catch(e){}}
+  VIEWS.forEach(function(x){$('t-'+x).setAttribute('aria-selected',String(x===v));});
+  document.body.classList.toggle('wiz',v==='escolha');
+  $('lbl-hoje').textContent=(S.pick&&key(S.pick)!==key(now))?'Dia '+pad(S.pick.d)+'/'+pad(S.pick.m):'Hoje';
+}
+
+function clientHead(cl){
+  return '<div class="chead"><button type="button" class="crumb" data-scope="todos">‹ Todos os clientes</button><h2>'+cl.nome+'</h2><p class="full">'+cl.full+'</p>'+(isSusp(cl.id,spNow())?'<div class="susp">'+suspTxt(cl.id)+'</div>':'')+
+    (ENVIO[cl.id]?'<div>'+envLong(cl.id)+'</div>':'')+'<div class="btns"><a class="lnk pri" href="'+cl.pasta+'" target="_blank" rel="noopener">Abrir pasta do cliente</a>'+(ENVIO[cl.id]==='ol'?mailBtn():'')+(ALR[cl.id]?'<a class="lnk" href="'+esc(ALR[cl.id])+'" target="_blank" rel="noopener">Pasta de alertas</a>':'')+'<a class="lnk" href="'+VOL+'" target="_blank" rel="noopener">Planilha de volumetria</a>'+(COMO[cl.id]&&cl.id!=='mjsp'?'<button type="button" class="lnk" data-jump="como">Como montar</button>':'')+'</div></div>';
+}
+
+/* ----- Alertas ----- */
+function alertCard(cl,c){
+  var n={mda:'No MDA, o registro é feito no documento de prints.',cfq:'Relatório de alertas por e-mail todo dia em que houver alerta enviado, até 18h00.',infra:'Alertas só por WhatsApp, ao longo do dia, sem horário fixo.',mjsp:'Fim de semana e feriado: só alertas, sem relatório.'}[cl.id]||'';
+  return '<div class="acard"><div class="ent-h"><b>'+cl.nome+'</b>'+(isSusp(cl.id,spNow())?'<span class="sus" style="font-weight:700;color:var(--bad)">'+suspTxt(cl.id)+'</span>':'')+'</div>'+
+    '<p class="rl">Registre cada alerta enviado na pasta de alertas do cliente, no formato que ela pede, para não acumular.</p>'+(n?'<p class="rl">'+n+'</p>':'')+
+    ((c&&c.type!=='util')?'<p class="rl">Plantão: você fica com os alertas deste cliente.</p>':'<p class="rl">Volumetria de alertas: todo 1º dia útil, até 18h00.</p>')+
+    (ALR[cl.id]?'<div class="btns" style="margin-top:6px"><a class="lnk" href="'+esc(ALR[cl.id])+'" target="_blank" rel="noopener">Pasta de alertas</a></div>':'')+'</div>';
+}
+
+/* ----- Hoje ----- */
+function leftTxt(mm){return mm>=60?'faltam '+Math.floor(mm/60)+'h'+(mm%60?pad(mm%60):''):'faltam '+mm+' min';}
+
+function viewHoje(){
+  var now=spNow(),d=S.pick||{y:now.y,m:now.m,d:now.d};
+  var dkey=key(d),tkey=key(now);
+  var isToday=dkey===tkey,isFuture=dkey>tkey;
+  var c=ctxOf(d),only=S.scope==='todos'?null:BYID[S.scope];
+  var biz=isBiz(d)?bizDays(d.y,d.m).indexOf(d.d)+1:0;
+
+  var tags='';
+  if(biz)tags+='<span class="tag acc">'+biz+'º dia útil</span>';
+  if(c.hol)tags+='<span class="tag hol">Feriado: '+c.hol+'</span>';
+  if(c.type!=='util')tags+='<span class="tag plt">Modo plantão</span>';
+  var h='<div class="picker"><label for="pick">Ver outro dia</label><input type="date" id="pick" value="'+dkey+'"><button class="btn" type="button" data-today="1">Hoje</button></div>';
+  h+='<div class="datebar"><div><span class="wd">'+WDL[c.w]+'</span><span class="dd">'+d.d+' de '+MESES[d.m-1]+(d.y!==now.y?' de '+d.y:'')+'</span><div class="tags">'+tags+'</div></div>'+
+    (isToday?'<div class="clock">agora<b>'+fmt(now.min)+'</b></div>':'<div class="clock">consulta de outro dia</div>')+'</div>';
+
+  h+=(c.type!=='util')
+    ?'<button type="button" class="protobtn plt" data-view="protocolo">Hoje é plantão. Abra o Protocolo do Caos ›</button>'
+    :'<button type="button" class="protobtn" data-view="protocolo">Revisor não respondeu? Veja o Protocolo ›</button>';
+  h+=plNote(c,only);
+  var items=itemsOn(c,only);
+  items.forEach(function(it){
+    it.st=stateOf(it.e,isToday?now.min:null);
+    it.cs=it.st.done?'done':'todo';
+  });
+  function byT(a,b){var ta=a.st.t==null?99999:a.st.t,tb=b.st.t==null?99999:b.st.t;return ta-tb;}
+  var todo=items.filter(function(i){return i.cs==='todo';}).sort(byT);
+  var done=items.filter(function(i){return i.cs==='done';}).sort(byT);
+
+  var total=items.length;
+  if(total){
+    var nxt=todo.length?todo[0]:null,nxtTxt='';
+    if(nxt&&nxt.st.t!=null)nxtTxt=(isToday?'próximo prazo ':'primeiro prazo ')+fmt(nxt.st.t)+(isToday?', '+leftTxt(nxt.st.t-now.min):'');
+    else if(nxt)nxtTxt='próximo envio só depois da revisão';
+    h+='<div class="sumb"><div class="sumt"><b>'+total+'</b> '+(total>1?'entregas':'entrega')+(isFuture?(total>1?' previstas':' prevista'):' neste dia')+'</div>'+
+      '<div class="sums">'+(nxtTxt?nxtTxt.charAt(0).toUpperCase()+nxtTxt.slice(1):'Todos os prazos de hoje já passaram')+'</div></div>';
+  }
+
+  var due=dueOn(d,only?only.id:null);
+  var dueIds={};
+  if(due)due.items.forEach(function(x){obClients(x.ob).forEach(function(id){dueIds[id]=1;});});
+
+  if(!only){
+    var tileFn=function(cl){
+      var its=items.filter(function(i){return i.cl.id===cl.id;});
+      var pe=its.filter(function(i){return i.cs==='todo';}).sort(byT);
+      var sub;
+      if(isSusp(cl.id,d))sub='<span class="tbad">'+suspTxt(cl.id)+'</span>';
+      else if(!its.length)sub='<span>'+((cl.id==='infra'||cl.id==='mjsp')?'Só alertas':'Sem entrega')+'</span>';
+      else if(!pe.length)sub='<span>Encerrado</span>';
+      else sub='<span>'+(isToday?'Próximo ':'A partir de ')+(pe[0].st.t==null?'após a revisão':fmt(pe[0].st.t))+'</span>';
+      return '<button type="button" class="tile" data-scope="'+cl.id+'" data-view="hoje"><b>'+cl.nome+'</b>'+sub+(dueIds[cl.id]&&!isSusp(cl.id,d)?'<span class="tdue">Prazo mensal</span>':'')+'</button>';
+    };
+    var mineDay=function(cl){return !isMeus()||(c.type==='util'?baseIds().indexOf(cl.id)>=0:plIds(d).indexOf(cl.id)>=0);};var mineL=CL.filter(mineDay),otherL=CL.filter(function(cl){return !mineDay(cl);});
+    h+='<h2 class="lab">'+(isMeus()?'Meus clientes':'Escolha seu cliente')+'</h2><div class="tiles">'+mineL.map(tileFn).join('')+'</div>';
+    if(otherL.length)h+='<details class="dn" id="outros"'+($('outros')&&$('outros').open?' open':'')+'><summary>Outros clientes ('+otherL.length+')</summary><div class="tiles" style="margin-top:8px">'+otherL.map(tileFn).join('')+'</div></details>';
+  }
+
+  if(due){
+    h+='<h2 class="lab">'+(isToday?'Vence hoje no mês':'Vence neste dia no mês')+'</h2><div class="due">'+
+      due.items.map(function(x){
+        return '<div class="dueitem"><b>'+x.ob.t+'</b><span class="dq">'+x.tag+'</span>'+dHtml(x.ob)+obChips(x.ob)+obControl(x.ob,only)+
+          (x.ob.link?'<a href="'+x.ob.link+'" target="_blank" rel="noopener">'+x.ob.linkTxt+'</a>':'')+'</div>';
+      }).join('')+'</div>';
+  }
+
+  function rowHtml(it,isNext){
+    var st=it.st,e=it.e,cs=it.cs,left='',cls='row';
+    var lab=cs==='done'?'Encerrado':(st.k==='rev'?'Revisão até':(st.t!=null?'Envio até':'Envio'));
+    var tm=st.t!=null?'<span class="t">'+fmt(st.t)+'</span>':'<span class="t sm">após a revisão</span>';
+    if(cs==='done')cls+=' done';
+    if(cs==='todo'&&isToday&&st.t!=null){
+      var mm=st.t-now.min;
+      if(isNext||mm<=120)left='<span class="left'+(mm<=30?' soon':'')+'">'+leftTxt(mm)+'</span>';
+    }
+    if(isNext&&cs==='todo')cls+=' next';
+    var head=only?'<span class="ed solo">'+e.ed+'</span>':'<button type="button" class="nmb" data-scope="'+it.cl.id+'" data-view="hoje">'+it.cl.nome+' ›</button><span class="ed">'+e.ed+'</span>';
+    var badge=(isNext&&cs==='todo')?'<span class="nextbadge">Próximo</span>':'';
+    return '<div class="'+cls+'"><div class="when"><span class="l">'+lab+'</span>'+tm+left+'</div>'+
+      '<div class="what"><div>'+head+badge+'</div><div class="rec">Recorte: '+recDated(e,c)+'</div><div class="envrow">'+(ENVIO[it.cl.id]==='ol'?'<span class="env ol">Outlook</span>'+mailBtn('sm'):'<span class="env mc">Mailchimp</span>')+'</div>'+chipsOf(e)+'</div></div>';
+  }
+
+  var title=only?'Entregas do dia':(isMeus()?'Meus relatórios de hoje':'Agenda do dia');
+  if(!items.length){
+    h+='<h2 class="lab">'+title+'</h2><div class="empty"><p class="none">'+(only?(isSusp(only.id,d)?suspTxt(only.id)+'.':(isMeus()&&relFor(c).indexOf(only.id)<0?(c.type==='util'?'Você não escolheu este cliente em Relatórios.':'Você não marcou este cliente no plantão.'):semText(only,c.type))):'Nenhuma entrega diária neste dia.')+'</p></div>';
+  }else{
+    if(todo.length)h+='<h2 class="lab">'+title+'</h2><div class="list">'+todo.map(function(it,i){return rowHtml(it,i===0&&isToday);}).join('')+'</div>';
+    if(done.length){
+      var o=$('dn')&&$('dn').open;
+      h+='<details class="dn" id="dn"'+(o||!todo.length?' open':'')+'><summary>Já encerrados hoje ('+done.length+')</summary><div class="list">'+done.map(function(it){return rowHtml(it,false);}).join('')+'</div></details>';
+    }
+  }
+
+  if(isMeus()){
+    var ac=CL.filter(function(cl){return aleFor(c).indexOf(cl.id)>=0&&(!only||only.id===cl.id);});
+    if(ac.length)h+='<h2 class="lab">Meus alertas</h2>'+ac.map(function(cl){return alertCard(cl,c);}).join('');
+  }
+
+  if(!only){
+    var sem=[];
+    CL.forEach(function(cl){
+      if(isMeus()&&relFor(c).indexOf(cl.id)<0)return;
+      if(isSusp(cl.id,d)){sem.push('<li><b>'+cl.nome+'</b><span style="color:var(--bad);font-weight:700">'+suspTxt(cl.id)+'</span></li>');return;}
+      if(cl.ent.some(function(e){return e.on.indexOf(c.type)>=0;}))return;
+      sem.push('<li><b>'+cl.nome+'</b><span>'+semText(cl,c.type)+'</span></li>');
+    });
+    if(sem.length)h+='<h2 class="lab">Sem relatório neste dia</h2><ul class="semlist">'+sem.join('')+'</ul>';
+    var nx=nextDues(d,null,1)[0];
+    if(nx){
+      h+='<h2 class="lab">Próximo prazo mensal</h2><div class="due"><h3>'+WDS[dow(nx.o)]+' '+pad(nx.o.d)+'/'+pad(nx.o.m)+'</h3>'+nx.items.map(function(x){
+        return '<div class="dueitem"><b>'+x.ob.t+'</b><span class="dq">'+x.tag+'</span>'+dHtml(x.ob)+pillsOf(x.ob)+'</div>';
+      }).join('')+'</div>';
+    }
+    h+='<h2 class="lab">Quando vence cada obrigação</h2>'+prazosMap();
+    h+='<h2 class="lab">Regras fixas</h2><ul class="rules"><li>Nada sai para o cliente sem passar pela revisão.</li><li>Todos os mensais: revisão até 12h00 e envio até 14h00. O mensal do GHC vence no último dia útil. Os demais, no 3º dia útil.</li><li>Todo 1º dia útil, até 18h00: volumetria de alertas (interna).</li><li>Relatório de alertas é enviado no grupo interno do cliente. Não confundir com a volumetria.</li><li>Feriado nacional: todos os clientes em modo plantão.</li></ul>';
+    h+='<details class="dn"><summary>Como usar este guia</summary><ul class="rules"><li>Em "Hoje", veja as entregas do dia, os horários e quanto falta para cada prazo.</li><li>Em "Calendário", veja só os seus dias de entrega e leve os lembretes para o celular.</li><li>Em "Plantão", marque seus clientes do fim de semana ou feriado e use o checklist.</li><li>Em "Protocolo" e "Regras", veja o que fazer quando algo foge do previsto e todos os horários.</li><li>Toque em "Perfil", no topo, para mudar seus clientes.</li></ul></details>';
+  }else{
+    var nds=nextDues(d,only.id,4);
+    if(nds.length){
+      h+='<h2 class="lab">Próximas obrigações</h2><div>'+nds.map(function(g){
+        return '<div class="nx"><div class="nd">'+pad(g.o.d)+'/'+pad(g.o.m)+'<small>'+WDS[dow(g.o)]+'</small></div><div>'+g.items.map(function(x){
+          return '<div class="dueitem" style="margin-bottom:8px"><b>'+x.ob.t+'</b><span class="dq">'+x.tag+'</span>'+dHtml(x.ob)+obChips(x.ob)+'</div>';
+        }).join('')+'</div></div>';
+      }).join('')+'</div>';
+    }
+  }
+  return h;
+}
+
+/* ----- Calendario ----- */
+function dayItems(o,only){
+  var now=spNow(),c=ctxOf(o),isToday=key(o)===key(now);
+  var items=itemsOn(c,only);
+  items.forEach(function(it){it.st=stateOf(it.e,isToday?now.min:null);});
+  items.sort(function(a,b){var ta=a.st.t==null?99999:a.st.t,tb=b.st.t==null?99999:b.st.t;return ta-tb;});
+  return {c:c,items:items,due:dueOn(o,only?only.id:null)};
+}
+function plNote(c,only){
+  if(!isMeus()||c.type==='util')return '';
+  var ids=plIds(c.o);
+  if(only?ids.indexOf(only.id)>=0:ids.length)return '';
+  return '<div class="notice"><span>'+(only?'Você não marcou este cliente no plantão.':'Você ainda não marcou clientes para este plantão.')+'</span><button type="button" class="btn" data-scope="todos" data-view="plantao">Marcar</button></div>';
+}
+function dayPanel(o,only){
+  var d=dayItems(o,only),c=d.c;
+  var biz=isBiz(o)?bizDays(o.y,o.m).indexOf(o.d)+1:0,tags='';
+  if(biz)tags+='<span class="tag acc">'+biz+'º dia útil</span>';
+  if(c.hol)tags+='<span class="tag hol">Feriado: '+c.hol+'</span>';
+  if(c.type!=='util')tags+='<span class="tag plt">Modo plantão</span>';
+  var h='<div class="dpanel"><div class="dph"><b>'+WDL[c.w]+', '+o.d+' de '+MESES[o.m-1]+'</b><div class="tags">'+tags+'</div></div>'+plNote(c,only);
+  if(!d.items.length&&!d.due&&!plNote(c,only))h+='<p class="none">Nenhuma entrega sua neste dia.</p>';
+  d.items.forEach(function(it){
+    var tm=it.st.t!=null?fmt(it.st.t):'após a revisão';
+    h+='<div class="dc"><div class="dct">'+tm+'</div><div class="dcb"><div class="dcn"><b>'+it.cl.nome+'</b><span class="tag acc">'+it.e.ed+'</span></div><p class="rl">Recorte: '+recDated(it.e,c)+'</p>'+chipsOf(it.e)+'</div></div>';
+  });
+  if(d.due)d.due.items.forEach(function(x){
+    var cat=obCat(x.ob)==='men'?'m':'a',t=x.ob.rev!=null?x.ob.rev:x.ob.env;
+    h+='<div class="dc '+cat+'"><div class="dct">'+(t!=null?fmt(t):'--')+'</div><div class="dcb"><div class="dcn"><b>'+x.ob.t+'</b><span class="tag '+(cat==='m'?'ok':'wrn')+'">'+x.tag+'</span></div>'+dHtml(x.ob)+obChips(x.ob)+obControl(x.ob,only)+(x.ob.link?'<a href="'+x.ob.link+'" target="_blank" rel="noopener">'+x.ob.linkTxt+'</a>':'')+'</div></div>';
+  });
+  h+='<button type="button" class="btn full" data-day="'+key(o)+'">Abrir o dia completo ›</button></div>';
+  return h;
+}
+function monthList(y,m,only){
+  var groups=dueMap(y,m,only?only.id:null),tk=key(spNow());
+  if(!groups.length)return '<p class="none">Nenhuma obrigação mensal neste mês.</p>';
+  return '<ol class="days">'+groups.map(function(g){
+    var tags={};g.items.forEach(function(x){tags[x.tag]=1;});
+    var kk=key(g.o);
+    return '<li class="day'+(kk===tk?' today':'')+'"><div class="dn2"><button type="button" class="daybtn" data-calday="'+kk+'" aria-label="Ver detalhes do dia '+pad(g.o.d)+'"><b>'+pad(g.o.d)+'</b></button><span>'+WDS[dow(g.o)]+'</span></div><div><div class="dtag">'+Object.keys(tags).join(' · ')+'</div><ul class="its">'+
+      g.items.map(function(x){
+        return '<li class="it"><b>'+x.ob.t+'</b>'+dHtml(x.ob)+obChips(x.ob)+obControl(x.ob,only)+(x.ob.link?'<a href="'+x.ob.link+'" target="_blank" rel="noopener">'+x.ob.linkTxt+'</a>':'')+'</li>';
+      }).join('')+'</ul></div></li>';
+  }).join('')+'</ol>';
+}
+function viewCal(){
+  var now=spNow();
+  if(!S.month)S.month={y:now.y,m:now.m};
+  var y=S.month.y,m=S.month.m,only=S.scope==='todos'?null:BYID[S.scope],tk=key(now);
+  var cd=S.calDay?parseKey(S.calDay):null;
+  if(!cd||cd.y!==y||cd.m!==m)S.calDay=(now.y===y&&now.m===m)?tk:key({y:y,m:m,d:1});
+  var groups=dueMap(y,m,only?only.id:null),byDay={};
+  groups.forEach(function(g){byDay[g.o.d]=g;});
+  var h='<div class="monthbar"><button class="btn" type="button" data-m="-1" aria-label="Mês anterior">‹</button><div class="mlabel">'+MESES[m-1]+' de '+y+'</div><button class="btn" type="button" data-m="1" aria-label="Próximo mês">›</button></div>';
+  h+='<div class="mgrid">'+WDS.map(function(w){return '<div class="mwd">'+w+'</div>';}).join('');
+  var first=new Date(Date.UTC(y,m-1,1)).getUTCDay();
+  for(var i=0;i<first;i++)h+='<div class="mc blank"></div>';
+  for(var d=1;d<=dim(y,m);d++){
+    var o={y:y,m:m,d:d},w=dow(o),hn=holName(o),k=key(o),c=ctxOf(o);
+    var hasD=itemsOn(c,only).length>0,g=byDay[d],hasA=false,hasM=false;
+    if(g)g.items.forEach(function(x){if(obCat(x.ob)==='men')hasM=true;else hasA=true;});
+    var cls='mc'+(hn?' hol':(w===0||w===6?' wk':''))+(k===tk?' today':'')+(k===S.calDay?' sel':'');
+    h+='<button type="button" class="'+cls+'" data-calday="'+k+'" aria-pressed="'+(k===S.calDay)+'" aria-label="'+d+' de '+MESES[m-1]+(hn?', feriado '+hn:'')+(hasD||hasA||hasM?', com entregas':'')+'">'+d+'<i>'+(hasD?'<s class="d"></s>':'')+(hasA?'<s class="a"></s>':'')+(hasM?'<s class="m"></s>':'')+'</i></button>';
+  }
+  h+='</div><div class="legend"><span><s class="d"></s>diário</span><span><s class="a"></s>alerta</span><span><s class="m"></s>mensal</span><span>vermelho: feriado</span></div>';
+  if(isMeus())h+='<p class="hols">Fim de semana e feriado mostram só o plantão que você marcou na aba Plantão.</p>';
+  h+=dayPanel(parseKey(S.calDay),only);
+  if(SEL){
+    h+='<h2 class="lab">Lembretes no celular</h2><div class="card"><p class="rl">Leve as suas entregas para o calendário do celular, com alarme 15 minutos antes de cada prazo. Vale para os próximos 45 dias e para os plantões que você já marcou.</p><button type="button" class="go2" data-ics="1">Adicionar ao meu calendário</button>'+
+      (S.icsMsg?'<p class="pnote">'+S.icsMsg+'</p>':'<p class="pnote">Se você mudar seus clientes ou o guia mudar, gere de novo. Apague antes os eventos antigos que têm "Guia de Entregas" na categoria.</p>')+
+      (S.icsText?'<details class="acc"><summary>O arquivo não baixou?<small>Copie o texto e salve como lembretes.ics</small></summary><textarea class="icsbox" readonly onfocus="this.select()" aria-label="Conteúdo do arquivo de calendário">'+esc(S.icsText)+'</textarea></details>':'')+'</div>';
+  }
+  h+='<details class="dn" style="margin-top:14px"><summary>Lista de obrigações do mês</summary><div style="margin-top:8px">'+monthList(y,m,only)+'</div></details>';
+  return h;
+}
+
+/* ----- Lembretes (.ics) ----- */
+function icsEsc(t){return String(t).replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');}
+function icsFold(l){var out=[],s=l;while(s.length>36){out.push(s.slice(0,36));s=' '+s.slice(36);}out.push(s);return out.join('\r\n');}
+function icsT(o,min){var t=new Date(Date.UTC(o.y,o.m-1,o.d,0,min)+3*3600000);return t.getUTCFullYear()+pad(t.getUTCMonth()+1)+pad(t.getUTCDate())+'T'+pad(t.getUTCHours())+pad(t.getUTCMinutes())+'00Z';}
+function buildIcs(){
+  var now=spNow(),ev=[],prev=S.mode;
+  S.mode='meus';
+  try{
+    for(var i=0;i<45;i++){
+      var o=add(now,i),c=ctxOf(o);
+      itemsOn(c,null).forEach(function(it){
+        var e=it.e,a=e.rev!=null?e.rev:e.env,b=e.env;
+        if(a==null)return;
+        ev.push({o:o,a:a,b:b,t:it.cl.nome+' '+e.ed+(e.rev!=null&&b!=null?' (revisão '+fmt(a)+', envio '+fmt(b)+')':''),d:'Recorte: '+recDated(e,c)+'. '+(ENVIO[it.cl.id]==='ol'?'Envio pelo Outlook, com a Central de Mailing.':'Envio pelo Mailchimp.')});
+      });
+      var g=dueOn(o,null);
+      if(g)g.items.forEach(function(x){
+        var a=x.ob.rev!=null?x.ob.rev:x.ob.env,b=x.ob.env;
+        var who=obClients(x.ob).filter(function(id){return mine(x.ob,id)&&!isSusp(id,o);}).map(function(id){return BYID[id].nome;});
+        if(a==null||!who.length)return;
+        ev.push({o:o,a:a,b:b,t:x.ob.t+': '+who.join(', ')+(x.ob.rev!=null&&b!=null?' (revisão '+fmt(a)+', envio '+fmt(b)+')':' (até '+fmt(a)+')'),d:(x.ob.d||'')});
+      });
+    }
+  }finally{S.mode=prev;}
+  var stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Guia de Entregas//PT-BR','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Guia de Entregas','X-WR-TIMEZONE:America/Sao_Paulo'],n=0;
+  ev.forEach(function(x,ix){
+    var end=(x.b!=null&&x.b>x.a)?x.b:x.a+15;
+    if(key(x.o)===key(now)&&end<=now.min)return;
+    n++;
+    L.push('BEGIN:VEVENT','UID:guia-'+key(x.o)+'-'+ix+'@guia-entregas','DTSTAMP:'+stamp,'DTSTART:'+icsT(x.o,x.a),'DTEND:'+icsT(x.o,end),'SUMMARY:'+icsEsc(x.t),'DESCRIPTION:'+icsEsc(x.d),'CATEGORIES:Guia de Entregas',
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(x.t),'TRIGGER:-PT15M','END:VALARM');
+    if(x.b!=null&&x.b>x.a)L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc('Envio em 15 min: '+x.t),'TRIGGER;RELATED=END:-PT15M','END:VALARM');
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  return {n:n,text:L.map(icsFold).join('\r\n')+'\r\n'};
+}
+function icsRun(){
+  var r=buildIcs();
+  if(!r.n){S.icsMsg='Não há entregas suas nos próximos 45 dias. Confira seu perfil.';S.icsText='';renderMain();return;}
+  var name='guia-entregas-lembretes.ics';
+  S.icsText=r.text;
+  var ok=function(){S.icsMsg=r.n+' lembretes prontos. Abra o arquivo baixado para importar no seu calendário.';renderMain();};
+  var viaAnchor=function(){
+    try{
+      var b=new Blob([r.text],{type:'text/calendar;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');
+      a.href=u;a.download=name;document.body.appendChild(a);a.click();
+      setTimeout(function(){try{document.body.removeChild(a);URL.revokeObjectURL(u);}catch(e){}},1500);
+      ok();
+    }catch(e){S.icsMsg='Não consegui baixar o arquivo aqui. Use o texto abaixo.';renderMain();}
+  };
+  if(window.claude&&typeof window.claude.use==='function'){
+    window.claude.use('downloads').then(function(dl){
+      if(!dl){viaAnchor();return;}
+      dl.save({filename:name,data:r.text}).then(ok,function(err){
+        if(err&&err.code==='declined')return;
+        viaAnchor();
+      });
+    },function(){viaAnchor();});
+  }else viaAnchor();
+}
+
+/* ----- Protocolo ----- */
+var TBD='<em class="tbdx">A confirmar</em>';
+var PROB=[
+ {t:'Mailchimp com problemas',s:'Não dá para enviar o relatório no corpo do e-mail.',a:{
+  ghc:'Não usa Mailchimp. Consulte a lista de destinatários na Central de Mailing.',
+  mda:'Gere uma imagem do PDF e cole no corpo do e-mail. Consulte os destinatários na Central de Mailing.',
+  alema:'Pode enviar o PDF por e-mail. Consulte os destinatários na Central de Mailing.',
+  cfq:'Não usa Mailchimp. Consulte os destinatários na Central de Mailing.',
+  midr:'Pode enviar o PDF por e-mail. Consulte os destinatários na Central de Mailing.',
+  mcti:'Pode enviar o PDF por e-mail. Consulte os destinatários na Central de Mailing.'}},
+ {t:'Outlook fora do ar',s:'Não dá para enviar o PDF por ele.',a:{
+  ghc:'Pode usar um e-mail alternativo.',
+  mda:'Nada define isso, mas o ideal é o e-mail institucional, porque a agência é quem tem a obrigação de enviar.',
+  alema:'Pode usar um e-mail alternativo.',
+  cfq:'Contratualmente não há exigência de e-mail ou sistema. Pode usar um e-mail alternativo.',
+  midr:'Envie pelo Gmail do monitoramento. Avise gerentes e subs com antecedência, para que possam avisar o cliente.',
+  mcti:'Envio interno pode sair de qualquer e-mail. Para o recebimento pela cliente, o protocolo prevê o envio ao e-mail pessoal dela. Peça o endereço ao TL.'}},
+ {t:'Revisor não responde',s:'Passou do combinado e o prazo de envio está chegando.',a:{
+  ghc:'Pode ser enviado sem revisão, seguindo a regra geral: se o revisor não aparecer até 15 minutos antes do horário limite, envie.',
+  mda:'Pode acionar o supervisor para revisar. Se não houver tempo, uma revisão alternativa é permitida, sem prejuízo na entrega.',
+  alema:'Pode acionar o supervisor do monitoramento do fim de semana.',
+  cfq:'O supervisor é a melhor solução. Enviar, mesmo revisado com ajuda de IA, é preferível a não enviar.',
+  midr:'Tente ligar ou avisar o gerente ou o scrum master, alguém vai revisar. Em último caso, envie sem revisão.',
+  mcti:'Tente ligar para o revisor e, se não responder, acione o supervisor do monitoramento para revisar. Não use o ChatGPT para essa revisão. Se ainda assim não houver revisão até 15 minutos antes do horário limite, envie sem revisão.',
+  mjsp:'Nunca envie sem revisão, até segunda ordem. Fale com o TL.'}},
+ {t:'Crise de um cliente no fim de semana',s:'Você identificou uma crise durante o plantão.',a:{
+  ghc:'Vale para dia de semana e para plantão. Avise o supervisor do plantão (em dia de semana, o TL). Se ninguém revisar até 15 minutos antes do horário limite, envie sem revisão.',
+  mda:'Envie o alerta no grupo interno de monitoramento do MDA, para os responsáveis sinalizarem ao cliente. Em casos graves, avalie caso a caso o compilado.',
+  alema:'Avise primeiro o account ou o grupo interno antes de disparar o alerta, e envie um compilado de alertas no mesmo dia.',
+  cfq:'Avise primeiro o account ou o scrum de plantão. Envio extraordinário, compilado ou envio na segunda são decididos junto com o monitoramento e a gerência da conta.',
+  midr:'Avise no grupo em que as revisões são enviadas. O compilado é sempre um bônus, o cliente gosta.',
+  mcti:'Entre em contato com o account. Vale enviar um compilado de alertas sobre o tema ao fim do dia.'}}
+];
+function probHtml(only){
+  var now=spNow();
+  return PROB.map(function(p){
+    var rows=[];
+    CL.forEach(function(cl){
+      if(only&&cl.id!==only.id)return;
+      if(!only&&isMeus()&&!inMine(cl.id))return;
+      var t=p.a[cl.id];
+      if(!t){
+        if(only)rows.push('<li><b>'+cl.nome+'</b><span>O protocolo não traz orientação específica para este cliente. Fale com o TL.</span></li>');
+        return;
+      }
+      rows.push('<li><b>'+cl.nome+'</b><span>'+t+(isSusp(cl.id,now)?' <em class="sus">'+suspTxt(cl.id)+'.</em>':'')+'</span></li>');
+    });
+    return '<details class="acc"'+(only?' open':'')+'><summary>'+p.t+'<small>'+p.s+'</small></summary><ul class="ans">'+rows.join('')+'</ul></details>';
+  }).join('');
+}
+function semRevHtml(only){
+  var now=spNow(),rows=[];
+  CL.forEach(function(cl){
+    if(only&&cl.id!==only.id)return;
+    if(!only&&isMeus()&&!inMine(cl.id))return;
+    if(cl.id==='mjsp'){rows.push('<li><b>MJSP</b><span class="sus">Nunca sem revisão, até segunda ordem.</span></li>');return;}
+    var parts=[];
+    cl.ent.forEach(function(e){
+      if(e.env==null)return;
+      if(e.et==='09h30 em ponto')parts.push(e.ed+': envio às 09h30 em ponto, nunca antes');
+      else parts.push(e.ed+': '+fmt(e.env-15)+' (limite '+fmt(e.env)+')');
+    });
+    if(!parts.length)return;
+    rows.push('<li><b>'+cl.nome+'</b><span>'+parts.join('<br>')+(isSusp(cl.id,now)?'<br><em class="sus">'+suspTxt(cl.id)+'.</em>':'')+'</span></li>');
+  });
+  return '<ul class="ans">'+rows.join('')+'</ul>';
+}
+function viewProtocolo(){
+  var now=spNow(),c=ctxOf(now),only=S.scope==='todos'?null:BYID[S.scope];
+  var h='';
+  if(c.type!=='util')h+='<div class="tags" style="margin:0 0 10px"><span class="tag plt">Hoje é plantão</span></div>';
+  h+='<div class="btns" style="margin-top:0">'+mailBtn('pri')+'<a class="lnk" href="'+ACESSOS+'" target="_blank" rel="noopener">Acesso às Ferramentas</a></div>';
+  h+='<p class="pnote">Protocolo do Caos: um guia de sobrevivência para os plantões e para o dia a dia, quando algo foge do previsto. Para tudo o que já está mapeado aqui, aplique o protocolo e avise depois. Para o que não está, fale com o TL (dia útil) ou com o supervisor (plantão).</p>';
+
+  h+='<h2 class="lab">Revisor não respondeu?</h2><div class="rulebox"><ul>'+
+    '<li><b>Dia útil:</b> fale com o TL.</li>'+
+    '<li><b>Plantão:</b> acione o supervisor do plantão. O nome dele está no card Stand By, no grupo de WhatsApp do plantão.</li>'+
+    '<li><b>Continua sem revisão?</b> Se o revisor não aparecer até 15 minutos antes do horário limite, envie sem revisão. Isso não vale para o MJSP.</li>'+
+    '<li class="stop"><b>Exceção, até segunda ordem: MJSP.</b> A revisão é obrigatória. Nunca envie sem revisão.</li>'+
+    '<li><b>MCTI:</b> antes de enviar sem revisão, tente ligar para o revisor e acione o supervisor. Não use o ChatGPT para revisar.</li>'+
+    '</ul></div>';
+  h+='<details class="acc"><summary>Em que horário o envio sem revisão vale?<small>15 minutos antes do limite de cada entrega</small></summary>'+semRevHtml(only)+'</details>';
+
+  h+='<h2 class="lab">Se der problema</h2>';
+  if(only)h+='<p class="pnote" style="margin-top:0">Mostrando só o '+only.nome+'. Toque em "Todos" no topo para voltar.</p>';
+  else if(isMeus())h+='<p class="pnote" style="margin-top:0">Mostrando só os seus clientes. Use "Ver todos os clientes", no fim da tela, para ver os demais.</p>';
+  h+=probHtml(only);
+
+  h+='<h2 class="lab">Durante o plantão</h2>';
+  var prow=[
+    ['ghc','<tr><td>GHC</td><td>10h</td><td>até 12h<small>protocolo: por volta de 11h</small></td><td>12h a 14h</td></tr>'],
+    ['mda','<tr><td>MDA</td><td>10h</td><td>até 12h<small>protocolo: 12h a 12h30</small></td><td>até 14h</td></tr>'],
+    ['alema','<tr class="'+(isSusp('alema',now)?'s':'')+'"><td>Alema</td><td>11h</td><td>11h30 a 13h<small>protocolo: 12h a 13h</small></td><td>até 14h'+(isSusp('alema',now)?'<small>'+suspTxt('alema')+'</small>':'')+'</td></tr>'],
+    ['cfq','<tr><td>CFQ</td><td>11h</td><td>até 12h<small>protocolo: 12h a 13h</small></td><td>12h a 14h</td></tr>'],
+    ['midr','<tr><td>MIDR</td><td>12h</td><td>por volta de 13h</td><td>até 14h</td></tr>'],
+    ['mcti','<tr><td>MCTI</td><td>14h</td><td>até 15h<small>protocolo: por volta de 15h</small></td><td>até 16h</td></tr>']
+  ].filter(function(r){return !isMeus()||inMine(r[0]);}).map(function(r){return r[1];}).join('');
+  h+='<details class="acc"><summary>Corte, revisão e entrega<small>Horários do plantão por cliente</small></summary><table class="ptab"><thead><tr><th>Cliente</th><th>Corte</th><th>Revisão</th><th>Entrega</th></tr></thead><tbody>'+prow+'</tbody></table><p class="pnote">Na coluna Revisão vale o horário do guia. A janela do protocolo aparece abaixo, em letra pequena.</p></details>';
+  h+='<details class="acc"><summary>Quem está no plantão<small>Relatórios, alertas e supervisão</small></summary><ul class="ans">'+
+    '<li><b>Relatórios</b><span>MIDR, MCTI, MDA, GHC e CFQ.</span></li>'+
+    '<li><b>Alertas</b><span>MIDR, MCTI, MDA, CFQ e MJSP.</span></li>'+
+    '<li><b>Supervisor do plantão</b><span>É o ponto focal da Listening para as contas e para os analistas. Ele é responsável pelo envio dos alertas do MJSP.</span></li>'+
+    '<li><b>Account managers</b><span>Ficam de sobreaviso no período e podem tirar dúvidas sobre o cliente.</span></li>'+
+    '<li><b>Ao terminar</b><span>Confirme no grupo, por exemplo "CFQ check" ou "Alertas ✅". Ao fim do plantão, os supervisores abrem espaço para feedbacks e reports.</span></li>'+
+    '</ul></details>';
+
+  h+='<h2 class="lab">Antes do plantão</h2>';
+  h+='<details class="acc"><summary>Como se chega ao plantão<small>Escala, grupo e card Stand By</small></summary><ul class="ck">'+
+    '<li><span>O head divulga a escala dos fins de semana e feriados.</span></li>'+
+    '<li><span>Os escalados são adicionados na <b>segunda-feira</b> ao grupo de WhatsApp Plantão - Monitoramento, para terem tempo de se organizar.</span></li>'+
+    '<li><span>A escala dos revisores chega pelo card <b>Stand By</b>, enviado só pelo grupo de WhatsApp (não vem mais por e-mail). Ele mostra o revisor de cada conta, o supervisor do plantão e os account managers de sobreaviso.</span></li>'+
+    '<li><span>No grupo, o time define quem fica com cada produto.</span></li>'+
+    '</ul></details>';
+  h+='<details class="acc"><summary>Checklist de acessos<small>Até o último dia útil antes do plantão</small></summary><ul class="ck">'+
+    '<li><span>Confirme o acesso ao <b>Mailchimp</b> e ao <b>Outlook</b>, consultando a planilha Acesso às Ferramentas.</span></li>'+
+    '<li><span>Confirme o código de autenticação com o analista indicado na planilha. Faça isso antes do plantão, para garantir o descanso de quem não está escalado.</span></li>'+
+    '<li><span>Clientes que pedem envio por e-mail: teste o acesso ao e-mail corporativo do cliente alguns dias antes, para a TI ter tempo. Depois da liberação, procure a conta em "abrir outra conta de correio" no Outlook.</span></li>'+
+    '<li><span>Consulte a <b>Central de Mailing</b> para os e-mails de envio.</span></li>'+
+    '<li><span>Leia o Manual da Conta e os relatórios anteriores, e antecipe problemas e soluções.</span></li>'+
+    '</ul></details>';
+  h+='<details class="acc"><summary>Boas práticas<small>Para evitar o caos</small></summary><ul class="ans">'+
+    '<li><b>Cobertura de 24h</b><span>O monitoramento é contínuo. O horário inicial do próximo relatório é sempre o horário de corte do último. É regra contratual não deixar nenhum período descoberto.</span></li>'+
+    '<li><b>Manual da Conta</b><span>É o principal instrumento de autonomia. Se uma instrução divergir do manual, avise na hora e atualize o manual.</span></li>'+
+    '<li><b>Atenção no envio</b><span>Confira datas, horários, arquivos e mailing antes de enviar. Faça vários checks: respire, volte e revise de novo antes de apertar "enviar".</span></li>'+
+    '</ul></details>';
+
+  h+='<h2 class="lab">Glossário</h2>';
+  h+='<details class="acc"><summary>O que queremos dizer com...<small>Período, corte, revisão e entrega</small></summary><ul class="ans">'+
+    '<li><b>Período de cobertura</b><span>O tempo monitorado por cada produto. São as datas que o analista coloca na Brandwatch, entre o horário de início e o de corte.</span></li>'+
+    '<li><b>Horário de corte</b><span>O momento em que o período de cobertura se encerra.</span></li>'+
+    '<li><b>Horário para a revisão</b><span>A janela combinada para enviar o produto à revisão, que deixa tempo para a entrega final no prazo do contrato.</span></li>'+
+    '<li><b>Prazo de envio ou entrega final</b><span>O disparo por e-mail, a entrega formal do produto ao cliente.</span></li>'+
+    '<li><b>Manual da Conta</b><span>O tutorial de produção de cada relatório, com as informações-chave de cada conta.</span></li>'+
+    '</ul></details>';
+  return h;
+}
+
+/* ----- Regras ----- */
+function viewRegras(){
+  if(S.scope!=='todos'){
+    var c=BYID[S.scope];
+    var daily=c.ent.length?c.ent.map(function(e,i){return entHtml(e,i===0);}).join(''):'<p class="none">'+c.sem.all+'</p>';
+    var obs=OBS.filter(function(ob){return obHas(ob,c.id);}).map(function(ob,i){return obHtml(ob,i===0);}).join('');
+    var tbd=c.tbd.length?'<details class="tbd" open><summary>A confirmar ('+c.tbd.length+')</summary><ul>'+c.tbd.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul></details>':'';
+    return '<h2 class="lab first">Entregas diárias</h2><div class="card">'+daily+'</div>'+
+      '<h2 class="lab">Mensal e alertas</h2><div class="card">'+obs+'</div>'+
+      comoHtml(c.id)+
+      '<h2 class="lab">Atenção</h2><div class="card"><ul class="att">'+c.att.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ul>'+tbd+'</div>';
+  }
+  var vol=OBS[0];
+  var h='<h2 class="lab first">Para todos os clientes</h2><div class="card">'+obHtml(vol,true)+'<div class="ent"><div class="ent-h"><b>Feriado nacional</b><span>Regra geral</span></div><p class="rl">Todos os clientes operam em modo plantão. Mensal ou obrigação que cai em feriado vai para o dia útil seguinte.</p></div></div>';
+  h+='<h2 class="lab">Quando vence cada obrigação</h2>'+prazosMap();
+  h+=CL.filter(function(c){return inMine(c.id);}).map(function(c){
+    var rows=c.ent.length?c.ent.map(function(e,i){return entHtml(e,i===0);}).join(''):'<p class="none">'+c.sem.all+'</p>';
+    var obs=OBS.filter(function(ob){return ob!==vol&&obHas(ob,c.id);}).map(function(ob){return obHtml(ob,false);}).join('');
+    return '<h2 class="lab">'+c.nome+'</h2><div class="card"><div class="ch"><h2>'+c.nome+'</h2><span class="bs">'+(COMO[c.id]&&c.id!=='mjsp'?'<button type="button" class="btn" data-scope="'+c.id+'" data-view="regras">Como montar</button>':'')+'<button type="button" class="btn" data-scope="'+c.id+'" data-view="regras">Ver tudo</button></span></div>'+(isSusp(c.id,spNow())?'<div class="susp">'+suspTxt(c.id)+'</div>':'')+rows+obs+'</div>';
+  }).join('');
+  return h;
+}
+
+var COMO={"mda":[["Insumos","O que pedir e de onde vem","<ul><li><b>CSV:</b> painel do MDA, aba \"Todas as menções\", botão Export. O cabeçalho está na linha de índice 8.</li><li><b>Prints do diário</b> (aba \"Diário/plantão\"): big numbers (menções, autores, usuários/alcance; nunca impressões do X), Roda de Tópicos, sentimento, Benchmark de Tags, Fonte de Dados, Tipos de conteúdo, termos em alta (o termo mais à direita) e citações à ministra.</li><li><b>2ª edição:</b> Google Trends das últimas 24h no lugar de Tendências.</li><li><b>Semanal (sexta):</b> 5 prints: big numbers com variação, sentimento da semana, Fonte de Dados, Tipos de conteúdo e Google Trends.</li><li><b>Mensal:</b> prints de Total Volume com variações, Fonte de Dados, sentimento por canal, volume diário, Benchmark de Tags, termos em alta e citações à ministra. Não há CSV mensal.</li></ul>"],["Recortes e envio","Janelas e prazos de cada produto","<ul><li><b>1ª edição:</b> 15h de ontem às 5h (segunda ou depois de feriado: 10h de ontem às 5h). Envio até 8h.</li><li><b>2ª edição:</b> 5h às 15h. Envio até 18h.</li><li><b>Plantão:</b> sábado 15h de sexta às 10h; domingo 10h de sábado às 10h; feriado 15h de ontem às 10h. Edição única, entrega até 14h.</li><li><b>Semanal:</b> sexta anterior 15h até quinta 23h59; envio até 18h de sexta.</li><li><b>Mensal:</b> até o 3º dia útil, 14 slides.</li><li>Extraia e envie assim que possível; não espere chegarem mais menções.</li></ul>"],["Passo a passo do diário","Ordem de trabalho","<ol><li>Leia o CSV, os prints e os últimos relatórios, para acumular contexto.</li><li>Sentimentalização só de grupos volumosos e muito republicados. Uma ou duas menções: ajuste só no texto. Volumoso: o Claude traz tabela e busca booleana, você altera na Brandwatch e reenvia o CSV.</li><li>Inventário de menções. URL sempre do campo \"Url\" do CSV; para RT, o campo \"Twitter Retweet of\".</li><li>Seções uma por vez, com o gate \"Você se responsabiliza pela análise? Posso prosseguir?\": Insights, Destaques, Redes Sociais, Ocorrências, Termos em Alta, Origem, Ministra, Ocupações e Tendências (só 1ª edição e edição única).</li><li>Resumo para WhatsApp em formato fixo, com a URL do Mailchimp que você tiver.</li><li>Mensagem de fechamento, revisão do PDF, arquivo de links e subida no projeto.</li></ol>"],["Arquivo \"Links para o semanal\"","Rotina obrigatória em toda edição","<p>O CSV não pode ser baixado para o semanal e o mensal, então esse arquivo é a única fonte de links deles.</p><ul><li><b>1ª edição:</b> revisão do PDF opcional, arquivo obrigatório. <b>2ª edição:</b> revisão e arquivo obrigatórios. <b>Plantão e edição única:</b> ambos obrigatórios.</li><li>Parta sempre do arquivo que já está no projeto, nunca do zero.</li><li>Para subir: nome do projeto no topo, depois Contexto; apague o arquivo de links antigo; suba o novo e o PDF final do dia; confira que há um só arquivo e que a última linha é a edição de hoje.</li></ul>"],["Regras de texto","O que não pode aparecer","<ul><li>Linguagem simples. Nada de travessão, \"invasões\" (sem aspas), \"Brandwatch\" no texto, \"outlier\", \"widget\", \"cluster\", \"trending topics\" ou \"pontos de engajamento\".</li><li>Hiperlink só na primeira citação e nunca em negrito. Aviso ao analista vai em nota fora do texto.</li><li>Curtidas e compartilhamentos só pelo campo da plataforma, nunca somados ao genérico. Facebook na Fonte de Dados = Facebook + Facebook Public.</li><li>Tom neutro com a ministra. Tema Abril Vermelho fora até 01/04/2027.</li><li>Destaques e pautas só da agenda do ministério, sem casos virais fora da pauta (o mensal mostra a variedade do mês). Todo Destaque leva ao menos uma matéria de imprensa formal.</li></ul>"]],"mcti":[["Recortes e prazos","Atenção ao horário do relatório e do boletim","<ul><li><b>Relatório:</b> sempre 14h de ontem até 14h de hoje, de segunda a segunda, inclusive plantão, sábado, domingo e feriado.</li><li><b>Boletim da manhã:</b> 14h de ontem até 7h, só em dia útil, sem plantão.</li><li>O CSV vem em UTC: converta tudo para BRT (UTC-3) antes de analisar picos e horas. Nunca cite horário em UTC.</li><li><b>Revisão às 15h</b> no grupo interno, marcando o revisor do dia. <b>Envio às 16h</b> pelo Mailchimp; depois, PDF e texto de WhatsApp no grupo de alertas.</li><li>Sem revisão 15 minutos antes do limite: ligue para o revisor, escale ao supervisor e envie sem revisão se continuar sem resposta. Nunca use ChatGPT.</li><li>Relatório de alertas: 1º dia útil e dia 15 (ou o dia útil mais próximo), até 12h.</li></ul>"],["Arquivo do dia","Como nomear","<ul><li>Nome: AAAAMMDD_MCTI_Relatorio_Diario, com a data da <b>entrega</b>, não a do início do recorte.</li><li>Sempre duplique o arquivo do dia anterior. Nunca edite por cima.</li></ul>"],["Insumos","CSV, painel e prints manuais","<ul><li>CSV da Brandwatch com cabeçalho de 8 ou 9 linhas: teste em cada arquivo. Exclua gov.br e retweets da análise.</li><li>O CSV costuma trazer só cerca de 44% do volume do painel. É normal: os números do painel valem mais (volume, sentimento, entidades, origem, picos por hora).</li><li>Capture a cada edição o print do cartão de totais (menções, autores, alcance, com variações) e o da nuvem de termos: não dá para extrair do painel.</li><li>Influenciadores: print do post, trecho da legenda, URL, nome, @, rede e alcance (seguidores).</li><li><b>Fontes proibidas como base:</b> releases do gov.br, comunicados do MCTI e conteúdo institucional sem repercussão externa. Servem só de contexto.</li></ul>"],["Ordem das seções","Uma por vez, com o aval do analista","<p>Insights e Recomendações (feitos por último, mas no topo), Visão Geral (picos), Principais Assuntos na Mídia, Principais Assuntos nas Redes, Análise de Sentimento, Origem das Menções, Nuvem de Termos e Tendências, Entidades Vinculadas, Influenciadores e Texto para WhatsApp. Antes do inventário, leia os últimos 6 relatórios.</p>"],["Regras de texto","Sentimento, links e influenciadores","<ul><li>Sentimento do cliente: positivo = ações do MCTI e elogios; neutro = assuntos gerais sem citar o MCTI; negativo = críticas e termos pejorativos. Percentuais do painel; nenhuma tag de ajuste dentro do texto.</li><li>Sem travessão e sem \"sindicação\". A Visão Geral abre com \"Foi registrado o pico de menções...\".</li><li>Link inline no nome do veículo ou publicador, nunca URL por extenso; cada matéria com o seu link; URL de post, não de perfil.</li><li>Influenciadores: contas institucionais, de governo, de portais e do próprio MCTI ficam de fora. Sem ninguém: \"No período analisado, não foram identificadas menções de influenciadores.\"</li><li>Conteúdo eleitoral fica fora dos destaques (mas no inventário). Tema já destacado só volta com fato novo; item usado numa seção não repete em outra.</li></ul>"],["Texto de WhatsApp","Formato fixo","<ul><li>Cabeçalho: RELATÓRIO DE MONITORAMENTO / _STA_ / data e dia da semana.</li><li>Um parágrafo de 4 a 6 linhas, sem marcadores nem travessão, e o link do Mailchimp em linha separada (inserido depois de gerado).</li><li>Boletim: só o recorte (14h de ontem até 7h, dia útil, sem plantão).</li></ul>"]],"ghc":[["Arquivo e formato","PPT, nome e arquivamento","<ul><li>Diário em PowerPoint, fonte Aptos 14. Parta da última versão: copie, renomeie e trabalhe na cópia. Diários na pasta \"relatórios diários\" do drive, plantões na pasta \"plantão\".</li><li>Nome: AAAA_MM_DD_GHC_Relatório_Diário_[1ª edição | 2ª edição | Sábado | Domingo | Segunda]. O nome precisa bater com o conteúdo.</li><li>Depois da revisão, exporte o PDF e coloque na pasta \"links de entrega\" do drive (o link vira shortlink).</li><li><b>Arquivamento obrigatório:</b> suba o PDF final ao projeto do GHC em toda edição, no diário, no semanal e no mensal. Os diários são a base do semanal e do mensal.</li></ul>"],["Recortes e prazos","Diário","<ul><li><b>1ª edição:</b> 16h de ontem às 5h (segunda: 10h de domingo às 5h). Revisão no grupo interno até 6h10; e-mail até 7h00.</li><li><b>2ª edição:</b> 5h às 16h. Revisão até 17h10; e-mail até 18h00.</li><li><b>Plantão:</b> sábado 16h de sexta às 10h; domingo 10h de sábado às 10h. Revisão a partir das 11h; e-mail até 14h.</li><li>Cite nos textos o recorte oficial da edição, nunca o intervalo real dos dados.</li></ul>"],["Insumos","Brandwatch e CSV","<ul><li>Dashboard \"Grupo Hospitalar Conceição\": abas GHC-Diário, GHC-Semanal, Menções, GHC Alertas e Menções-TV/Radio/Podcast/Print.</li><li>Diário: gráfico de picos com sentimentos, Total Volume (big numbers), nuvem de trending (GHC-Diário), gráfico de canais (GHC-Alertas) e CSV do recorte.</li><li>CSV com 11 linhas de cabeçalho (o real está na 11) e data em UTC (BRT = UTC-3). Curtidas e compartilhamentos só pelo campo da plataforma.</li><li>Big numbers e pizzas vêm dos prints, no recorte certo (confira as datas do eixo). O comparativo usa o card da edição anterior enviado pelo analista (a 2ª edição compara com a 2ª edição de ontem), nunca a variação do painel. Segunda: sem comparativo.</li><li>Menção capturada à mão (fora do CSV) entra no volume e no sentimento só depois do aval do analista.</li></ul>"],["Ordem das seções","Uma por vez, com o aval do analista","<p>Slide 1 (Resumo do Dia, só na 1ª edição e no plantão), Picos e Sentimentos, Principais Destaques, Canais/Fontes, Termos em Alta, Insights e Estratégia, Radar News (por último, porque as manchetes mudam) e textos de distribuição. Lembre de subir o PDF a partir da penúltima seção; o bloco de arquivamento obrigatório fecha a última mensagem.</p>"],["Cuidados editoriais","Homonímia e sentimento","<ul><li><b>Homonímia é o maior risco:</b> confira endereço ou Google Maps. Falsos positivos típicos: Nossa Senhora da Conceição e Cristo Redentor de outras cidades ou estados, \"GHC\" de time de handebol, estação BRT Bonsucesso, release do Ministério da Saúde replicado por agregadores e onda de RTs sem relação com o GHC.</li><li>Unidade do RJ: Hospital Geral de Bonsucesso (HGB), mesmo se a matéria disser \"Federal\".</li><li>Sentimento: a ferramenta pode errar; sinalize a divergência e o analista decide. Crime em que o hospital é só local = neutro; pesquisa científica = positivo; fiscalização de conselho e vetor trabalhista = negativo real.</li><li>Grupo volumoso de republicação: tabela e busca booleana; o analista altera na Brandwatch.</li><li>Todo relatório traz ao menos um tema negativo real, mesmo com negativo baixo.</li><li>Textos curtos (o slide é apertado), em prosa corrida, negrito em nomes, números e termos-chave, link no nome do veículo ou perfil, sem travessão. Confira todos os links; Facebook, Instagram, X, O Globo e g1 bloqueiam, então o analista abre antes de fechar.</li></ul>"],["Radar News","Manchetes dos portais","<ul><li>Nacionais: O Globo, Estadão, Folha e Correio Braziliense. Regionais (RS): Correio do Povo, GZH e G1 RS. Mais o UOL: vale a lista de 8.</li><li>Dois parágrafos de prosa (nacional e RS). Os portais bloqueiam leitura automática, então o analista passa as URLs. Varie a redação a cada edição.</li></ul>"],["Envio","E-mail e WhatsApp","<ul><li><b>E-mail:</b> pela caixa do GHC, todos os contatos (cliente e Listening) em CCO, com nome do produto, data, edição, resumo curto e o PDF anexado. Use os envios anteriores como modelo.</li><li><b>WhatsApp (grupo do cliente):</b> 1ª mensagem = print do slide 1 + cabeçalho (RELATÓRIO DE MONITORAMENTO / In.Pacto Comunicação / data e edição) + resumo + link encurtado + \"Att, Monitoramento GHC\". 2ª mensagem = Radar News (manchetes entre aspas, portal e \"Link:\" com shortlink). Encurtador interno da holding.</li></ul>"],["Semanal e mensal","Recorte e prints","<ul><li><b>Semanal:</b> sexta a quinta, entregue na sexta à tarde, PDF por e-mail e WhatsApp, sem link no corpo. 14 slides; Introdução e Insights saem juntos primeiro; revisão criteriosa do PDF; arquive o PDF no projeto. Prints: Total Volume, Volume Over Time com quebra por sentimento, Share de sentimento, Fonte de dados, Insights 3 e nuvem de tendências.</li><li><b>Mensal:</b> recorte do dia 25 do mês anterior ao dia 24; big numbers do PDF do painel; picos sem quebra por sentimento.</li></ul>"]],"midr":[["Recortes do diário","Horários em BRT","<ul><li><b>Manhã:</b> 18h às 6h. <b>Tarde:</b> 6h às 18h. Segunda: manhã fixa, 12h de domingo às 6h.</li><li><b>Plantão:</b> sábado 18h de sexta às 12h; domingo 12h de sábado às 12h. Feriado: continuidade do último período.</li><li>O CSV vem em UTC: converta para BRT (00h UTC = 21h do dia anterior).</li></ul>"],["Seções do diário","Uma por vez, com o aval do analista","<ul><li>Principais Matérias: 2 a 3 parágrafos, portais de notícias.</li><li>Análise de Redes Sociais: um parágrafo positivo, um negativo e um neutro.</li><li>Ocorrências Temáticas: escopo restrito às tags (segurança hídrica, secretarias e superintendências do MIDR etc.).</li><li>Termos em Alta: 2 a 3 frases. Radar Defesa Civil Nacional: 1 parágrafo, link no nome do veículo. Em Pauta: 1 a 2 parágrafos de tendências políticas e institucionais.</li><li>Não use releases oficiais como fonte principal. Inventário antes da redação.</li></ul>"],["Semanal: recorte e prazo","Atenção a feriado","<ul><li>Segunda 00h a domingo 23h59 da semana anterior, exato na Brandwatch. Com feriado na segunda seguinte, a semana pode ter 8 dias e o relatório sai na terça: confira capa, assunto, e-mail e a barra da segunda no gráfico.</li><li><b>Revisão até 14h</b> no grupo interno, marcando a revisora. Depois, PDF por e-mail (caixa do MIDR, lista da Central de Mailing) e no grupo de alertas, com o mesmo texto de resumo. Assunto do e-mail em padrão fixo: use o anterior como exemplo.</li></ul>"],["Semanal: insumos e estrutura","16 slides","<ul><li>Você manda: CSV da semana, prints (gráficos, sentimento, cards, Google Trends com os termos certos, posts e matérias) e todos os diários da semana. Gráficos entram sempre como print.</li><li>16 slides: capa, divisor, Análise Geral (4 KPIs com variação e Destaques da semana), volume por dia, Plataformas e Sentimento (3 pizzas: plataforma, tipo de publicação e fonte; sem pizza de sentimento), Principais Publicações de redes (prints com link; o Claude entrega a lista de 9 links com justificativa), divisor Mídia, 4 matérias (1 por slide), divisor Trends, Google Trends (compara o nome do ministério e o do ministro) e encerramento.</li><li>Antes de redigir, leia os 2 últimos semanais e todos os diários da semana: o semanal segue a classificação de sentimento dos diários.</li><li>O inventário semanal começa sempre com o bloco \"DIVERGÊNCIAS DE SENTIMENTO\", mesmo vazio.</li><li>Redes (4) e mídia (5) são entregues juntas. Resumo em duas versões: WhatsApp (bloco de código, negrito com asterisco simples) e e-mail (assunto à parte), saudação \"Boa tarde,\" por padrão.</li></ul>"],["Regras gerais","Links e sentimento","<ul><li>Link no texto, nunca por extenso. URL só do campo \"Url\" do CSV (para RT, o campo do original). Sem travessão.</li><li>Curtidas e compartilhamentos só pelo campo da plataforma, nunca somando o genérico.</li><li>Conteúdo político-eleitoral que não cita o MIDR é neutro, salvo se os diários trataram de outra forma.</li></ul>"]],"anp":[["O produto","Boletim de clipping, não relatório de redes","<ul><li>Blocos \"ANP na Mídia\" e \"Matérias sobre o Setor\", mais Redes Sociais e, só na 1ª edição, Manchetes do Dia. Além do boletim, há relatório mensal e trimestral.</li><li>Plataforma: planilha exportada do info4 (HTML com extensão .xls). Coluna B = título, e o hiperlink da célula é o link do info4 que vai no nome do veículo; coluna AC = link original (para ler o texto); L = hora; H = veículo.</li><li>Nunca \"presidente\": o cargo máximo é Diretor-Geral (confira se é interino). Porta-vozes: o Diretor-Geral e quatro Diretores.</li></ul>"],["Edições e prazos","Corte, revisão e envio","<ul><li><b>1ª edição:</b> corte de 16h de ontem às 8h (segunda: 16h de sexta às 8h). Revisão às 8h20 no grupo do cliente, marcando a revisora. Entrega até 9h30 pelo MailChimp, sem adiantar.</li><li><b>2ª edição:</b> corte de 8h às 16h. Revisão às 16h; entrega até 17h. Sem Manchetes do Dia. Documento separado da 1ª: tema retomado vira resumo próprio (\"segue repercutindo\").</li><li>O texto só entra no MailChimp depois da revisão. Para o envio, replique a última edição do mesmo horário e atualize data no cabeçalho do design, assunto, título (edição e data), \"Enviar Agora\", índices, resumos e links.</li></ul>"],["Fluxo","Do material ao texto final","<ol><li>Você manda numa mensagem só: planilha completa do info4 (dois blocos), prints das redes e prints das capas dos jornais. Antes da 1ª edição, confira a newsletter \"Comece Seu Dia\".</li><li>O Claude devolve o inventário: título, veículo, resumo de 2 linhas, tema sugerido, sinalizações, e no fim o que ficou fora do corte e o descartado, com motivo.</li><li>Você seleciona.</li><li>O Claude gera o texto final para colar no Word de revisão.</li></ol><p>Portal que bloqueia: o Claude devolve o link do info4 e você envia o texto.</p>"],["Regras de texto","Resumo e links","<ul><li>Resumo de até 100 palavras (só passa disso com aspas de Diretor, integrais, atribuição depois da citação). Três frases fixas: abertura com o veículo, \"O texto menciona que...\", \"A publicação informa/ressalta...\". Verbos no presente, \"matéria\" e nunca \"reportagem\", sem bullets. Título da matéria nunca alterado.</li><li>Tipo de publicação sempre explícito (matéria, coluna, editorial, artigo, entrevista, newsletter). Opinião leva \"Trata-se de opinião do autor/do veículo\".</li><li>Grafia: \"ANP\" sempre sigla; \"Petrobras\" sem acento; \"Petronotícias\" junto; cargos da ANP com inicial maiúscula.</li><li>Link no nome do veículo, nunca em negrito e nunca de sindicato ou entidade. Valor Econômico: link externo direto (o cliente é assinante). Estadão: o link que você fornecer. Agência Eixos: info4.</li></ul>"],["Redes e manchetes","Dois destaques e capas","<ul><li>Redes Sociais: dois destaques por edição, só perfis de veículos (nunca sindicato, órgão ou agente do governo), métricas manuais e fórmula fixa \"No X, o perfil do/da... destaca que... Até o fechamento deste boletim...\". As métricas ficam em XX no rascunho e entram no fechamento.</li><li>Manchetes do Dia (só na 1ª edição): Estadão, O Globo, Folha, Correio Braziliense e Valor, a partir dos prints das capas.</li><li>Classificação temática é nota de trabalho e não vai ao cliente (Abastecimento, Biocombustíveis, E&P, Fiscalização, Gás Natural, Institucional, Meio ambiente/Segurança operacional, PD&I, Preço, Qualidade etc.).</li><li>\"Ficar de olho\": lista da ANP atualizada diariamente e enviada a cada edição.</li></ul>"],["Outras rotinas","Além do boletim","<ul><li>Monitorar manualmente \"Últimas Notícias\" do site da ANP e avisar o cliente de fatos pontuais. A ANP não tem relatório de alertas.</li><li>Planilha de sentimentos (sentimentalizar impresso, rádio, TV e revistas), documento mensal de boletins, porta-vozes para o mensal e atualização de manuais.</li><li><b>Mensal (3º dia útil):</b> resumo do mês (redes e imprensa), tipos de mídia, sentimento, temas e porta-vozes.</li></ul>"]],"infra":[["Prazos e escopo","Mensal e alertas","<ul><li>Mensal: 3º dia útil, revisão até 12h, envio até 14h. Recorte do dia 1 ao último dia do mês anterior: confira as datas do export e do painel (já veio um export de 01/08 a 01/09 num mensal de agosto).</li><li>Alertas da Infra S.A. são só por WhatsApp (projeto à parte). A auditoria de imagem trimestral também é um projeto à parte.</li></ul>"],["O que pedir no início","Insumos","<ul><li><b>CSV do mês inteiro.</b> Confira se é o conjunto completo: já veio só com negativas (98 de 642) e só com imprensa (876, todas neutras). O cabeçalho muda de linha entre edições (8 a 10): localize antes de ler.</li><li><b>Dashboard em HTML e prints</b> (o valor só aparece em tooltip, então o print garante o número): canais, picos, barras, nuvem de palavras, sentimento geral e <b>sentimento por plataforma</b> (faz falta quando esquecido).</li><li>Export separado de social, se quiser link de post em algum trecho (o CSV de notícias não traz URL de post).</li><li>Relatório do mês anterior como modelo.</li></ul>"],["Antes de redigir","Conferências","<ul><li><b>Comparativo:</b> use os percentuais de variação do painel (decisão do time).</li><li>Confira se os números de canais batem (ex.: total 642 = 552 de sites + 90 de redes; notícias online 73,36% do total, não os 85,33% do gráfico de sites, que usa outra base).</li><li>CSV só de negativas: quantifique os temas delas (ex.: 40 das 98 eram a repostagem de uma mesma lista) e confira cada afirmação no CSV antes de escrever.</li><li>O texto sai <b>por slide</b>, não o relatório inteiro de uma vez, com \"Pontos para você conferir\" no fim.</li></ul>"],["Estrutura","16 slides e o que vai em cada um","<ul><li>Capa, apresentação, Introdução, Metodologia (fixa), Números gerais, Mídias sociais, Picos, Tendência, Redes sociais, Publicações principais, Conclusão, Insights e encerramento.</li><li><b>Introdução:</b> período por extenso, 2 a 3 assuntos do mês, volume e sentimento em uma frase. <b>Números gerais:</b> menções, alcance e autores únicos com variação, e um parágrafo com o pico e o fato gerador.</li><li><b>Mídias sociais:</b> percentual por canal, com o percentual sob o ícone certo (já saíram trocados). <b>Picos:</b> três maiores dias e o menor do mês, com o mês certo no subtítulo.</li><li><b>Tendência:</b> termos da nuvem com contagem, o de maior índice de tendência e termos de pico com datas. <b>Redes sociais:</b> canal líder, sentimento geral e por rede, e a explicação da negatividade quando houver foco.</li><li><b>Publicações principais:</b> duas, com \"Ver publicação\" e link. <b>Conclusão</b> resume volume, pico, sentimento e agenda. <b>Insights:</b> três, com título em negrito e ao menos um ponto de atenção real.</li></ul>"],["Hiperlinks","A parte mais trabalhosa","<ul><li>Link na frase do fato, não em palavras soltas, para a matéria (nunca perfil ou página inicial). Só linke o que você abriu e conferiu; o resto vai em \"Pendências\".</li><li>Link que não abre: busque outro veículo com o mesmo fato e confirme a data.</li><li>Post de rede social não vale como matéria: sinalize e troque por imprensa se aparecer.</li><li>Os números de redes vêm do painel e não têm URL de post: avise em nota ou peça o export de social.</li></ul>"],["Estilo e revisão","Erros que já aconteceram","<ul><li>Tom institucional e factual, sem entrar no mérito político (o contexto eleitoral é descrito de forma factual). Siga a estrutura e o jeito do mês anterior. <b>Sem travessão</b>.</li><li>Confira frases-modelo com mês errado e comparativos contra o mês errado.</li><li>Revisão do PDF: extraia os hiperlinks reais e confira cada um contra a matéria; confira números com painel e CSV. Erros recorrentes: ícone e percentual trocados, mês errado no subtítulo, hífen sobrando no título, marcadores sem espaçamento nos insights, rede repetida.</li></ul>"]],"cfq":[["Formatos","O que muda entre as edições","<ul><li><b>1ª edição e edição única</b> (dia útil e fim de semana ou feriado): mesmo formato de 5 slides: capa, Volume e Ocorrências, Análise de Mídia/Redes, Temas e Tendências e encerramento.</li><li><b>2ª edição:</b> outro formato de 5 slides: capa, Principais Termos e Ocorrências, Análise de Rede, Principais Publicadores e Temas e Tendências.</li><li><b>Semanal:</b> segunda a domingo, entrega na segunda, sete seções e etapa de sentimentalização antes. <b>Mensal:</b> mês inteiro, com inventário antes dos blocos.</li><li>Regra de todos: uma seção por vez, esperando a validação do analista.</li></ul>"],["Insumos","Prints e CSV","<ul><li><b>1ª edição e edição única:</b> CSV e prints do card Total Volume, pizza de Fontes de Dados, tabela Top Sites e nuvem de tendências. Se o resumo do Iris tiver o aviso \"Settings have changed...\", não use nada dele, só os cards.</li><li><b>2ª edição:</b> os números do slide 2 vêm de planilha conectada (sem texto). Prints: tabela de Principais Publicadores e roda de tópicos com o resumo do Iris.</li><li><b>Semanal e mensal:</b> CSV, Total Volume, Top Authors, Sentiment, Volume Over Time, Trending Topics e, <b>sem esquecer</b>, o print dos 3 cards \"Total Volume\" por termo (Produtos Químicos, Indústria Química e Transição Energética).</li><li>CSV com 10 linhas de cabeçalho e datas em UTC (converta para BRT). Compare o total do CSV com o card Total Volume: diferença pequena = base completa; grande = amostra, confirme com o analista.</li></ul>"],["2ª edição, slide a slide","Prazo: coleta 7h às 16h, entrega até 18h","<ul><li><b>Slides 1 e 2</b> são só conferência: data e marcação \"2ª Edição\", os três termos fixos, valores batendo com os dados e o gráfico de 7 dias. Já ocorreu de o último ponto de \"Produtos Químicos\" aparecer na série de \"Transição Energética\"; valide contra os cards do topo. Troque um termo só se algum tiver volume excepcional no dia (ex.: hidrogênio verde); o analista decide antes.</li><li><b>Slide 3 (o central):</b> leia os 6 relatórios mais recentes, receba CSV e prints e monte o inventário com 3 sugestões (alta, média, complementar). O analista escolhe; só então o Claude redige. Abra com \"Podemos destacar a publicação do/da [veículo com hiperlink em negrito]\". Um parágrafo de 3 a 4 linhas, só o fato e por que importa ao universo CFQ. Sem listar outros portais.</li><li><b>Slide 4:</b> autor de maior alcance e sua relação com o universo CFQ, 3 a 4 linhas. Se já foi destaque no slide 3, cite com alcance e remeta ao slide anterior, mais um segundo publicador em meia linha. Nunca abra com \"O principal autor não publicou...\".</li><li><b>Slide 5:</b> abra com \"O principal assunto está associado\" e feche com a frase fixa \"[\"Tema A\"], [\"Tema B\"], [\"Tema C\"] e [\"Tema D\"] também apareceram entre os tópicos mais citados\". Todo termo do anel interno em negrito e entre aspas, identificado pelo texto do Iris, não só pela imagem.</li></ul>"],["1ª edição e edição única","Textos fixos e cards","<ul><li><b>Slide 2 (texto fixo):</b> \"Durante o período analisado, foram registradas [N] menções, com [alta/queda] de [X]% em relação ao período anterior. O alcance total foi de [N] mil contas, apresentando [crescimento/redução] de [X]%.\" Negrito nos números.</li><li><b>Slide 3:</b> tabela dos 3 principais sites (Site, Menções, Impacto) e 3 destaques em cards curtos: veículo em negrito, 2 a 4 linhas e link \"Saiba mais\". Sem inventário formal: o Claude escolhe direto do CSV. Se o analista pedir uma matéria que cai em exclusão, sinalize antes.</li><li><b>Slide 4 (texto fixo):</b> \"Matérias com temáticas relacionadas aos temas de interesse do CFQ devem continuar em destaque nas próximas horas.\" mais o parágrafo padrão da nuvem (esquerda = esfriando; direita = quente).</li></ul>"],["Destaques: o que entra e sai","Critérios de prioridade","<ul><li><b>Prioridade:</b> acidentes, vazamentos e incidentes com produto químico (alerta vermelho, sempre primeiro); notícias que citam CFQ ou CRQs; CFT ou CRTs; indústria química, Abiquim, Anvisa e políticas do setor; ciência com aplicação química; outros temas setoriais.</li><li><b>Excluir:</b> publicações do próprio CFQ/CRQs; opinião com viés político explícito; fontes duvidosas sem corroboração (inclui Reclame Aqui, mesmo com Impact alto); notícias sem data recente.</li></ul>"],["Semanal: sentimentalização","Etapa obrigatória antes da Seção 1","<ul><li>A classificação automática é guiada pelo canal (quase nenhuma notícia negativa, quase todo post do X negativo), então precisa de auditoria.</li><li><b>Negativo:</b> acidente, vazamento ou incidente com risco ou vítimas; crime que afeta o setor. <b>Positivo:</b> só o favorável ao setor químico, ao CFQ/CRQs ou à ciência e inovação em química. <b>Neutro:</b> notícia factual, repostagem de manchete, nota institucional. <b>Lixo:</b> fora do escopo ou fonte excluída; marque como neutro e ignore no texto.</li><li>Entrega: uma tabela por mudança (Perfil, Horário, Trecho, Justificativa) e, no fim de cada uma, <b>uma busca booleana</b> validada por simulação no CSV. Você aplica na Brandwatch, corrige o gráfico e reexporta pizza e cards.</li><li>Verifique também falso positivo por palavra-chave que infla termos e picos, com os números com e sem o lixo.</li></ul>"],["Semanal: seções","Pontos que mais pegam","<ul><li><b>Seção 2:</b> três termos fixos, ocorrências e variação vindos do print dos 3 cards (nunca do CSV). A caixa fixa do template cita \"BrandWatch\": é a única vez permitida.</li><li><b>Seção 3:</b> dois destaques: o 1º de veículo tradicional; o 2º um post dos 10 perfis do Top Authors (aplique as exclusões e pegue o de maior alcance).</li><li><b>Seção 4:</b> três parágrafos (neutras, positivas, negativas) em ordem decrescente, dois destaques cada. Percentuais iguais aos da pizza e soma 100%. Lixo não entra.</li><li><b>Seção 5:</b> 1 a 3 picos; explique sempre o ponto mais alto (se for lixo, uma frase curta e sem link). Confira data e hora de publicação antes de atribuir uma matéria ao dia.</li><li><b>Seção 6:</b> abra com \"O mapa de calor evidencia tendências de menções em alta e em declínio.\" A contagem dos termos vem do CSV (informe total e valor sem lixo, use o sem lixo). O termo em alta precisa ter lastro editorial; se contaminado (post viral, conta político-partidária), troque e sinalize. Sem placeholder.</li><li>Evite repetir o mesmo veículo e matéria entre as seções.</li></ul>"],["Mensal","Diferenças para o semanal","<ul><li>Leia os 3 últimos mensais, todos os semanais e diários do mês; sinalize lacunas; lembre do print dos 3 cards.</li><li>Inventário antes dos blocos: 3 termos, categorias temáticas (ciência, acidentes, regulação, geopolítica, saúde pública, meio ambiente, narcotráfico e precursores, farmoquímica), volume e portais. <b>Destaque sempre toda publicação que cite o CFQ ou seus dirigentes.</b></li><li>Blocos: Resumo/Principais Termos, Análise de Mídia e Redes, Volume e Sentimento, Pico de Menção (2 a 3 picos) e Tendências. Mesma sentimentalização.</li><li>Links: só os dos diários, semanais e CSV. Nunca invente nem busque URL externa; URL enviada pelo analista como válida pode ser usada.</li></ul>"],["Estilo e revisão do PDF","Para todos os produtos","<ul><li>Tom direto, linguagem simples, parágrafos de 3 a 4 linhas. O cliente é da área técnica e prefere números e gráficos.</li><li><b>Nunca travessão. Nunca \"sustentou\"</b> (use \"colocou\"). Nunca \"Brandwatch\" no texto, exceto na caixa fixa.</li><li>Negrito em veículos e entidades na primeira menção, números relevantes, termos do universo CFQ e termos da nuvem (entre aspas). Link para o conteúdo específico, nunca o domínio.</li><li>Revisão do PDF: sem travessão e sem placeholder; pizza e cards batendo com o texto; links extraídos e conferidos; ponto mais alto do gráfico explicado; termos inflados; repetição de veículo. Devolução em \"corrigir antes de enviar\", \"decisões do analista\" e \"só para saber\".</li><li>O CFQ não usa Mailchimp (destinatários na Central de Mailing). Alerta vermelho de acidente químico vale também no plantão.</li></ul>"]],"alema":[["Cliente suspenso","Pronto para a retomada","<p>A Alema está suspensa até 03/02/2027. O passo a passo abaixo fica registrado para quando voltar. É a Assembleia Legislativa do Maranhão: um relatório diário de redes sociais, enviado por Mailchimp, com texto de encaminhamento para o grupo de alertas.</p>"],["Recorte e insumos","11h às 11h","<ul><li>Recorte sempre das 11h do dia anterior às 11h do dia atual (BRT). Se o CSV mostrar outro recorte, aponte e peça a responsabilização do analista antes de seguir.</li><li>CSV: o cabeçalho é a linha que começa com ,\"Query Id\". Datas em UTC: converta para BRT (00h UTC = 21h do dia anterior). \"Likes\" e \"Twitter Likes\" duplicam: não some.</li><li>Prints, em ordem de prioridade: nuvem de palavras, distribuição por tipo de mídia, volume por hora e card de métricas gerais. São a fonte primária de totais, percentuais, alcance, autores e sentimento.</li><li>Relatórios anteriores servem para as variações e para checar repetição de tema. Se o PDF vier sem texto, rasterize e leia.</li></ul>"],["Ordem de trabalho","Etapa a etapa","<ol><li>Leitura do CSV e conferência do recorte.</li><li><b>Sentimentalização</b>, único foco antes de qualquer inventário. Uma tabela por tipo de mudança, nesta ordem: negativo para neutro, positivo para neutro, positivo para negativo, neutro para negativo. Colunas: Perfil, Horário BRT, Trecho literal e Justificativa. Depois de cada tabela, <b>uma busca booleana</b> em bloco de código, no formato <code>((author:\"a\" OR author:\"b\") AND \"trecho\") OR (author:\"c\" AND \"trecho2\")</code>, com a quantidade esperada conferida no CSV. Só trecho falha (RT e título); só autor traz a mais.</li><li>Você corrige na Brandwatch e reenvia o CSV; o Claude confere e segue direto ao inventário. O que você decidir manter é decisão editorial.</li><li><b>Inventário</b> hierárquico, sem dividir por sentimento e sem falsos positivos: descrição, sentimento da ferramenta (com nota de divergência), URL, seção sugerida, justificativa e aviso se o tema já saiu antes.</li><li>Seções, uma por vez, com \"Você se responsabiliza pela análise? Posso prosseguir?\".</li></ol>"],["Regra de sentimento","Ancorada na Alema","<ul><li><b>Positivo:</b> só o que cita a Alema de forma positiva.</li><li><b>Neutro:</b> Poder Executivo (estadual ou federal), campanha, apoio declarado, propostas de candidatos, posição de deputado sobre tema federal (ex.: fim da escala 6x1), divulgação institucional do governo e agenda. Factual marcado como negativo vira neutro.</li><li><b>Negativo:</b> o que atinge a Alema ou seus parlamentares: cobranças, ataques (inclusive respostas e comentários ofensivos), conflitos, denúncias, críticas à gestão e escândalos de nepotismo.</li><li>O mesmo assunto não pode ser positivo e negativo; cluster de RTs segue o sentimento do post original.</li><li>Falsos positivos normalmente não podem ser excluídos na Brandwatch (a query é compartilhada com outros clientes): sinalize o volume e ignore nos textos e no inventário. Recorrente: deputado federal homônimo do Paraná.</li></ul>"],["Seções","Ordem de redação","<ul><li><b>Análise de Mídia:</b> 2 a 3 parágrafos, um assunto cada, só portais e blogs. O primeiro é sempre o político-eleitoral. É aqui que cada assunto é explicado; as outras seções só citam.</li><li><b>Análise de Redes:</b> 2 parágrafos curtos: percentuais por plataforma (dos prints) e RTs como distorção de volume; depois os canais com história editorial. Some as variantes (Facebook + Facebook Public = Facebook). Sem total de menções, autores ou alcance.</li><li><b>Alema em Números:</b> 1 a 2 frases: horário e dia do pico em BRT e a causa, conferida no CSV. Pico de efeito de borda (RTs de antes das 11h): diga e reporte o próximo pico.</li><li><b>Volume e Sentimento:</b> 1 parágrafo com menções, alcance e publicadores, variações contra o <b>relatório anterior publicado</b> (não o \"previous period\" da ferramenta), e sentimentos em ordem de tamanho. Divergência interna da ferramenta (133 x 132): use o card.</li><li><b>Termos em Evidência:</b> 2 a 3 frases, só os 2 principais (o prioritário é o de maior destaque no lado direito da nuvem; peça confirmação). <b>Google Trends:</b> texto fixo \"Não há dados para análise no recorte analisado\".</li><li><b>Influenciadores:</b> 1 a 3 parágrafos, um fio temático cada: \"Destaque para a publicação do perfil [@perfil](url), que...\". Métricas concretas (curtidas, comentários, alcance, RTs). Sem o post original do X no CSV, use RTs e alcance dos RTs e sinalize.</li><li><b>Insights:</b> 2 parágrafos curtos, a seção que mais cresce. Sugestões em tom leve (\"uma possibilidade seria\", \"vale considerar\"); nada de \"recomenda-se\" ou \"deve\".</li></ul>"],["WhatsApp e revisão do PDF","Etapas finais","<ul><li><b>Texto do WhatsApp</b> (automático depois dos Insights, em bloco de código): cabeçalho *RELATÓRIO DE MONITORAMENTO* / _In.Pacto Comunicação_ / *data e dia da semana*; 2 a 3 parágrafos curtos de tom estratégico, 4 a 6 linhas no total, sem marcadores, links ou travessões; o último traz leitura de contexto; fecha com o link do Mailchimp em linha própria (placeholder até ser enviado: lembre de trocar).</li><li><b>Revisão do PDF:</b> sempre cobre o PDF depois do texto do WhatsApp. Compare o texto com o aprovado, extraia e confira cada link, e confira card, pizza, volume por hora e nuvem contra os prints, mais datas e dia da semana.</li><li>Não são erro: título do PDF \"MDA\", subtítulo \"dos últimos sete dias\", cores da pizza, fatias pequenas sem rótulo, \"Facebook Public\" e \"Instagram Public\" na legenda, nuvem pequena, glossário, \"View this email in your browser\", diferença de separador decimal e inconsistência interna da ferramenta.</li></ul>"],["Estilo e fidelidade","Regras que valem sempre","<ul><li>Voz impessoal (\"Foi registrado\", \"Observou-se\"), sem adjetivos de intensidade (\"intensa\", \"ampla\", \"expressiva\"), com números e percentuais. <b>Sem travessão.</b></li><li>Redes só pelo nome: Facebook, Instagram, X. Mesmo veículo repetido: \"também publicou\". Veículo de nome próprio leva o tipo (blog, portal).</li><li>Negrito com critério (pessoas, veículos e perfis, números, datas-chave), nunca itálico. Hiperlink no nome em negrito desde o primeiro rascunho, nunca domínio ou URL solta.</li><li>Parágrafos curtos, sem repetir contexto entre seções. Antes de redigir, veja se o tema já saiu: se sim, diga \"desde quando\".</li><li><b>Fidelidade às fontes:</b> nada inventado; leia a íntegra do texto, não só o snippet. URL sempre do campo Url ou Original Url do CSV, nunca de RT nem inferida (RT sem original no CSV: use \"Twitter Retweet of\" e sinalize). Link que não abre: remova o trecho ou sinalize. Só entram menções do CSV do recorte.</li></ul>"]],"mjsp":[["Fora do Claude","Onde o relatório é feito","<p>O relatório do MJSP é produzido numa IA particular, fora do Claude. Os prazos, a revisão obrigatória e as regras de fim de semana e feriado estão nas telas de entregas deste guia.</p>"]]};
+function comoHtml(id){
+  var l=COMO[id];
+  if(!l||!l.length)return '';
+  return '<h2 class="lab" id="como">Como montar</h2><div class="card"><p class="cmint">Passo a passo e cuidados de cada relatório. Toque para abrir.</p>'+l.map(function(b){
+    return '<details class="cm"><summary>'+b[0]+'<small>'+b[1]+'</small></summary><div class="cmb">'+b[2]+'</div></details>';
+  }).join('')+'</div>';
+}
+
+/* ---------- Novidades ---------- */
+var NEWS=[
+ {id:'n001',d:'2026-11-05',t:'Novo: crie seu perfil e veja só os seus clientes.'},
+ {id:'n002',d:'2026-11-05',t:'Novo: aba Calendário só com as suas entregas, e botão para levar os lembretes ao celular.'},
+ {id:'n003',d:'2026-11-05',t:'Novo: aba Plantão. Marque seus clientes do fim de semana ou feriado e use o checklist. Zera no domingo à noite.'},
+ {id:'n004',d:'2026-11-05',t:'MCTI: o relatório pega sempre 14h de ontem até 14h de hoje. O boletim pega 14h de ontem até 7h de hoje.'},
+ {id:'n005',d:'2026-11-05',t:'ANP não tem alertas. Todos os relatórios de alertas saem até 12h. Alema segue suspenso até 03/02/2027.'},
+ {id:'n006',d:'2026-11-05',t:'Novo: "Como montar" em cada cliente (aba Regras, Ver tudo). Insumos, passo a passo e cuidados de cada relatório.'}
+];
+function newsHtml(){
+  var now=spNow(),seen=lsGet(NWK)||'',last=seen;
+  if(S.newsHide)return '';
+  var l=NEWS.filter(function(n){var p=parseKey(n.d);return dayDiff(p,now)<=10&&n.id>seen;});
+  if(!l.length)return '';
+  return '<details class="news" id="newsd"'+($('newsd')&&$('newsd').open?' open':'')+'><summary><b>Novidades do guia</b><span class="nb">'+l.length+(l.length>1?' novas':' nova')+'</span></summary><ul>'+l.map(function(n){return '<li>'+n.t+'</li>';}).join('')+'</ul><button type="button" class="btn" data-news="1">Entendi, esconder</button></details>';
+}
+function newsSeen(){
+  var m='';NEWS.forEach(function(n){if(n.id>m)m=n.id;});
+  lsSet(NWK,m);S.newsHide=true;
+}
+
+/* ---------- Perfil: cadastro em passos e edicao ---------- */
+function avatarOf(n){return (String(n||'').trim().charAt(0)||'?').toUpperCase();}
+function cardSub(cat,id){
+  var cl=BYID[id];
+  if(isSusp(id,spNow()))return '<small class="sus">suspenso até '+pad(SUSP[id].d)+'/'+pad(SUSP[id].m)+'</small>';
+  if(cat==='rel'){
+    var u=cl.ent.filter(function(e){return e.on.indexOf('util')>=0;});
+    return '<small>'+(u.length===1?u[0].ed:u.length+' entregas por dia')+'</small>';
+  }
+  if(cat==='men'){
+    var ob=OBS.filter(function(o){return obCat(o)==='men'&&obHas(o,id);})[0];
+    return ob?'<small>'+Q[ob.q]+'</small>':'';
+  }
+  return id==='infra'?'<small>só por WhatsApp</small>':(id==='mjsp'?'<small>fim de semana: TL</small>':'');
+}
+function stepGrid(cat,ids){
+  var d=S.draft;
+  return '<div class="gridc">'+ids.map(function(id){
+    var on=d[cat].indexOf(id)>=0;
+    return '<button type="button" class="cc'+(on?' on':'')+'" data-sel="'+cat+':'+id+'" aria-pressed="'+on+'"><span class="av">'+id.slice(0,2).toUpperCase()+'</span><span class="ck">'+(on?'✓':'')+'</span><b>'+BYID[id].nome+'</b>'+cardSub(cat,id)+'</button>';
+  }).join('')+'</div>';
+}
+function chipsList(cls,l){return l.length?'<div class="chips2">'+l.map(function(i){return '<span class="chip2 '+cls+'">'+BYID[i].nome+'</span>';}).join('')+'</div>':'<p class="none">Nenhum</p>';}
+function wizDots(n){var h='<div class="dots" aria-hidden="true">';for(var i=1;i<=4;i++)h+='<i class="'+(i<=n?'on':'')+'"></i>';return h+'</div>';}
+function viewWizard(){
+  var d=S.draft,st=S.step||1,nm=esc(d.name||''),first=d.name?esc(d.name):'';
+  var h='<div class="wz">';
+  if(st===1){
+    h+=wizDots(1)+'<div class="step">Passo 1 de 4</div><h1 class="eh">Oi! Vamos montar o seu guia.</h1><p class="wl">Como você se chama?</p>'+
+      '<input type="text" id="nm" class="nmbig" maxlength="30" autocomplete="given-name" placeholder="Seu nome" value="'+nm+'" aria-label="Seu nome">'+
+      (S.err?'<p class="errt">Digite seu nome para continuar.</p>':'<p class="wl sm">Fica salvo só neste aparelho. Dá para trocar depois.</p>')+
+      '<div class="wfoot"><button type="button" class="go2" data-next="1">Continuar</button><button type="button" class="tlink" data-skip="1">Ver tudo por enquanto</button></div>';
+  }else if(st===2||st===3||st===4){
+    var cat=st===2?'rel':st===3?'ale':'men',ids=st===2?relIds():st===3?aleIds():menIds(),n=d[cat].length;
+    var q=st===2?'Quais relatórios diários você faz'+(first?', '+first:'')+'?':st===3?'Quais clientes você pega para alertas?':'Quais relatórios mensais você faz?';
+    var hint=st===2?'Toque nos clientes. Pode marcar vários.':st===3?'Os alertas ficam com quem monta o relatório no plantão. No dia a dia, marque aqui os seus.':'Revisão até 12h e envio até 14h, no dia do mensal.';
+    h+=wizDots(st)+'<div class="step">Passo '+st+' de 4</div><h1 class="eh">'+q+'</h1><p class="wl">'+hint+'</p>'+stepGrid(cat,ids)+
+      (st>2?'<button type="button" class="btn same" data-same="'+cat+'">Usar os mesmos dos relatórios diários</button>':'')+
+      '<div class="wfoot"><button type="button" class="go2" data-next="1">'+(n?'Continuar · '+n+' marcado'+(n>1?'s':''):'Não faço nenhum, continuar')+'</button><button type="button" class="tlink" data-back="1">Voltar</button></div>';
+  }else{
+    var none=!(d.rel.length+d.ale.length+d.men.length);
+    h+=wizDots(4)+'<div class="step">Tudo pronto</div><h1 class="eh">Seu guia está montado'+(first?', '+first:'')+'.</h1><p class="wl">Você só vai ver o que é seu.</p>'+
+      '<div class="sum"><h3>Relatórios diários</h3>'+chipsList('',d.rel)+'</div><div class="sum"><h3>Alertas</h3>'+chipsList('a',d.ale)+'</div><div class="sum"><h3>Relatórios mensais</h3>'+chipsList('m',d.men)+'</div>'+
+      (none?'<p class="errt">Marque pelo menos um cliente em algum passo.</p>':'')+
+      '<div class="wfoot"><button type="button" class="go2" data-save="1">Ver meu guia</button><button type="button" class="tlink" data-step="2">Mudar alguma coisa</button></div>';
+  }
+  return h+'</div>';
+}
+function viewPerfil(){
+  var d=S.draft,now=spNow();
+  function tg(cat,id,ok){
+    if(!ok)return '<span class="tg x" aria-hidden="true"></span>';
+    var on=d[cat].indexOf(id)>=0,lb={rel:'relatório diário',ale:'alertas',men:'relatório mensal'}[cat];
+    return '<button type="button" class="tg'+(on?' on':'')+'" role="switch" aria-checked="'+on+'" data-sel="'+cat+':'+id+'" aria-label="'+BYID[id].nome+', '+lb+'"></button>';
+  }
+  var R=relIds(),A=aleIds(),M=menIds();
+  var h='<div class="hello big"><div class="avt" aria-hidden="true">'+esc(avatarOf(d.name))+'</div><div class="hw"><input type="text" id="nm" class="nmin" maxlength="30" value="'+esc(d.name||'')+'" placeholder="Seu nome" aria-label="Seu nome"><small>Toque no nome para mudar</small></div></div>';
+  h+='<h1 class="eh">O que é seu?</h1><p class="wl">Ligue só o que você faz. O guia mostra apenas isso.</p>';
+  h+='<div class="mx"><div class="mxh"><span>Cliente</span><span>Diário</span><span>Alerta</span><span>Mensal</span></div>'+CL.map(function(cl){
+    var id=cl.id;
+    return '<div class="mxr"><b>'+cl.nome+(isSusp(id,now)?'<small class="sus">suspenso</small>':'')+'</b>'+tg('rel',id,R.indexOf(id)>=0)+tg('ale',id,A.indexOf(id)>=0)+tg('men',id,M.indexOf(id)>=0)+'</div>';
+  }).join('')+'</div>';
+  if(S.err)h+='<p class="errt">'+(d.name?'Marque pelo menos um cliente.':'Digite seu nome.')+'</p>';
+  if(SEL){
+    h+='<h2 class="lab">Abrir em outro aparelho</h2><p class="pnote" style="margin-top:0">Este link abre o guia já com o seu perfil. Ele reflete o que você salvou por último.</p><div class="linkbox"><input type="text" readonly value="'+esc(selLink(SEL))+'" aria-label="Link com o meu perfil" onfocus="this.select()"><button type="button" class="btn" data-copy="1">'+(S.copied?'Copiado':'Copiar')+'</button></div>';
+  }
+  h+='<div class="savebar"><button type="button" class="go" data-save="1">Salvar</button><button type="button" class="btn" data-skip="1">Cancelar</button></div>';
+  return h;
+}
+function viewEscolha(){
+  if(!S.draft)S.draft=SEL?{name:SEL.name||'',rel:SEL.rel.slice(),ale:SEL.ale.slice(),men:SEL.men.slice()}:{name:'',rel:[],ale:[],men:[]};
+  return SEL?viewPerfil():viewWizard();
+}
+
+function render(){renderBar();renderMain();}
+function allLink(){return isMeus()?'<p class="allink"><button type="button" class="tlink" data-mode="todos">Ver todos os clientes</button></p>':'';}
+function renderMain(){
+  var h='',v=S.view;
+  if(SEL&&SEL.v!==DIV_V&&v!=='escolha')h+='<div class="notice"><span>A divisão de clientes mudou. Confirme seus clientes.</span><button type="button" class="btn" data-scope="todos" data-view="escolha">Confirmar</button></div>';
+  if(v==='escolha')h+=viewEscolha();
+  else{
+    if(v==='hoje')h+=newsHtml();
+    if(S.scope!=='todos'&&(v==='hoje'||v==='regras'||v==='protocolo'))h+=clientHead(BYID[S.scope]);
+    h+=v==='cal'?viewCal():v==='regras'?viewRegras():v==='protocolo'?viewProtocolo():v==='plantao'?viewPlantao():viewHoje();
+    if(v!=='plantao')h+=allLink();
+  }
+  $('main').innerHTML=h;
+  if(S.focusSel){var f=$('main').querySelector('[data-sel="'+S.focusSel+'"]');if(f)try{f.focus({preventScroll:true});}catch(e){}S.focusSel=null;}
+  if(S.focusPl){var f2=$('main').querySelector('[data-plsel="'+S.focusPl+'"],[data-chk="'+S.focusPl+'"]');if(f2)try{f2.focus({preventScroll:true});}catch(e){}S.focusPl=null;}
+}
+
+/* ---------- Eventos ---------- */
+function doSave(){
+  var dr=S.draft,name=String(dr.name||'').trim();
+  if(!name){S.err=true;if(!SEL)S.step=1;renderMain();return;}
+  if(!(dr.rel.length+dr.ale.length+dr.men.length)){S.err=true;renderMain();return;}
+  SEL={v:DIV_V,name:name.slice(0,30),rel:relIdsSorted(dr.rel),ale:relIdsSorted(dr.ale),men:relIdsSorted(dr.men)};
+  saveSel();S.mode='meus';saveMode();S.draft=null;S.err=false;S.copied=false;S.step=1;S.scope='todos';go('todos','hoje');
+}
+document.addEventListener('click',function(ev){
+  var el=ev.target.closest('[data-scope],[data-view],[data-m],[data-day],[data-calday],[data-today],[data-mode],[data-sel],[data-same],[data-save],[data-skip],[data-copy],[data-next],[data-back],[data-step],[data-plsel],[data-chk],[data-ics],[data-news],[data-jump]');
+  if(!el)return;
+  if(el.dataset.mode){
+    if(el.dataset.mode==='meus'&&!SEL){go('todos','escolha');return;}
+    S.mode=el.dataset.mode;saveMode();
+    if(S.scope!=='todos'&&S.mode==='meus'&&SEL&&myIds().indexOf(S.scope)<0)S.scope='todos';
+    render();window.scrollTo(0,0);return;
+  }
+  if(el.dataset.jump){
+    if(S.view!=='regras')go(S.scope,'regras');
+    setTimeout(function(){var t=$('como');if(t){t.scrollIntoView({block:'start'});var d=t.nextElementSibling&&t.nextElementSibling.querySelector('details.cm');if(d)d.open=true;}},250);return;
+  }
+  if(el.dataset.news){newsSeen();renderMain();return;}
+  if(el.dataset.ics){icsRun();return;}
+  if(el.dataset.plsel){
+    var pv=el.dataset.plsel.split('|'),pl=PL[pv[0]]||(PL[pv[0]]=[]),pi=pl.indexOf(pv[1]);
+    if(pi>=0)pl.splice(pi,1);else pl.push(pv[1]);
+    if(!pl.length)delete PL[pv[0]];
+    plSave();S.focusPl=el.dataset.plsel;render();return;
+  }
+  if(el.dataset.chk){
+    var cv=el.dataset.chk.split('|'),cm=CHK[cv[0]]||(CHK[cv[0]]={});
+    if(cm[cv[1]])delete cm[cv[1]];else cm[cv[1]]=1;
+    plSave();S.focusPl=el.dataset.chk;renderMain();return;
+  }
+  if(el.dataset.sel){
+    var kv=el.dataset.sel.split(':'),l=S.draft[kv[0]],ix=l.indexOf(kv[1]);
+    if(ix>=0)l.splice(ix,1);else l.push(kv[1]);
+    S.focusSel=el.dataset.sel;renderMain();return;
+  }
+  if(el.dataset.same){
+    var ct=el.dataset.same,allow=ct==='ale'?aleIds():menIds();
+    S.draft[ct]=S.draft.rel.filter(function(i){return allow.indexOf(i)>=0;});renderMain();return;
+  }
+  if(el.dataset.next){
+    var st=S.step||1;
+    if(st===1){
+      var nm=String(S.draft.name||'').trim();
+      if(!nm){S.err=true;renderMain();return;}
+      S.draft.name=nm;S.err=false;
+    }
+    S.step=Math.min(5,st+1);renderMain();window.scrollTo(0,0);return;
+  }
+  if(el.dataset.back){S.step=Math.max(1,(S.step||1)-1);renderMain();window.scrollTo(0,0);return;}
+  if(el.dataset.step){S.step=+el.dataset.step;renderMain();window.scrollTo(0,0);return;}
+  if(el.dataset.save){doSave();return;}
+  if(el.dataset.skip){
+    S.draft=null;S.err=false;S.step=1;
+    if(!SEL){setSkip();S.mode='todos';}
+    go('todos','hoje');return;
+  }
+  if(el.dataset.copy){
+    var link=selLink(SEL);
+    var done=function(){S.copied=true;renderMain();};
+    try{navigator.clipboard.writeText(link).then(done,function(){var i=$('main').querySelector('.linkbox input');if(i){i.focus();i.select();}});}
+    catch(e){var i2=$('main').querySelector('.linkbox input');if(i2){i2.focus();i2.select();}}
+    return;
+  }
+  if(el.dataset.calday){
+    var cp=parseKey(el.dataset.calday);
+    if(cp){S.calDay=key(cp);S.month={y:cp.y,m:cp.m};renderMain();
+      if(el.classList.contains('daybtn')){var dp=$('main').querySelector('.dpanel');if(dp&&dp.scrollIntoView)dp.scrollIntoView({block:'start'});}}
+    return;
+  }
+  if(el.dataset.day){
+    var p=parseKey(el.dataset.day),n=spNow();
+    S.pick=(p&&key(p)===key(n))?null:p;
+    go(S.scope,'hoje');return;
+  }
+  if(el.dataset.m){
+    var mm=S.month.m+(+el.dataset.m),yy=S.month.y;
+    if(mm<1){mm=12;yy--;}if(mm>12){mm=1;yy++;}
+    S.month={y:yy,m:mm};renderMain();return;
+  }
+  if(el.dataset.today){S.pick=null;render();return;}
+  if(el.dataset.scope){go(el.dataset.scope,el.dataset.view||S.view);return;}
+  if(el.dataset.view){go(S.scope,el.dataset.view);}
+});
+document.addEventListener('input',function(ev){
+  if(ev.target&&ev.target.id==='nm'&&S.draft){
+    S.draft.name=ev.target.value;
+    var a=document.querySelector('.hello.big .avt');if(a)a.textContent=avatarOf(ev.target.value);
+  }
+});
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Enter'&&ev.target&&ev.target.id==='nm'&&S.view==='escolha'&&!SEL){
+    ev.preventDefault();var b=document.querySelector('[data-next]');if(b)b.click();
+  }
+});
+document.addEventListener('change',function(ev){
+  if(ev.target&&ev.target.id==='pick'){
+    var p=parseKey(ev.target.value);
+    if(p&&p.y>1999){S.pick=(key(p)===key(spNow()))?null:p;render();}
+  }
+});
+window.addEventListener('hashchange',function(){
+  var h=parseHash();
+  if(h){S.scope=h.scope;S.view=h.view;save();}
+  if(S.view!=='escolha'){S.draft=null;S.step=1;S.err=false;}
+  render();window.scrollTo(0,0);
+});
+setInterval(function(){
+  var a=document.activeElement;plClean();
+  if(S.view==='hoje'&&!S.pick&&!(a&&a.id==='pick'))renderMain();
+},30000);
+
+plLoad();
+var h0=parseHash();
+var fromLink=selFromHash();
+if(fromLink){SEL=fromLink;saveSel();S.mode='meus';saveMode();try{history.replaceState(null,'',location.href.split('?')[0]);}catch(e){}}
+else{SEL=loadSel();S.mode=(SEL&&loadMode()!=='todos')?'meus':'todos';}
+if(h0){S.scope=h0.scope;S.view=h0.view;}
+else{var sv=saved();if(sv)S.scope=sv;}
+if(S.scope!=='todos'&&isMeus()&&myIds().indexOf(S.scope)<0)S.scope='todos';
+if(!SEL&&!h0&&!skipped()){S.scope='todos';S.view='escolha';}
+render();
+})();
+</script>
+</body>
+</html>

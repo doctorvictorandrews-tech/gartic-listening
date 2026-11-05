@@ -116,6 +116,7 @@ function cleanNick(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
 function nickError(n) {
   if (n.length < 2) return 'Escolha um apelido com pelo menos 2 caracteres.';
   if (n.length > 14) return 'Use no máximo 14 caracteres.';
+  if (n.indexOf('__') === 0) return 'O apelido não pode começar com dois sublinhados.';
   if (!/^[\p{L}\p{N} _.\-]+$/u.test(n)) return 'Use só letras, números, espaço, ponto, hífen ou sublinhado.';
   return '';
 }
@@ -187,6 +188,7 @@ function publicPlayers() {
       score: p.score,
       online: p.online,
       pl: p.pl || '',
+      pt: plantOn(p.key) ? 1 : 0,
       lv: levelOfPlayer(p),
       pet: p.acct && p.acct.items ? p.acct.items.pet : '',
       sc: p.sc || 'arcade',
@@ -571,7 +573,7 @@ function supabaseStore() {
   const enc = encodeURIComponent;
   return {
     kind: 'supabase',
-    async listPlayers() { return (await sb('GET', 'players?select=key,nick,av,xp,items&order=xp.desc&limit=200')) || []; },
+    async listPlayers() { return ((await sb('GET', 'players?select=key,nick,av,xp,items&order=xp.desc&limit=200')) || []).filter(function (r) { return String(r.key).indexOf('__') !== 0; }); },
     async galList(n) { return (await sb('GET', 'gallery?select=id,key,nick,word,theme,img,likes,n_likes,created_at&order=created_at.desc&limit=' + n)) || []; },
     async galAdd(row) { const r = await sb('POST', 'gallery', row, { Prefer: 'return=representation' }); return r && r[0] ? r[0] : null; },
     async galGet(id) { id = parseInt(id, 10); if (!(id > 0)) return null; const r = await sb('GET', 'gallery?id=eq.' + id + '&select=id,key,nick,likes,n_likes'); return r && r[0] ? r[0] : null; },
@@ -600,7 +602,7 @@ function fileStore() {
   return {
     kind: 'arquivo',
     flush: flush,
-    async listPlayers() { return Object.keys(db.players).map(function (k) { const r = db.players[k]; return { key: r.key, nick: r.nick, av: r.av, xp: r.xp, items: r.items }; }); },
+    async listPlayers() { return Object.keys(db.players).filter(function (k) { return k.indexOf('__') !== 0; }).map(function (k) { const r = db.players[k]; return { key: r.key, nick: r.nick, av: r.av, xp: r.xp, items: r.items }; }); },
     async galList(n) { return db.gallery.slice().sort(function (a, b) { return b.id - a.id; }).slice(0, n).map(clone); },
     async galAdd(row) { const r = Object.assign({ id: ++db.gseq, created_at: new Date().toISOString() }, clone(row)); db.gallery.push(r); later(); return clone(r); },
     async galGet(id) { id = parseInt(id, 10); return clone(db.gallery.find(function (r) { return r.id === id; })); },
@@ -691,6 +693,10 @@ ACH.push(
   { id: 'galerista', n: 'Na Galeria', d: 'Publique um desenho na galeria.', c: 20, t: function (s, a) { return a.items.gal.total >= 1; } },
   { id: 'estrela', n: 'Artista Querido', d: 'Receba 10 curtidas nos seus desenhos.', c: 50, t: function (s, a) { return a.items.gal.likes >= 10; } },
   { id: 'popular', n: 'Quarto Popular', d: 'Receba 5 curtidas no seu quarto.', c: 40, t: function (s, a) { return Object.keys(a.items.likes).length >= 5; } }
+);
+ACH.push(
+  { id: 'pronto_plantao', n: 'Pronto para o plantão', d: 'Complete todos os cenários do Simulado do Caos.', c: 60, t: function (s, a) { return Object.keys(cenOf(a).sim).length >= SIM_IDS.length; } },
+  { id: 'primeiro_dia', n: 'Primeiro dia concluído', d: 'Conclua a trilha do Primeiro dia.', c: 40, t: function (s, a) { return !!cenOf(a).firstDone; } }
 );
 const ACH_PUB = ACH.map(function (a) { return { id: a.id, n: a.n, d: a.d, c: a.c }; });
 
@@ -1475,6 +1481,185 @@ async function loadAcct(key) {
   return a ? normalizeAcct(a) : null;
 }
 
+/* ====================================================================
+   CENTRAL DE ENTREGAS: selo de plantão, cofre da equipe e Simulado
+   Tudo aqui é opcional. O guia nunca depende deste bloco.
+   Os dados ficam numa linha especial da tabela players (key __central__),
+   então não é preciso criar nenhuma tabela nova no Supabase.
+   ==================================================================== */
+const CKEY = '__central__';
+const SIM_KEY = {"s1": 1, "s2": 1, "s3": 2, "s4": 1, "s5": 1, "s6": 1, "s7": 1, "s8": 1, "s9": 1, "s10": 1};
+const SIM_IDS = Object.keys(SIM_KEY);
+const CEN = { week: '', plant: {}, open: {}, chk: {}, goals: {}, rew: {}, act: {}, ok: false, row: false, timer: null };
+const FIRST_STEPS = ['tour', 'central', 'protocolo', 'equipe', 'sim3'];
+const GOAL_DEF = [
+  { id: 'g1', t: 'Plantão fechado', d: 'Todas as pessoas que estavam de plantão fizeram o check-in no fim.', coins: 100 },
+  { id: 'g2', t: 'Central aberta', d: 'Pelo menos 60% do time abriu a Central de Entregas na semana.', coins: 100 },
+  { id: 'g3', t: 'Semana sem alerta atrasado', d: 'Nenhum check-in de plantão declarou alerta atrasado.', coins: 150 }
+];
+const FULL_COINS = 200;
+
+function cenDefaults() { return { week: '', plant: {}, open: {}, chk: {}, goals: {}, rew: {}, act: {} }; }
+async function loadCentral() {
+  try {
+    const row = await Store.getPlayer(CKEY);
+    if (row) {
+      CEN.row = true;
+      const it = row.items && typeof row.items === 'object' ? row.items : {};
+      Object.assign(CEN, cenDefaults(), { week: it.week || '', plant: it.plant || {}, open: it.open || {}, chk: it.chk || {}, goals: it.goals || {}, rew: it.rew || {}, act: it.act || {} });
+    }
+    CEN.ok = true;
+  } catch (e) { console.error('central: não consegui ler o banco, seguindo só na memória.', e && e.message); CEN.ok = true; }
+  cenTick();
+}
+function cenSnapshot() { return { week: CEN.week, plant: CEN.plant, open: CEN.open, chk: CEN.chk, goals: CEN.goals, rew: CEN.rew, act: CEN.act }; }
+function cenSave(now) {
+  const run = async function () {
+    CEN.timer = null;
+    try {
+      if (!CEN.row) { await Store.createPlayer({ key: CKEY, nick: CKEY, salt: '', hash: '', av: '', coins: 0, xp: 0, total_coins: 0, ach: {}, stats: {}, items: cenSnapshot(), last_daily: '', streak: 0 }); CEN.row = true; }
+      else await Store.savePlayer(CKEY, { items: cenSnapshot() });
+    } catch (e) { console.error('central: salvar', e && e.message); }
+  };
+  if (now) { if (CEN.timer) { clearTimeout(CEN.timer); CEN.timer = null; } return run(); }
+  if (!CEN.timer) { CEN.timer = setTimeout(run, 2500); if (CEN.timer.unref) CEN.timer.unref(); }
+  return Promise.resolve();
+}
+/* fim do plantão: próximo domingo às 23h59 de Brasília */
+function plantUntil() {
+  const d = brt(), dow = d.getUTCDay();
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + ((7 - dow) % 7), 23, 59, 59) + 3 * 3600 * 1000;
+}
+function cenTick() {
+  const w = weekKey(), t = nowMs();
+  let ch = false;
+  if (CEN.week !== w) {
+    CEN.week = w; CEN.open = {}; CEN.chk = {}; CEN.goals = {}; ch = true;
+    Object.keys(CEN.rew).forEach(function (r) { if (!CEN.rew[r] || t - (CEN.rew[r].at || 0) > 20 * 86400000) delete CEN.rew[r]; });
+  }
+  Object.keys(CEN.plant).forEach(function (k) { if (!CEN.plant[k] || CEN.plant[k].until <= t) { delete CEN.plant[k]; ch = true; } });
+  const lim = dayKey(new Date(brt().getTime() - 14 * 86400000));
+  Object.keys(CEN.act).forEach(function (k) { if (CEN.act[k] < lim) { delete CEN.act[k]; ch = true; } });
+  if (ch) cenSave();
+  return ch;
+}
+function plantOn(key) { return !!CEN.plant[key]; }
+function cenCounts() {
+  const pk = Object.keys(CEN.plant), n1 = pk.length, d1 = pk.filter(function (k) { return CEN.chk[k]; }).length;
+  const chkKeys = Object.keys(CEN.chk), anyDelay = chkKeys.some(function (k) { return CEN.chk[k] && CEN.chk[k].sem === false; });
+  const active = Math.max(1, Object.keys(CEN.act).length), openers = Object.keys(CEN.open).length, need = Math.max(3, Math.ceil(active * 0.6));
+  return { n1: n1, d1: d1, anyDelay: anyDelay, active: active, openers: openers, need: need };
+}
+function cenGoals() {
+  const c = cenCounts(), out = [];
+  const reach = {
+    g1: c.n1 >= 1 && c.d1 === c.n1,
+    g2: c.openers >= c.need,
+    g3: c.n1 >= 1 && c.d1 === c.n1 && !c.anyDelay
+  };
+  const frac = {
+    g1: c.n1 ? c.d1 / c.n1 : 0,
+    g2: Math.min(1, c.openers / c.need),
+    g3: c.n1 ? (c.anyDelay ? 0 : c.d1 / c.n1) : 0
+  };
+  const have = {
+    g1: c.n1 ? c.d1 + ' de ' + c.n1 + (c.n1 === 1 ? ' check-in feito' : ' check-ins feitos') : 'ninguém marcou plantão ainda',
+    g2: c.openers + ' de ' + c.active + ' pessoas abriram (meta: ' + c.need + ')',
+    g3: c.n1 ? (c.anyDelay ? 'não nesta semana' : c.d1 + ' de ' + c.n1 + (c.n1 === 1 ? ' check-in sem atraso' : ' check-ins sem atraso')) : 'ninguém marcou plantão ainda'
+  };
+  GOAL_DEF.forEach(function (g) {
+    const done = !!CEN.goals[g.id] || reach[g.id];
+    out.push({ id: g.id, t: g.t, d: g.d, coins: g.coins, done: done, pct: done ? 1 : frac[g.id], have: have[g.id], miss: g.id === 'g3' && c.anyDelay && !done });
+  });
+  return { goals: out, counts: c };
+}
+function cenPublic() {
+  cenTick();
+  const gl = cenGoals(), n = gl.goals.filter(function (g) { return g.done; }).length;
+  const pct = gl.goals.reduce(function (s, g) { return s + g.pct; }, 0) / gl.goals.length;
+  const list = Object.keys(CEN.plant).map(function (k) { const p = playerByKey(k); return { nick: CEN.plant[k].nick, av: p ? (p.av || '') : '' }; });
+  list.sort(function (a, b) { return a.nick.toLowerCase() < b.nick.toLowerCase() ? -1 : 1; });
+  return { week: CEN.week, goals: gl.goals, pct: Math.round(pct * 100), n: n, full: n === gl.goals.length, plant: list, counts: { plant: gl.counts.n1, chk: gl.counts.d1, active: gl.counts.active, openers: gl.counts.openers, need: gl.counts.need }, ok: true };
+}
+function cenMe(p) {
+  const a = p.acct, cen = a ? cenOf(a) : { sim: {}, first: {}, claimed: {}, firstDone: 0 };
+  return { plant: plantOn(p.key), chk: !!CEN.chk[p.key], sim: Object.keys(cen.sim), simTotal: SIM_IDS.length, first: cen.first, firstDone: !!cen.firstDone, steps: FIRST_STEPS };
+}
+function cenOf(a) {
+  const it = a.items;
+  it.cen = it.cen && typeof it.cen === 'object' ? it.cen : {};
+  const c = it.cen;
+  c.sim = c.sim && typeof c.sim === 'object' ? c.sim : {};
+  c.first = c.first && typeof c.first === 'object' ? c.first : {};
+  c.claimed = c.claimed && typeof c.claimed === 'object' ? c.claimed : {};
+  return c;
+}
+function cenEmitAll() {
+  const pub = cenPublic();
+  io.emit('central_state', pub);
+  room.players.forEach(function (p) { if (p.online && p.id) io.to(p.id).emit('central_me', cenMe(p)); });
+}
+/* conquista nova por eventos que não passam por jogos */
+function cenCheckGoals() {
+  const gl = cenGoals();
+  const fresh = [];
+  gl.goals.forEach(function (g) {
+    if (g.done && !CEN.goals[g.id]) {
+      CEN.goals[g.id] = Date.now(); fresh.push(g);
+      const def = GOAL_DEF.find(function (x) { return x.id === g.id; });
+      CEN.rew[CEN.week + ':' + g.id] = { at: Date.now(), coins: def.coins, xp: 20, t: g.t };
+    }
+  });
+  if (Object.keys(CEN.goals).length === GOAL_DEF.length && !CEN.rew[CEN.week + ':full']) {
+    CEN.rew[CEN.week + ':full'] = { at: Date.now(), coins: FULL_COINS, xp: 60, t: 'Cofre cheio', item: 'trofeu' };
+    fresh.push({ id: 'full', t: 'Cofre cheio' });
+  }
+  if (fresh.length) {
+    cenSave();
+    fresh.forEach(function (g) {
+      const msg = g.id === 'full' ? 'COFRE CHEIO! O time completou todas as metas da semana. A Semana Dourada começou para todo mundo!' : 'META DO COFRE: ' + g.t + '! Moedas para o time inteiro.';
+      io.emit('cofre_goal', { goal: g.id, msg: msg });
+      sys(msg);
+    });
+    room.players.forEach(function (p) { if (p.online && p.acct) cenClaim(p); });
+  }
+  return fresh.length > 0;
+}
+/* entrega as recompensas do cofre que a pessoa ainda não recebeu (só semana atual e anterior) */
+function cenClaim(p) {
+  if (!p.acct) return;
+  const c = cenOf(p.acct), tit = [];
+  let coins = 0, xp = 0, item = '';
+  Object.keys(CEN.rew).forEach(function (rid) {
+    const r = CEN.rew[rid];
+    if (!r || c.claimed[rid]) return;
+    if (nowMs() - (r.at || 0) > 9 * 86400000) return;
+    c.claimed[rid] = 1;
+    coins += r.coins | 0; xp += r.xp | 0; tit.push(r.t);
+    if (r.item) { item = r.item; if (!(p.acct.items.own[r.item] > 0)) p.acct.items.own[r.item] = 1; }
+  });
+  if (!tit.length) return;
+  grant(p, { kind: 'cofre', coins: coins, xp: xp, t: tit.join(', '), item: item });
+}
+function cenFirstCheck(p) {
+  const c = cenOf(p.acct);
+  if (Object.keys(c.sim).length >= 3) c.first.sim3 = 1;
+  const all = FIRST_STEPS.every(function (s) { return c.first[s]; });
+  if (all && !c.firstDone) { c.firstDone = Date.now(); grant(p, { kind: 'first', coins: 150, xp: 60 }); }
+  saveAcct(p);
+}
+function cenJoin(p) {
+  try {
+    cenTick();
+    CEN.act[p.key] = dayKey(); cenSave();
+    cenClaim(p);
+    const c = cenOf(p.acct);
+    if (Object.keys(c.sim).length >= 3 && !c.first.sim3) cenFirstCheck(p);
+    io.to(p.id).emit('central_state', cenPublic());
+    io.to(p.id).emit('central_me', cenMe(p));
+  } catch (e) { console.error('central join', e); }
+}
+
 /* ---------- lista de quartos ---------- */
 let roomsCache = { t: 0, v: [] };
 async function roomsList() {
@@ -1640,6 +1825,7 @@ io.on('connection', function (socket) {
       saveAcct(p);
       dailyBonus(p);
       giveStarter(p);
+      cenJoin(p);
     } catch (e) { console.error('join', e); try { socket.emit('join_error', { msg: 'Não foi possível entrar agora. Tente de novo.' }); } catch (e2) { /* segue */ } }
     finally { socket.data.joining = false; }
   });
@@ -2010,6 +2196,65 @@ io.on('connection', function (socket) {
     } catch (e) { console.error('gal_del', e.message); }
   });
 
+  /* ---------- Central de Entregas ---------- */
+  socket.on('central_open', function () {
+    try {
+      const p = playerOf(socket); if (!p || p.id !== socket.id || !p.acct) return;
+      cenTick();
+      CEN.act[p.key] = dayKey();
+      const first = !CEN.open[p.key]; CEN.open[p.key] = 1;
+      const cn = cenOf(p.acct), fresh = !cn.first.central; cn.first.central = 1;
+      if (first) cenSave();
+      cenCheckGoals();
+      if (fresh) cenFirstCheck(p);
+      if (first) cenEmitAll(); else { socket.emit('central_state', cenPublic()); socket.emit('central_me', cenMe(p)); }
+    } catch (e) { console.error('central_open', e); }
+  });
+  socket.on('plant_set', function (m) {
+    try {
+      const p = playerOf(socket); if (!p || p.id !== socket.id || !p.acct) return;
+      cenTick();
+      if (m && m.on) { if (!CEN.plant[p.key]) CEN.plant[p.key] = { nick: p.nick, until: plantUntil(), at: Date.now() }; }
+      else { delete CEN.plant[p.key]; delete CEN.chk[p.key]; }
+      cenSave(); cenCheckGoals(); sendPlayers(); cenEmitAll();
+    } catch (e) { console.error('plant_set', e); }
+  });
+  socket.on('plant_done', function (m) {
+    try {
+      const p = playerOf(socket); if (!p || p.id !== socket.id || !p.acct) return;
+      cenTick();
+      if (!CEN.plant[p.key]) { socket.emit('central_me', cenMe(p)); return; }
+      CEN.chk[p.key] = { at: Date.now(), sem: !(m && m.sem === false) };
+      cenSave(); cenCheckGoals(); cenEmitAll();
+    } catch (e) { console.error('plant_done', e); }
+  });
+  socket.on('first_mark', function (step) {
+    try {
+      const p = playerOf(socket); if (!p || p.id !== socket.id || !p.acct) return;
+      step = String(step || '');
+      if (['tour', 'protocolo', 'equipe'].indexOf(step) < 0) return;
+      const cn = cenOf(p.acct); if (cn.first[step]) return;
+      cn.first[step] = 1; cenFirstCheck(p);
+      socket.emit('central_me', cenMe(p));
+    } catch (e) { console.error('first_mark', e); }
+  });
+  socket.on('sim_answer', function (m) {
+    try {
+      const p = playerOf(socket); if (!p || p.id !== socket.id || !p.acct) return;
+      const id = String((m && m.id) || ''), ch = (m && m.ch) | 0;
+      if (!Object.prototype.hasOwnProperty.call(SIM_KEY, id)) return;
+      const cn = cenOf(p.acct), right = SIM_KEY[id] === ch;
+      let first = false;
+      if (right && !cn.sim[id]) {
+        first = true; cn.sim[id] = Date.now();
+        grant(p, { kind: 'sim', coins: 25, xp: 15 });
+        cenFirstCheck(p);
+      }
+      socket.emit('sim_res', { id: id, right: right, first: first, done: Object.keys(cn.sim), all: Object.keys(cn.sim).length >= SIM_IDS.length });
+      socket.emit('central_me', cenMe(p));
+    } catch (e) { console.error('sim_answer', e); }
+  });
+
   socket.on('disconnect', function () {
     try {
       const p = playerOf(socket);
@@ -2027,7 +2272,7 @@ io.on('connection', function (socket) {
 });
 
 process.on('SIGTERM', function () {
-  Promise.all(room.players.map(function (p) { return saveAcct(p, true); })).catch(function () { /* segue */ }).then(function () {
+  Promise.all(room.players.map(function (p) { return saveAcct(p, true); }).concat([cenSave(true)])).catch(function () { /* segue */ }).then(function () {
     if (Store.flush) Store.flush();
     process.exit(0);
   });
@@ -2038,6 +2283,8 @@ process.on('unhandledRejection', function (e) { console.error('unhandledRejectio
 
 server.listen(PORT, function () {
   initLots();
+  loadCentral();
+  setInterval(function () { try { if (cenTick()) { sendPlayers(); cenEmitAll(); } } catch (e) { console.error('central tick', e); } }, 60000);
   console.log('Servidor do Gartic Listening rodando na porta ' + PORT + '.');
   console.log(Store.kind === 'supabase' ? 'Banco: Supabase conectado.' : 'ATENÇÃO: sem Supabase configurado. Salvando em arquivo local (some se o servidor reiniciar na hospedagem grátis).');
   console.log(ALLOWED.length ? 'Aceitando conexões de: ' + ALLOWED.join(', ') : 'ALLOWED_ORIGIN vazio: aceitando conexões de qualquer site (modo de teste).');

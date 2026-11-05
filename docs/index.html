@@ -1102,6 +1102,119 @@ body.mob #sLobby .tour { bottom: 78px; }
 #sLobby .view.hassky::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(10, 8, 30, .28)); }
 @media (prefers-reduced-motion: reduce) { #sLobby .sky .cl, #sLobby .sky .sk-st b { animation: none; } }
 
+/* ===== Fase 6: Central de Entregas ===== */
+.cen { position: fixed; inset: 0; z-index: 9000; background: #120c20; color: #fff; display: flex; flex-direction: column; font-family: var(--font-mono); }
+.cen[hidden] { display: none !important; }
+.cen-top { display: flex; align-items: center; gap: 10px; padding: 8px 10px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); background: var(--ink); border-bottom: 3px solid var(--desk); flex-wrap: wrap; }
+.cen-ttl { font-family: var(--font-pixel); font-size: 10px; font-weight: 400; color: var(--desk); letter-spacing: .5px; white-space: nowrap; }
+.cen-tabs { display: flex; gap: 4px; flex: 1 1 auto; overflow-x: auto; }
+.cen-tabs button { font-family: var(--font-pixel); font-size: 8px; color: #fff; background: #2a2140; border: 2px solid #4a3d6a; padding: 8px 10px; cursor: pointer; white-space: nowrap; }
+.cen-tabs button.on { background: var(--orange); border-color: var(--desk); color: #fff; }
+.cen-tabs button:focus-visible, .cen-act .btn:focus-visible { outline: 3px solid var(--desk); outline-offset: 1px; }
+.cen-act { display: flex; gap: 6px; margin-left: auto; }
+.cen-act .btn { height: 30px; padding: 0 10px; font-size: 8px; text-decoration: none; display: inline-flex; align-items: center; color: var(--ink); }
+.cen-vault, .cofre { display: flex; align-items: center; gap: 10px; }
+.cen-vault { padding: 6px 12px; background: #1b1430; border-bottom: 2px solid #4a3d6a; font-size: 11px; min-height: 34px; }
+.cen-vault b, .cofre b { font-family: var(--font-pixel); font-size: 8px; font-weight: 400; color: var(--desk); white-space: nowrap; }
+.cen-vault em, .cofre em { font-style: normal; font-family: var(--font-pixel); font-size: 7px; color: #fff; white-space: nowrap; }
+.vb-off { font-size: 11px; opacity: .8; }
+.vsegs { display: flex; gap: 3px; flex: 0 0 150px; }
+.vs { flex: 1; height: 12px; background: #05050c; border: 2px solid #fff; position: relative; display: block; overflow: hidden; }
+.vs u { position: absolute; left: 0; top: 0; bottom: 0; background: var(--orange); display: block; text-decoration: none; transition: width .6s; }
+.vs.d u { background: #7CFF7C; }
+.cen-body { flex: 1 1 auto; min-height: 0; position: relative; }
+.cen-pane { position: absolute; inset: 0; }
+.cen-pane[hidden] { display: none !important; }
+.cen-pane iframe { width: 100%; height: 100%; border: 0; background: #fff; display: block; }
+.cen-pane.scroll { overflow: auto; padding: 14px 16px 30px; max-width: 760px; margin: 0 auto; right: 0; left: 0; }
+.cen h3 { font-family: var(--font-pixel); font-size: 11px; font-weight: 400; color: var(--desk); margin: 6px 0 8px; }
+.cen h4 { font-family: var(--font-pixel); font-size: 8px; font-weight: 400; color: var(--orange); margin: 16px 0 6px; }
+.cen-p { margin: 0 0 10px; font-size: 13px; line-height: 1.5; }
+.cen-p.sm, .cen small, .cen .sm { font-size: 11px; opacity: .85; }
+.goals { display: grid; gap: 8px; margin-bottom: 8px; }
+.goal { background: #1b1430; border: 2px solid #4a3d6a; padding: 9px 11px; }
+.goal.d { border-color: #7CFF7C; }
+.goal .gt { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.goal .gt b { font-size: 13px; }
+.goal .gt span { font-family: var(--font-pixel); font-size: 7px; color: var(--desk); }
+.goal.d .gt span { color: #7CFF7C; }
+.goal p { margin: 4px 0 6px; font-size: 12px; opacity: .9; }
+.gbar { height: 12px; background: #05050c; border: 2px solid #fff; position: relative; margin: 4px 0; }
+.gbar.big { height: 16px; }
+.gbar u { position: absolute; left: 0; top: 0; bottom: 0; background: var(--orange); display: block; text-decoration: none; transition: width .6s; }
+.goal.d .gbar u { background: #7CFF7C; }
+.cen-card { background: #1b1430; border: 2px solid var(--desk); padding: 10px 12px; margin: 10px 0; }
+.cen-card.ok { border-color: #7CFF7C; }
+.cen-card.bad { border-color: var(--orange); }
+.cen-card b { font-family: var(--font-pixel); font-size: 9px; font-weight: 400; display: block; margin-bottom: 6px; }
+.cen-card.ok b { color: #7CFF7C; }
+.cen-card.bad b { color: #ffb08a; }
+.cen-card p { margin: 0 0 6px; font-size: 13px; line-height: 1.5; }
+.cen-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.cen .btn { color: var(--ink); }
+.okmsg { font-size: 12px; color: #7CFF7C; }
+.plist { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.plist li { display: flex; align-items: center; gap: 6px; background: #1b1430; border: 2px solid #4a3d6a; padding: 4px 10px 4px 4px; font-size: 12px; }
+.plist .pvx { width: 26px; height: 26px; display: inline-block; flex: 0 0 26px; }
+.plist .pvx svg { width: 26px; height: 26px; display: block; }
+.rpt { display: inline-block; background: var(--orange); color: #fff; font-family: var(--font-pixel); font-size: 6px; padding: 2px 4px; margin-left: 4px; letter-spacing: .3px; vertical-align: middle; border: 1px solid var(--ink); }
+.sim-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.sim-tag { background: var(--desk); color: var(--ink); font-family: var(--font-pixel); font-size: 8px; padding: 4px 7px; }
+.sim-n { font-family: var(--font-pixel); font-size: 7px; opacity: .8; }
+.sim-q { font-size: 15px; line-height: 1.5; margin: 6px 0 12px; }
+.sim-o { display: grid; gap: 8px; }
+.sim-b { display: flex; gap: 10px; align-items: flex-start; text-align: left; background: #1b1430; color: #fff; border: 2px solid #4a3d6a; padding: 10px 12px; font: inherit; font-size: 13px; line-height: 1.45; cursor: pointer; }
+.sim-b i { font-style: normal; font-family: var(--font-pixel); font-size: 9px; color: var(--desk); flex: 0 0 auto; padding-top: 3px; }
+.sim-b:hover:not(:disabled), .sim-b:focus-visible { border-color: var(--desk); outline: none; }
+.sim-b.right { border-color: #7CFF7C; background: #14301f; }
+.sim-b.wrong { border-color: var(--orange); background: #36170c; }
+.sim-b.dim { opacity: .5; }
+.sim-b:disabled { cursor: default; }
+.dia { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dia li { display: flex; gap: 10px; align-items: center; background: #1b1430; border: 2px solid #4a3d6a; padding: 9px 11px; }
+.dia li.d { border-color: #7CFF7C; }
+.dia li > i { font-style: normal; font-family: var(--font-pixel); font-size: 7px; width: 26px; height: 26px; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; color: #05050c; }
+.dia li.d > i { background: #7CFF7C; border-color: #7CFF7C; }
+.dia li > div { flex: 1 1 auto; }
+.dia li b { font-size: 13px; }
+.dia li p { margin: 3px 0 0; font-size: 12px; opacity: .85; }
+/* barra do cofre no lobby */
+#sLobby .cofre { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 41; background: var(--ink); color: #fff; border: 2px solid var(--desk); padding: 5px 9px; cursor: pointer; font-family: var(--font-mono); box-shadow: 3px 3px 0 rgba(0,0,0,.35); max-width: calc(100% - 200px); }
+#sLobby .cofre[hidden] { display: none; }
+#sLobby .cofre .vsegs { flex: 0 0 90px; }
+#sLobby .cofre small { font-family: var(--font-pixel); font-size: 6px; color: var(--ink); background: var(--desk); padding: 3px 4px; white-space: nowrap; }
+#sLobby .cofre:hover { border-color: var(--orange); }
+.btn.cenbtn { background: var(--orange); color: #fff; }
+/* semana dourada */
+body.gold #sLobby .view { box-shadow: inset 0 0 70px rgba(255, 200, 60, .45); }
+body.gold #sLobby .cofre { border-color: #F6D84A; box-shadow: 0 0 12px rgba(246, 216, 74, .8); }
+body.gold .cen-vault { background: #3a2c08; }
+body.gold::after { content: 'SEMANA DOURADA'; position: fixed; left: 8px; bottom: 6px; z-index: 30; font-family: var(--font-pixel); font-size: 7px; color: #F6D84A; text-shadow: 1px 1px 0 var(--ink); pointer-events: none; }
+body.cen-on::after { display: none; }
+/* festa do cofre */
+.cenfx { position: fixed; inset: 0; z-index: 9100; pointer-events: none; overflow: hidden; }
+.cenfx[hidden] { display: none; }
+.cenfx .fxmsg { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); background: var(--ink); color: #F6D84A; border: 3px solid #F6D84A; padding: 12px 16px; font-family: var(--font-pixel); font-size: 10px; line-height: 1.6; text-align: center; max-width: min(92vw, 520px); box-shadow: 4px 4px 0 rgba(0,0,0,.4); }
+.cenfx s { position: absolute; top: -12px; width: 8px; height: 12px; animation: cenfall 3.2s linear infinite; }
+@keyframes cenfall { to { transform: translateY(110vh) rotate(540deg); } }
+@media (prefers-reduced-motion: reduce) { .cenfx s { animation: none; display: none; } .vs u, .gbar u { transition: none; } }
+body.mob .cen-top { gap: 6px; padding: 6px 8px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); }
+body.mob .cen-ttl { font-size: 8px; }
+body.mob .cen-tabs { order: 3; flex: 1 1 100%; }
+body.mob .cen-act .btn { height: 28px; padding: 0 8px; font-size: 7px; }
+body.mob .vsegs { flex-basis: 100px; }
+body.mob .cen-vault { flex-wrap: wrap; gap: 6px; }
+body.mob #sLobby .cofre { top: auto; bottom: 8px; left: 8px; transform: none; max-width: calc(100% - 170px); padding: 4px 6px; gap: 6px; }
+body.mob #sLobby .cofre b, body.mob #sLobby .cofre em { display: none; }
+.cen .btn:not(.small) { height: auto; min-height: 36px; padding: 9px 14px; font-size: 9px; line-height: 1.5; white-space: normal; text-align: center; }
+.cen .btn.alt { background: #d4d4d4; }
+.cen .btn { font-family: var(--font-pixel); box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 2px 2px 0 #000; }
+.cen .btn:active:not(:disabled) { transform: translate(2px, 2px); }
+.cen .btn.small { height: 28px; min-height: 0; padding: 0 10px; font-size: 8px; white-space: nowrap; }
+.cen .dia li .btn.small { height: 32px; }
+.guialnk { font-size: 11px; line-height: 15px; }
+.guialnk a { color: var(--orange-dk); font-weight: 700; }
+
 </style>
 </head>
 <body>
@@ -1170,6 +1283,7 @@ body.mob #sLobby .tour { bottom: 78px; }
 </div>
 </form>
 <p class="note" style="border-top:2px solid var(--lo);padding-top:6px;font-size:11px;line-height:14px">Sala única do time, 25 vagas. Cada visual é único na sala: se alguém já usa o seu, mude um detalhe.</p>
+<p class="note guialnk"><a href="guia/index.html#todos-hoje" target="_blank" rel="noopener">Abrir o Guia de Entregas</a> (abre direto, sem entrar na sala, mesmo se o servidor estiver fora do ar)</p>
 </div>
 </div>
 </section>
@@ -1680,7 +1794,49 @@ body.mob #sLobby .tour { bottom: 78px; }
         'entrevistado', 'grupo focal', 'mapa de calor', 'gráfico de barras', 'linha do tempo', 'briefing',
         'pauta', 'relatório mensal'
       ]
+    },
+
+    /* ---------- TRABALHO: temas do dia a dia da equipe ---------- */
+    monitoramento: {
+      nome: 'Monitoramento', grupo: 'Listening',
+      palavras: [
+        'booleana', 'crise', 'viral', 'nuvem de palavras', 'sentimento', 'influenciador', 'radar',
+        'pico de menções', 'alerta', 'plantão', 'revisão', 'relatório diário', 'compilado de alertas',
+        'operador AND', 'operador OR', 'aspas na busca', 'termo excluído', 'coleta de dados', 'perfil falso',
+        'robô de internet', 'hashtag', 'menção', 'gráfico de linha', 'mapa de calor', 'rede de influência',
+        'termômetro de crise', 'sirene de alerta', 'print de tela', 'monitor com gráficos', 'lupa sobre notícia',
+        'comentário negativo', 'comentário positivo', 'cancelamento', 'repercussão', 'matéria de jornal',
+        'portal de notícias', 'live no YouTube', 'trending topics', 'curva de crescimento', 'ranking de portais',
+        'café do plantão', 'despertador de fim de semana', 'e-mail enviado', 'PDF do relatório', 'prazo de envio',
+        'relógio de entrega', 'revisor', 'supervisor', 'pasta compartilhada', 'central de mailing'
+      ]
+    },
+    setores: {
+      nome: 'Setores dos clientes', grupo: 'Listening',
+      palavras: [
+        'usina solar', 'torre de transmissão', 'aerogerador', 'medidor de luz', 'barragem', 'refinaria',
+        'poste de luz', 'apagão', 'trator', 'soja', 'colheitadeira', 'gado', 'milho', 'silo', 'irrigação',
+        'drone agrícola', 'cafezal', 'hospital', 'vacina', 'ambulância', 'estetoscópio', 'UTI', 'seringa',
+        'raio-x', 'mosquito da dengue', 'posto de saúde', 'tubo de ensaio', 'béquer', 'tabela periódica',
+        'microscópio', 'jaleco', 'chaminé de fábrica', 'molécula', 'capela de exaustão', 'viatura',
+        'delegacia', 'algema', 'câmera de segurança', 'bombeiro', 'apito', 'colete', 'sirene policial',
+        'caminhão', 'trem', 'metrô', 'ônibus', 'porto', 'navio cargueiro', 'pedágio', 'semáforo', 'ferrovia',
+        'ponte', 'aeroporto', 'contêiner', 'estrada esburacada'
+      ]
+    },
+    pauta: {
+      nome: 'Pauta do dia', grupo: 'Listening',
+      palavras: [
+        'chuvas fortes', 'greve', 'reforma tributária', 'inflação', 'dólar', 'copa do mundo', 'vazamento de dados',
+        'apagão', 'queimadas', 'dengue', 'tarifa de energia', 'votação no plenário', 'audiência pública',
+        'medida provisória', 'licitação', 'concurso público', 'orçamento', 'fake news', 'enchente', 'seca',
+        'preço da gasolina', 'alta do café', 'salário mínimo', 'feriado prolongado', 'eleição', 'debate',
+        'pesquisa de intenção de voto', 'operação policial', 'acidente de trânsito', 'ataque hacker',
+        'campanha de vacinação', 'safra recorde', 'leilão de energia', 'obra parada', 'ônibus lotado',
+        'ponte interditada', 'protesto na avenida', 'coletiva de imprensa', 'entrevista exclusiva', 'manchete do dia'
+      ]
     }
+
   };
 
   /* Mix geral: junta as palavras de todos os temas acima, sem repetir. Não precisa editar. */
@@ -3647,7 +3803,7 @@ function tplHouse(kind, floorId, wallId) {
       }
       var ck = p.av || p.nick;
       if (a.cfgKey !== ck) { a.cfgKey = ck; a.avEl.innerHTML = avatarSvg(ck, 48, null, true); }
-      a.nmEl.innerHTML = esc(p.nick) + (p.lv > 1 ? '<span class="rlv">' + p.lv + '</span>' : '');
+      a.nmEl.innerHTML = esc(p.nick) + (p.lv > 1 ? '<span class="rlv">' + p.lv + '</span>' : '') + (p.pt ? '<span class="rpt" title="De plantão neste fim de semana ou feriado">PLANTÃO</span>' : '');
       a.isMe = !!p.me; if (p.me) meA = a;
       setPet(a, p.pet || '');
       a.online = p.online !== false;
@@ -6886,7 +7042,8 @@ function tplHouse(kind, floorId, wallId) {
     begin(PW, PH, 92);
     var exits = [
       { x: AX + 1, y: 2, w: 3, h: 1, to: 'arcade', at: null, label: 'FLIPERAMA' },
-      { x: PW - 1, y: 11, w: 1, h: 2, to: 'rua', at: [2, 5], label: 'RUA DAS CASAS' }
+      { x: PW - 1, y: 11, w: 1, h: 2, to: 'rua', at: [2, 5], label: 'RUA DAS CASAS' },
+      { x: 30, y: 3, w: 2, h: 1, to: 'central', at: null, label: 'CENTRAL DE ENTREGAS' }
     ];
     /* prédio do fliperama */
     deco('FLIPERAMA', { x: AX, y: 0, w: 5, d: 2 }, [{
@@ -6902,8 +7059,28 @@ function tplHouse(kind, floorId, wallId) {
       },
       faceX: function (fw, h) { return rc(0, 0, fw, h, '#1f1030') + rc(0, 0, fw, 12, '#C9400A') + rc(14, 30, fw - 28, 24, '#05050c') + rc(18, 34, fw - 36, 16, '#F29AC4'); }
     }], { name: 'FLIPERAMA', exitTo: 'arcade' });
+
+    /* CENTRAL DE ENTREGAS: abre o guia de entregas por cima do mundo */
+    deco('CENTRAL DE ENTREGAS', { x: 28, y: 0, w: 6, d: 3 }, [{
+      x: 28, y: 0, w: 6, d: 3, h: 76, top: '#e9e2cf', left: '#b9c4cf', right: '#8e9db0',
+      faceY: function (fw, h) {
+        var s = rc(0, 0, fw, h, '#b9c4cf') + rc(0, 0, fw, 10, '#F15A1A') + rc(0, 10, fw, 3, '#232323');
+        s += rc(8, 18, fw - 16, 26, '#232323') + rc(10, 20, fw - 20, 22, '#0f3b4a');
+        s += '<text x="' + (fw / 2) + '" y="30" text-anchor="middle" font-family="' + FONT + '" font-size="9" fill="#F6D84A" stroke="#F6D84A" stroke-width=".6">CENTRAL DE</text>';
+        s += '<text x="' + (fw / 2) + '" y="40" text-anchor="middle" font-family="' + FONT + '" font-size="9" fill="#5FD0D0" stroke="#5FD0D0" stroke-width=".6">ENTREGAS</text>';
+        s += rc(fw / 2 - 17, 48, 34, h - 48, '#232323') + rc(fw / 2 - 14, 51, 28, h - 51, '#5a3a14') + rc(fw / 2 - 14, 51, 28, 4, '#c98f45') + rc(fw / 2 + 7, 64, 3, 3, '#F6D84A');
+        for (var i = 0; i < 2; i++) {
+          var wx = i ? fw - 62 : 14;
+          s += rc(wx, 50, 48, 22, '#232323') + rc(wx + 2, 52, 44, 18, '#bfe8f2') + rc(wx + 23, 52, 2, 18, '#232323') + rc(wx + 2, 60, 44, 2, '#232323');
+        }
+        s += rc(fw / 2 - 5, 3, 10, 5, '#F6D84A') + rc(fw - 22, 20, 16, 16, '#fff') + rc(fw - 22, 20, 16, 2, '#232323') + rc(fw - 22, 34, 16, 2, '#232323') + rc(fw - 14, 22, 2, 8, '#232323') + rc(fw - 14, 28, 6, 2, '#232323');
+        return s;
+      },
+      faceX: function (fw, h) { return rc(0, 0, fw, h, '#8e9db0') + rc(0, 0, fw, 10, '#C9400A') + rc(12, 22, fw - 24, 22, '#232323') + rc(15, 25, fw - 30, 16, '#bfe8f2') + rc(fw / 2 - 1, 25, 2, 16, '#232323'); }
+    }], { name: 'CENTRAL DE ENTREGAS', exitTo: 'central' });
+    lampAt(29, 4); lampAt(32, 4); bedAt(28, 5, 1, 3); bedAt(33, 5, 1, 3); benchAt(28, 9, 'n'); benchAt(32, 9, 'n');
     var plaza = [13, 7, 25, 17], pond = [2, 19, 11, 27];
-    function onPath(x, y) { return inR(x, y, 17, 2, 19, 29) || inR(x, y, 0, 11, 37, 12) || inR(x, y, plaza[0], plaza[1], plaza[2], plaza[3]) || inR(x, y, 8, 19, 12, 20); }
+    function onPath(x, y) { return inR(x, y, 17, 2, 19, 29) || inR(x, y, 0, 11, 37, 12) || inR(x, y, plaza[0], plaza[1], plaza[2], plaza[3]) || inR(x, y, 8, 19, 12, 20) || inR(x, y, 30, 3, 31, 10); }
     fountainAt(18, 11);
     benchAt(18, 9, 'n'); benchAt(18, 14, 's'); benchAt(15, 11, 'w'); benchAt(22, 11, 'e');
     pondAt(pond[0] + 1, pond[1] + 1, 9, 7);
@@ -6912,7 +7089,7 @@ function tplHouse(kind, floorId, wallId) {
     var rr = rngf(4242), tl = [], tries = 0;
     while (tl.length < 46 && tries++ < 600) {
       var tx = 1 + Math.floor(rr() * (PW - 2)), ty = 3 + Math.floor(rr() * (PH - 4));
-      if (onPath(tx, ty) || inR(tx, ty, pond[0] - 1, pond[1] - 1, pond[2] + 1, pond[3] + 1) || inR(tx, ty, AX - 1, 0, AX + 6, 4) || inR(tx, ty, 16, 2, 20, 30)) continue;
+      if (onPath(tx, ty) || inR(tx, ty, pond[0] - 1, pond[1] - 1, pond[2] + 1, pond[3] + 1) || inR(tx, ty, AX - 1, 0, AX + 6, 4) || inR(tx, ty, 16, 2, 20, 30) || inR(tx, ty, 27, 0, 35, 10)) continue;
       if (tl.some(function (t) { return Math.abs(t[0] - tx) + Math.abs(t[1] - ty) < 3; })) continue;
       tl.push([tx, ty]);
     }
@@ -7210,6 +7387,7 @@ function tplHouse(kind, floorId, wallId) {
   }
   function goExit(e) {
     if (exiting) return;
+    if (e.to === 'central') { if (typeof openCentral === 'function') openCentral(); return; }
     if (e.to.indexOf('casa:') === 0) { visitHouse(e.to.slice(5), e.nick); return; }
     fadeSwap(function () { enterScene(e.to, e.at ? e.at[0] : null, e.at ? e.at[1] : null, SC); });
   }
@@ -7840,8 +8018,8 @@ function tplHouse(kind, floorId, wallId) {
   var tourEl = document.createElement('div'); tourEl.className = 'tour'; tourEl.hidden = true; view.appendChild(tourEl);
 
   function gdPlaces() {
-    var L = [['arcade', 'FLIPERAMA', 'jogos e mesas'], ['praca', 'PARQUE', 'praça, lago e a entrada do fliperama'], ['rua', 'RUA DAS CASAS', 'visite as casas da turma'], ['casa', 'MINHA CASA', 'construir e decorar']];
-    return L.map(function (p) { var here = p[0] === SC || (p[0] === 'casa' && HS && HS.mine); return '<button type="button" class="gdi' + (here ? ' here' : '') + '" data-gp="' + p[0] + '"><b>' + p[1] + '</b><span>' + (here ? 'VOCÊ ESTÁ AQUI' : p[2]) + '</span></button>'; }).join('');
+    var L = [['arcade', 'FLIPERAMA', 'jogos e mesas'], ['praca', 'PARQUE', 'praça, lago e a entrada do fliperama'], ['rua', 'RUA DAS CASAS', 'visite as casas da turma'], ['casa', 'MINHA CASA', 'construir e decorar'], ['central', 'CENTRAL DE ENTREGAS', 'guia de entregas, plantão e simulado']];
+    return L.map(function (p) { var here = p[0] === SC || (p[0] === 'casa' && HS && HS.mine) && p[0] !== 'central'; return '<button type="button" class="gdi' + (here ? ' here' : '') + '" data-gp="' + p[0] + '"><b>' + p[1] + '</b><span>' + (here ? 'VOCÊ ESTÁ AQUI' : p[2]) + '</span></button>'; }).join('');
   }
   function gdGames() {
     var tag = { solo: 'SOLO', duo: 'DUPLA', group: 'GRUPO' }, ord = { group: 0, duo: 1, solo: 2 }, L = [];
@@ -7872,6 +8050,7 @@ function tplHouse(kind, floorId, wallId) {
     if (!b) { if (e.target === gdm) gdClose(); return; }
     if (b.dataset.gx === 'close') { gdClose(); return; }
     if (b.dataset.gx === 'tour') { gdClose(); tourStart(); return; }
+    if (b.dataset.gp === 'central') { gdClose(); openCentral(); return; }
     if (b.dataset.gp) { gdClose(); goScene(b.dataset.gp); return; }
     if (b.dataset.gg) { gdClose(); goGame(b.dataset.gg); }
   });
@@ -7881,8 +8060,9 @@ function tplHouse(kind, floorId, wallId) {
   var TOUR = [
     { t: 'BEM-VINDO AO FLIPERAMA!', d: 'O salão é enorme, com ilhas de jogos. Toque no chão para andar e toque numa máquina ou mesa para ir até ela e jogar.', hl: '' },
     { t: 'BOTÃO ONDE IR', d: 'Perdeu-se? Toque aqui. A lista mostra todos os lugares e jogos, e o boneco vai andando sozinho.', hl: '.gdb' },
-    { t: 'O MUNDO É GRANDE', d: 'O PARQUE é o centro de tudo: o prédio do FLIPERAMA fica nele e a RUA DAS CASAS fica ao leste. Os tapetes amarelo e laranja levam de um lugar a outro. Dá para clicar nas placas.', hl: '#nav button[data-go]' },
+    { t: 'O MUNDO É GRANDE', d: 'O PARQUE é o centro de tudo: o prédio do FLIPERAMA e a CENTRAL DE ENTREGAS ficam nele, e a RUA DAS CASAS fica ao leste. Os tapetes amarelo e laranja levam de um lugar a outro. Dá para clicar nas placas.', hl: '#nav button[data-go]' },
     { t: 'A SUA CASA', d: 'Em MINHA CASA, toque em CONSTRUIR. Desenhe cômodos, ponha portas, pinte piso e parede e compre móveis. Você já começa com moedas para montar tudo.', hl: '#nav button[data-go=casa]' },
+    { t: 'CENTRAL DE ENTREGAS', d: 'No parque, a CENTRAL abre o guia de entregas do time, o cofre da equipe, o Simulado do Caos e a trilha do primeiro dia. Tudo é opcional e rende moedas.', hl: '.cenbtn' },
     { t: 'MOEDAS SEM MISSÃO', d: 'Você ganha moedas jogando, visitando casas e recebendo curtidas. Para rever este guia, use ONDE IR.', hl: '.gdb' }
   ];
   function hlClear() { hlEls.forEach(function (e) { e.classList.remove('tourhl'); }); hlEls = []; }
@@ -7900,7 +8080,7 @@ function tplHouse(kind, floorId, wallId) {
     e.stopPropagation();
     var b = e.target.closest('button[data-t]'); if (!b) return;
     if (b.dataset.t === 'skip') { tourStop(); return; }
-    if (tourI >= TOUR.length - 1) { tourStop(); return; }
+    if (tourI >= TOUR.length - 1) { tourStop(); try { sendSock('first_mark', 'tour'); } catch (e2) { /* segue */ } return; }
     tourI++; tourShow();
   });
   function tourMaybe(n) {
@@ -7972,6 +8152,221 @@ function tplHouse(kind, floorId, wallId) {
     }
   }
   function toArcade() { if (SC !== 'arcade') enterScene('arcade', null, null, SC, true); ED.on = false; document.body.classList.remove('ed-on'); exiting = false; }
+
+  /* ---------- CENTRAL DE ENTREGAS: guia em tela cheia, equipe, simulado e primeiro dia ---------- */
+  var GUIA_URL = 'guia/index.html', GUIA_HOJE = GUIA_URL + '#todos-hoje';
+  var SIMQ = [{"id":"s1","cli":"GHC","q":"Domingo, você está de plantão. O relatório do GHC está pronto, mas o revisor não responde. Você já ligou para ele e já acionou o supervisor do plantão, sem resposta. Faltam 12 minutos para o horário limite de envio. O que fazer?","o":["Esperar mais, mesmo que passe do horário limite","Enviar sem revisão e avisar depois","Cancelar o envio de hoje","Pedir a um colega de outra equipe que envie por você"],"c":1,"why":"A regra geral é: se o revisor não aparecer até 15 minutos antes do horário limite, o relatório é enviado sem revisão. Entregar no prazo vale mais do que esperar. Depois, avise o supervisor. Atenção: isso não vale para o MJSP."},{"id":"s2","cli":"MJSP","q":"O relatório pendente é do MJSP. O revisor não respondeu e faltam 10 minutos para o limite. O que fazer?","o":["Enviar sem revisão, como nos outros clientes","Nunca enviar sem revisão: acionar o TL (dia útil) ou o supervisor (plantão)","Pedir para uma IA revisar e enviar","Enviar um resumo curto no lugar do relatório"],"c":1,"why":"O MJSP é a exceção, até segunda ordem: a revisão é obrigatória e o relatório nunca sai sem ela. Em dia útil fale com o TL, no plantão fale com o supervisor."},{"id":"s3","cli":"MCTI","q":"O relatório do MCTI está pronto. O revisor não responde e faltam 20 minutos para o limite. Qual é o caminho certo?","o":["Colar no ChatGPT para uma revisão rápida e enviar","Enviar agora, sem esperar ninguém","Tentar ligar para o revisor, acionar o supervisor do monitoramento e, se ninguém revisar até 15 minutos antes do limite, enviar sem revisão","Esperar até o revisor aparecer, mesmo depois do limite"],"c":2,"why":"No MCTI o protocolo pede primeiro ligar para o revisor e acionar o supervisor do monitoramento. Não se usa o ChatGPT para revisar. Só se não houver revisão até 15 minutos antes do limite é que se envia sem revisão."},{"id":"s4","cli":"MDA","q":"O Mailchimp está com problemas e você não consegue enviar o relatório do MDA no corpo do e-mail. O que o protocolo orienta?","o":["Esperar o Mailchimp voltar, mesmo que o prazo passe","Gerar uma imagem do PDF, colar no corpo do e-mail e consultar os destinatários na Central de Mailing","Enviar só o link da pasta do SharePoint","Avisar o cliente de que o relatório não sai hoje"],"c":1,"why":"Para o MDA, quando o Mailchimp falha, gera-se uma imagem do PDF e ela é colada no corpo do e-mail. Os destinatários ficam na Central de Mailing."},{"id":"s5","cli":"MIDR","q":"O Outlook caiu na hora de enviar o relatório do MIDR. Como resolver?","o":["Esperar o Outlook voltar","Enviar pelo Gmail do monitoramento e avisar gerentes e subs com antecedência, para que possam avisar o cliente","Enviar pelo seu e-mail pessoal sem avisar ninguém","Pular o envio de hoje"],"c":1,"why":"No MIDR o envio sai pelo Gmail do monitoramento. Avisar gerentes e subs com antecedência permite que eles avisem o cliente sobre a mudança."},{"id":"s6","cli":"ANP","q":"Na ANP, o boletim da 1ª edição ficou pronto e revisado às 9h10. Quando enviar?","o":["Agora, para adiantar o cliente","Às 09h30 em ponto, nunca antes","Às 10h, para garantir","Só depois da 2ª edição"],"c":1,"why":"A 1ª edição da ANP sai às 09h30 em ponto, nunca antes do horário. Se ficar pronto cedo, aguarde."},{"id":"s7","cli":"CFQ","q":"Sábado de plantão: você identificou uma crise que envolve o CFQ. Qual é o primeiro passo?","o":["Disparar o alerta direto para o cliente","Avisar primeiro o account ou o scrum de plantão e decidir junto se haverá envio extraordinário, compilado ou envio na segunda","Esperar segunda-feira para contar ao TL","Publicar a análise no grupo geral da empresa"],"c":1,"why":"No CFQ o primeiro passo é avisar o account ou o scrum de plantão. Envio extraordinário, compilado ou envio na segunda são decididos junto com o monitoramento e a gerência da conta."},{"id":"s8","cli":"MCTI","q":"Domingo, crise do MCTI. Você já entrou em contato com o account. O que mais vale fazer ao fim do dia?","o":["Nada, o alerta já resolve","Enviar um compilado de alertas sobre o tema","Apagar os alertas antigos do tema","Pedir ao cliente para acompanhar sozinho"],"c":1,"why":"No MCTI o protocolo orienta falar com o account e vale enviar um compilado de alertas sobre o tema ao fim do dia."},{"id":"s9","cli":"Cliente suspenso","q":"No guia, um cliente aparece com a etiqueta 'Suspenso até' uma data futura, e hoje seria dia de entrega dele. O que fazer?","o":["Entregar mesmo assim, por garantia","Não há entrega dele enquanto durar a suspensão: confira a data no guia e siga com os demais clientes","Perguntar ao cliente se ele quer receber","Entregar o relatório mais curto"],"c":1,"why":"A etiqueta de suspensão mostra até quando o cliente está sem entregas. Enquanto a data não chega, não há o que entregar. Confira sempre a data no guia."},{"id":"s10","cli":"Fora do protocolo","q":"Aconteceu algo no meio de um dia útil que o Protocolo do Caos não prevê. Com quem falar?","o":["Resolver sozinho, sem avisar ninguém","Com o TL (em dia útil) ou com o supervisor (no plantão)","Esperar para ver se resolve","Perguntar no grupo geral da empresa"],"c":1,"why":"Para tudo o que está mapeado, aplique o protocolo e avise depois. Para o que não está, fale com o TL em dia útil ou com o supervisor no plantão."}];
+  var CST = null, CME = null, cenOpen = false, cenTab = 'guia', cenPoll = 0, chkForm = false;
+  var simSt = { i: -1, locked: false, pick: -1, rew: false, local: false };
+  var cenEl = document.createElement('div'); cenEl.className = 'cen'; cenEl.hidden = true;
+  cenEl.setAttribute('role', 'dialog'); cenEl.setAttribute('aria-modal', 'true'); cenEl.setAttribute('aria-label', 'Central de Entregas');
+  cenEl.innerHTML = '<div class="cen-top"><b class="cen-ttl">CENTRAL DE ENTREGAS</b>' +
+    '<div class="cen-tabs" role="tablist"><button type="button" role="tab" data-ct="guia">GUIA</button><button type="button" role="tab" data-ct="eq">EQUIPE</button><button type="button" role="tab" data-ct="sim">SIMULADO</button><button type="button" role="tab" data-ct="dia">1º DIA</button></div>' +
+    '<div class="cen-act"><a class="btn small" id="cenNew" href="' + GUIA_HOJE + '" target="_blank" rel="noopener">ABRIR EM OUTRA ABA</a><button type="button" class="btn small" data-cx="close" id="cenClose">FECHAR</button></div></div>' +
+    '<div class="cen-vault" id="cenVault"></div>' +
+    '<div class="cen-body"><div class="cen-pane" data-cp="guia"><iframe id="cenFrame" title="Guia de Entregas" loading="lazy"></iframe></div>' +
+    '<div class="cen-pane scroll" data-cp="eq" hidden></div><div class="cen-pane scroll" data-cp="sim" hidden></div><div class="cen-pane scroll" data-cp="dia" hidden></div></div>';
+  document.body.appendChild(cenEl);
+  var cenFrame = cenEl.querySelector('#cenFrame'), cenVault = cenEl.querySelector('#cenVault');
+  var cofreBar = document.createElement('button'); cofreBar.type = 'button'; cofreBar.className = 'cofre'; cofreBar.hidden = true; cofreBar.setAttribute('aria-label', 'Abrir o cofre da equipe na Central de Entregas');
+  view.appendChild(cofreBar);
+  var cenBtn = navBtn('CENTRAL', function () { openCentral(); }); cenBtn.classList.add('cenbtn');
+  var cenFx = document.createElement('div'); cenFx.className = 'cenfx'; cenFx.hidden = true; document.body.appendChild(cenFx);
+
+  function vaultHtml(st, big) {
+    if (!st) return '<span class="vb-off">COFRE DA EQUIPE: sem conexão com o servidor. O guia segue funcionando.</span>';
+    var segs = st.goals.map(function (g) { return '<i class="vs' + (g.done ? ' d' : '') + '" title="' + esc(g.t) + '"><u style="width:' + Math.round(g.pct * 100) + '%"></u></i>'; }).join('');
+    return '<b>COFRE DA EQUIPE</b><span class="vsegs">' + segs + '</span><em>' + (st.full ? 'COFRE CHEIO!' : st.n + ' de ' + st.goals.length + ' metas') + '</em>';
+  }
+  function firstCount() { if (!CME) return 0; var n = 0; CME.steps.forEach(function (s) { if (CME.first[s]) n++; }); return n; }
+  function renderVault() {
+    cenVault.innerHTML = vaultHtml(CST);
+    cofreBar.hidden = !CST;
+    var chip = CME && !CME.firstDone ? '<small>1º DIA ' + firstCount() + '/' + CME.steps.length + '</small>' : '';
+    cofreBar.innerHTML = vaultHtml(CST) + chip;
+    document.body.classList.toggle('gold', !!(CST && CST.full));
+  }
+  function setPane(t) {
+    cenTab = t;
+    Array.prototype.forEach.call(cenEl.querySelectorAll('[data-ct]'), function (b) { var on = b.dataset.ct === t; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    Array.prototype.forEach.call(cenEl.querySelectorAll('[data-cp]'), function (p) { p.hidden = p.dataset.cp !== t; });
+    if (t === 'eq' && CME && !CME.first.equipe) { CME.first.equipe = 1; sendSock('first_mark', 'equipe'); }
+    renderPanes();
+  }
+  function openCentral(tab) {
+    if (cenOpen) { setPane(tab || cenTab); return; }
+    cenOpen = true; cenEl.hidden = false; document.body.classList.add('cen-on');
+    if (!cenFrame.getAttribute('src')) cenFrame.src = GUIA_HOJE;
+    else if (!tab || tab === 'guia') { try { cenFrame.contentWindow.location.hash = '#todos-hoje'; } catch (e) { /* segue */ } }
+    setPane(tab || 'guia');
+    sendSock('central_open');
+    clearInterval(cenPoll);
+    cenPoll = setInterval(function () {
+      if (cenTab !== 'guia' || !CME || CME.first.protocolo) return;
+      try { if (/protocolo/.test(cenFrame.contentWindow.location.hash)) { CME.first.protocolo = 1; sendSock('first_mark', 'protocolo'); renderVault(); } } catch (e) { /* segue */ }
+    }, 1200);
+    var cb = cenEl.querySelector('#cenClose'); if (cb) cb.focus();
+  }
+  function closeCentral() { if (!cenOpen) return; cenOpen = false; cenEl.hidden = true; document.body.classList.remove('cen-on'); clearInterval(cenPoll); cenPoll = 0; }
+  window.addEventListener('keydown', function (e) {
+    if (!cenOpen) return;
+    if (e.key === 'Escape') { e.stopPropagation(); closeCentral(); return; }
+    if (e.key !== 'Tab') e.stopPropagation();
+  }, true);
+  cofreBar.addEventListener('click', function (e) { e.stopPropagation(); openCentral('eq'); });
+  cofreBar.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+
+  /* ----- aba EQUIPE ----- */
+  function paneEq() {
+    var h = '';
+    if (!CST) return '<div class="cen-card"><b>Sem conexão com o servidor</b><p>O guia continua funcionando normalmente na aba GUIA. O cofre e o selo de plantão voltam quando a conexão voltar. Tudo aqui é opcional.</p></div>';
+    h += '<h3>COFRE DA EQUIPE</h3><p class="cen-p">Metas coletivas da semana. Aqui aparece só o time, nunca uma pessoa. Cada meta atingida rende moedas para todo mundo, e o cofre cheio libera a Semana Dourada e o Troféu da Equipe.</p><div class="goals">';
+    CST.goals.forEach(function (g) {
+      h += '<div class="goal' + (g.done ? ' d' : '') + '"><div class="gt"><b>' + esc(g.t) + '</b><span>' + (g.done ? 'META ATINGIDA' : '+' + g.coins + ' moedas para todos') + '</span></div><p>' + esc(g.d) + '</p>' +
+        '<div class="gbar"><u style="width:' + Math.round(g.pct * 100) + '%"></u></div><small>' + (g.miss ? 'Não nesta semana. A próxima começa no domingo às 23h59.' : esc(g.have)) + '</small></div>';
+    });
+    h += '</div><p class="cen-p sm">O cofre zera sozinho no domingo às 23h59 (Brasília).</p>';
+    h += '<h3>PLANTÃO</h3>';
+    if (!CME) { h += '<p class="cen-p">Carregando...</p>'; }
+    else if (!CME.plant) {
+      h += '<p class="cen-p">Selo opcional: avise o time que você está de plantão e ganhe um selo ao lado do seu nome. É uma autodeclaração, sem verificação, e some sozinho no domingo às 23h59.</p>' +
+        '<button type="button" class="btn" data-cx="plon">Estou de plantão neste fim de semana ou feriado</button>';
+    } else {
+      h += '<p class="cen-p">Você está com o selo <b class="rpt">PLANTÃO</b> até domingo, 23h59.</p><div class="cen-row">';
+      if (CME.chk) h += '<span class="okmsg">Check-in feito. Obrigado!</span><button type="button" class="btn small" data-cx="chkopen">REFAZER CHECK-IN</button>';
+      else h += '<button type="button" class="btn" data-cx="chkopen">Terminei meu plantão</button>';
+      h += '<button type="button" class="btn small alt" data-cx="plof">DESMARCAR PLANTÃO</button></div>';
+      if (chkForm) {
+        h += '<div class="cen-card"><b>Como foi o plantão?</b><p>Ninguém vê a sua resposta, só o resultado do time.</p><div class="cen-row">' +
+          '<button type="button" class="btn" data-cx="chk1">Tudo no prazo</button><button type="button" class="btn alt" data-cx="chk0">Algum alerta atrasou</button></div>' +
+          '<p class="sm">Registrar um atraso também ajuda o time a melhorar. Não existe ranking nem punição.</p></div>';
+      }
+    }
+    h += '<h4>DE PLANTÃO AGORA</h4>';
+    if (!CST.plant.length) h += '<p class="cen-p sm">Ninguém marcou o selo ainda.</p>';
+    else h += '<ul class="plist">' + CST.plant.map(function (p) { return '<li><span class="pvx">' + avatarSvg(p.av || p.nick, 26) + '</span><b>' + esc(p.nick) + '</b></li>'; }).join('') + '</ul>';
+    return h;
+  }
+
+  /* ----- aba SIMULADO ----- */
+  function simDone() { return CME ? CME.sim : []; }
+  function simIsDone(id) { return simDone().indexOf(id) >= 0; }
+  function simNextIdx(from) {
+    var n = SIMQ.length, k, i;
+    for (k = 1; k <= n; k++) { i = (from + k) % n; if (!simIsDone(SIMQ[i].id)) return i; }
+    return -2;
+  }
+  function simOrder(q) {
+    var idx = q.o.map(function (_, i) { return i; }), seed = 0, j, t;
+    for (j = 0; j < q.id.length; j++) seed = (seed * 31 + q.id.charCodeAt(j)) >>> 0;
+    for (j = idx.length - 1; j > 0; j--) { seed = (seed * 1664525 + 1013904223) >>> 0; var r = seed % (j + 1); t = idx[j]; idx[j] = idx[r]; idx[r] = t; }
+    return idx;
+  }
+  function paneSim() {
+    var done = simDone().length, tot = SIMQ.length, h = '';
+    if (simSt.i === -1) {
+      h += '<h3>SIMULADO DO CAOS</h3><p class="cen-p">Treino solo com ' + tot + ' cenários tirados do Protocolo do Caos. Escolha a resposta, veja a explicação e repita quando quiser. Cada cenário rende moedas e XP na primeira vez que você acerta.</p>';
+      h += '<div class="gbar big"><u style="width:' + Math.round(done / tot * 100) + '%"></u></div><p class="cen-p sm">' + done + ' de ' + tot + ' cenários resolvidos</p>';
+      if (!CME) h += '<p class="cen-p sm">Sem conexão você treina normalmente, mas as moedas só contam conectado.</p>';
+      if (done >= tot) h += '<div class="cen-card ok"><b>PRONTO PARA O PLANTÃO!</b><p>Você resolveu todos os cenários. Pode rever quando quiser.</p></div>';
+      h += '<div class="cen-row"><button type="button" class="btn" data-cx="simgo">' + (done >= tot ? 'REVER OS CENÁRIOS' : done ? 'CONTINUAR' : 'COMEÇAR') + '</button></div>';
+      return h;
+    }
+    if (simSt.i === -2) {
+      return '<h3>SIMULADO DO CAOS</h3><div class="cen-card ok"><b>' + (done >= tot ? 'PRONTO PARA O PLANTÃO!' : 'FIM DA RODADA') + '</b><p>' + (done >= tot ? 'Você resolveu os ' + tot + ' cenários. Qualquer dúvida de verdade, o guia está a um toque.' : 'Você resolveu ' + done + ' de ' + tot + ' cenários. Os outros esperam por você, sem pressa.') + '</p></div>' +
+        '<div class="cen-row"><button type="button" class="btn" data-cx="simhome">VOLTAR</button><button type="button" class="btn alt" data-cx="guiaproto">ABRIR O PROTOCOLO NO GUIA</button></div>';
+    }
+    var q = SIMQ[simSt.i], ord = simOrder(q), L = 'ABCD';
+    h += '<div class="sim-head"><span class="sim-tag">' + esc(q.cli) + '</span><span class="sim-n">CENÁRIO ' + (simSt.i + 1) + ' DE ' + tot + (simIsDone(q.id) ? ' (JÁ RESOLVIDO)' : '') + '</span></div><p class="sim-q">' + esc(q.q) + '</p><div class="sim-o">';
+    ord.forEach(function (oi, k) {
+      var cls = '';
+      if (simSt.locked) cls = oi === q.c ? ' right' : oi === simSt.pick ? ' wrong' : ' dim';
+      h += '<button type="button" class="sim-b' + cls + '" data-so="' + oi + '"' + (simSt.locked ? ' disabled' : '') + '><i>' + L[k] + '</i><span>' + esc(q.o[oi]) + '</span></button>';
+    });
+    h += '</div>';
+    if (simSt.locked) {
+      var ok = simSt.pick === q.c;
+      h += '<div class="cen-card ' + (ok ? 'ok' : 'bad') + '"><b>' + (ok ? 'CERTO!' : 'NÃO FOI DESTA VEZ') + '</b><p>' + esc(q.why) + '</p>' + (ok && simSt.rew ? '<p class="sm">Primeira vez neste cenário: moedas e XP creditados.</p>' : '') + '</div><div class="cen-row">';
+      if (ok) h += '<button type="button" class="btn" data-cx="simnext">PRÓXIMO</button>';
+      else h += '<button type="button" class="btn" data-cx="simretry">TENTAR DE NOVO</button><button type="button" class="btn alt" data-cx="simnext">PULAR</button>';
+      h += '<button type="button" class="btn small alt" data-cx="simhome">SAIR</button></div>';
+    }
+    return h;
+  }
+
+  /* ----- aba 1º DIA ----- */
+  var DIA = [
+    ['tour', 'Fazer o tour do mundo', 'Passe pelos passos do tour até o fim. Dá para rever em ONDE IR.', 'FAZER O TOUR', 'tour'],
+    ['central', 'Visitar a Central de Entregas', 'Pronto, você já está aqui.', '', ''],
+    ['protocolo', 'Abrir o Protocolo do Caos no guia', 'É a aba PROTOCOLO dentro do guia. Ele diz o que fazer quando algo foge do previsto.', 'ABRIR O PROTOCOLO', 'proto'],
+    ['equipe', 'Conhecer o cofre da equipe', 'Veja as metas coletivas da semana.', 'VER O COFRE', 'eq'],
+    ['sim3', 'Acertar 3 cenários do Simulado', 'Treino solo, com explicação de cada resposta.', 'TREINAR', 'sim']
+  ];
+  function paneDia() {
+    if (!CME) return '<div class="cen-card"><b>Sem conexão com o servidor</b><p>A trilha do Primeiro dia registra o seu progresso quando você está conectado. O guia segue funcionando normalmente.</p></div>';
+    var n = firstCount(), tot = DIA.length, h = '<h3>PRIMEIRO DIA</h3><p class="cen-p">Cinco passos curtos para quem está começando. Ao concluir: 150 moedas, 60 de XP e uma conquista. Dá para fazer na ordem que quiser.</p>';
+    h += '<div class="gbar big"><u style="width:' + Math.round(n / tot * 100) + '%"></u></div><p class="cen-p sm">' + n + ' de ' + tot + ' passos' + (CME.firstDone ? ' (trilha concluída!)' : '') + '</p><ul class="dia">';
+    DIA.forEach(function (d) {
+      var ok = !!CME.first[d[0]];
+      h += '<li class="' + (ok ? 'd' : '') + '"><i>' + (ok ? 'OK' : '') + '</i><div><b>' + d[1] + '</b><p>' + d[2] + '</p></div>' + (!ok && d[3] ? '<button type="button" class="btn small" data-cx="dia-' + d[4] + '">' + d[3] + '</button>' : '') + '</li>';
+    });
+    return h + '</ul>';
+  }
+  function renderPanes() {
+    var p = cenEl.querySelector('[data-cp="' + cenTab + '"]');
+    if (cenTab === 'eq') p.innerHTML = paneEq();
+    else if (cenTab === 'sim') p.innerHTML = paneSim();
+    else if (cenTab === 'dia') p.innerHTML = paneDia();
+  }
+  cenEl.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.ct) { setPane(b.dataset.ct); return; }
+    var so = b.dataset.so;
+    if (so !== undefined) {
+      if (simSt.locked) return;
+      var q = SIMQ[simSt.i], ch = parseInt(so, 10);
+      simSt.locked = true; simSt.pick = ch; simSt.rew = false;
+      sendSock('sim_answer', { id: q.id, ch: ch });
+      renderPanes(); return;
+    }
+    var a = b.dataset.cx; if (!a) return;
+    if (a === 'close') closeCentral();
+    else if (a === 'plon') sendSock('plant_set', { on: true });
+    else if (a === 'plof') { chkForm = false; sendSock('plant_set', { on: false }); }
+    else if (a === 'chkopen') { chkForm = !chkForm; renderPanes(); }
+    else if (a === 'chk1' || a === 'chk0') { chkForm = false; sendSock('plant_done', { sem: a === 'chk1' }); renderPanes(); }
+    else if (a === 'simgo') { simSt.i = simNextIdx(-1); if (simSt.i === -2) simSt.i = 0; simSt.locked = false; simSt.pick = -1; renderPanes(); }
+    else if (a === 'simhome') { simSt.i = -1; simSt.locked = false; renderPanes(); }
+    else if (a === 'simretry') { simSt.locked = false; simSt.pick = -1; renderPanes(); }
+    else if (a === 'simnext') { simSt.i = simNextIdx(simSt.i); simSt.locked = false; simSt.pick = -1; renderPanes(); }
+    else if (a === 'guiaproto') { setPane('guia'); try { cenFrame.contentWindow.location.hash = '#todos-protocolo'; } catch (e2) { cenFrame.src = GUIA_URL + '#todos-protocolo'; } }
+    else if (a === 'dia-tour') { closeCentral(); tourStart(); }
+    else if (a === 'dia-proto') { setPane('guia'); try { cenFrame.contentWindow.location.hash = '#todos-protocolo'; } catch (e3) { cenFrame.src = GUIA_URL + '#todos-protocolo'; } }
+    else if (a === 'dia-eq') setPane('eq');
+    else if (a === 'dia-sim') { setPane('sim'); }
+  });
+
+  /* ----- vindos do servidor ----- */
+  var CENAPI = {
+    open: openCentral,
+    state: function (m) { CST = m; renderVault(); if (cenOpen) renderPanes(); },
+    me: function (m) { CME = m; renderVault(); if (cenOpen) renderPanes(); },
+    simRes: function (m) {
+      if (!m) return;
+      if (CME) CME.sim = m.done || CME.sim;
+      if (m.first) simSt.rew = true;
+      if (cenOpen && cenTab === 'sim') renderPanes();
+    },
+    goal: function (m) {
+      var h = '<div class="fxmsg">' + esc(m && m.msg || 'Meta do cofre atingida!') + '</div>', i, cols = ['#F6D84A', '#F15A1A', '#5FD0D0', '#F29AC4', '#7CFF7C'];
+      for (i = 0; i < 26; i++) h += '<s style="left:' + ((i * 4 + (i * 7) % 5) % 100) + '%;animation-delay:' + ((i % 7) * 0.18).toFixed(2) + 's;background:' + cols[i % 5] + '"></s>';
+      cenFx.innerHTML = h; cenFx.hidden = false; clearTimeout(cenFx._t); cenFx._t = setTimeout(function () { cenFx.hidden = true; cenFx.innerHTML = ''; }, 5200);
+    },
+    isOpen: function () { return cenOpen; },
+    close: closeCentral,
+    dbg: function () { return { st: CST, me: CME, tab: cenTab, open: cenOpen }; }
+  };
 
   /* ---------- laço principal ---------- */
   var raf = 0, lastT = 0, mmT = 0, sigPrev = '', noteSync = '', dayT = 0;
@@ -8070,7 +8465,7 @@ function tplHouse(kind, floorId, wallId) {
   var zoomDef = 0;
   function reset() { dayTick(); cam.init = false; if (!zoomDef) { zoomDef = 1; if (zi === 0) setZoom(1); } keysDown = []; selObj = null; clearDest(); if (Arc.active()) Arc.stop(); crt.hidden = true; }
   function stopGame() { if (Arc.active()) { Arc.stop(); crt.hidden = true; } }
-  return { edAcct: edAcct, goScene: goScene, openHouse: openHouse, openMine: openMine, scene: function () { return SC; }, setHouses: setHouses, houseRefresh: houseRefresh, houseLiked: houseLiked, edStart: edStart, edStop: edStop, inHome: inHome, visitPending: visitPending, visitFail: visitFail, rebuildMine: rebuildMine, toArcade: toArcade, ctxRun: function () { var cb = $('nearBox').querySelector('button[data-act]'); if (cb) { cb.click(); return true; } return false; }, hooks: hooks, setGallery: setGallery, dayTick: dayTick, evd: EVD, frames: FRAMES, arc: Arc, near: function () { renderNear(); }, duo: function (e, d) { Arc.net(e, d); }, stopGame: stopGame, clear: clear, sync: sync, showSay: showSay, loopOn: loopOn, walkNo: walkNo, reset: reset, setZoom: setZoom, _dbg: function () { return { vis: vis, meA: meA, OBJ: OBJ, focus: focus, cam: cam, zoom: ZOOMS[zi], P: P, clickObj: clickObj, clickTile: clickTile, spotOcc: spotOcc, Arc: Arc, openCrt: openCrt, SCN: SCN, HS: HS, ED: ED, W: W, H: H, BLOCK: BLOCK, OBJS: OBJS, enterScene: enterScene, walkable: walkable }; } };
+  return { central: CENAPI, edAcct: edAcct, goScene: goScene, openHouse: openHouse, openMine: openMine, scene: function () { return SC; }, setHouses: setHouses, houseRefresh: houseRefresh, houseLiked: houseLiked, edStart: edStart, edStop: edStop, inHome: inHome, visitPending: visitPending, visitFail: visitFail, rebuildMine: rebuildMine, toArcade: toArcade, ctxRun: function () { var cb = $('nearBox').querySelector('button[data-act]'); if (cb) { cb.click(); return true; } return false; }, hooks: hooks, setGallery: setGallery, dayTick: dayTick, evd: EVD, frames: FRAMES, arc: Arc, near: function () { renderNear(); }, duo: function (e, d) { Arc.net(e, d); }, stopGame: stopGame, clear: clear, sync: sync, showSay: showSay, loopOn: loopOn, walkNo: walkNo, reset: reset, setZoom: setZoom, _dbg: function () { return { vis: vis, meA: meA, OBJ: OBJ, focus: focus, cam: cam, zoom: ZOOMS[zi], P: P, clickObj: clickObj, clickTile: clickTile, spotOcc: spotOcc, Arc: Arc, openCrt: openCrt, SCN: SCN, HS: HS, ED: ED, W: W, H: H, BLOCK: BLOCK, OBJS: OBJS, enterScene: enterScene, walkable: walkable }; } };
 })();
 
   window.__hall = Hall;
@@ -8142,6 +8537,9 @@ function tplHouse(kind, floorId, wallId) {
     else if (r.kind === 'run' && !Arc.active() && r.coins > 0) base = '+' + r.coins + ' moedas' + xp;
     else if (r.kind === 'visit') base = 'Visita à casa de <b>' + escH(r.nick || '') + '</b>. +' + r.coins + ' moedas' + xp;
     else if (r.kind === 'visited') base = '<b>' + escH(r.by || 'Alguém') + '</b> visitou a sua casa! +5 moedas' + xp;
+    else if (r.kind === 'cofre') base = '<b>COFRE DA EQUIPE:</b> ' + escH(r.t || 'meta atingida') + '! +' + r.coins + ' moedas para você' + (r.item ? ' e o Troféu da Equipe' : '') + '.';
+    else if (r.kind === 'sim') base = '<b>SIMULADO:</b> cenário resolvido! +' + r.coins + ' moedas' + xp;
+    else if (r.kind === 'first') base = '<b>PRIMEIRO DIA CONCLUÍDO!</b> +' + r.coins + ' moedas' + xp;
     else if (r.kind === 'starter') base = '<b>BEM-VINDO À VIDA NO SALÃO!</b> Você ganhou ' + r.coins + ' moedas para decorar a casa inteira.';
     else if (r.kind === 'pres') base = '+' + r.coins + ' moedas por passar um tempo por aqui.';
     else if (r.kind === 'liked') base = '<b>' + escH(r.by || 'Alguém') + '</b> curtiu seu ' + escH(r.what || 'quarto') + '! +' + (r.what === 'desenho' ? 1 : 2) + ' moedas';
@@ -9299,7 +9697,7 @@ function tplHouse(kind, floorId, wallId) {
 
   function setPlayers(list) {
     players = list.map(function (p) {
-      return { nick: p.nick, av: p.av, x: p.x, y: p.y, score: p.score, online: p.online, pl: p.pl || '', pet: p.pet || '', sc: p.sc || 'arcade', lv: p.lv || 1, drawing: p.drawing, guessed: p.guessed, me: me ? sameNick(p.nick, me.nick) : false };
+      return { nick: p.nick, av: p.av, x: p.x, y: p.y, score: p.score, online: p.online, pl: p.pl || '', pt: p.pt | 0, pet: p.pet || '', sc: p.sc || 'arcade', lv: p.lv || 1, drawing: p.drawing, guessed: p.guessed, me: me ? sameNick(p.nick, me.nick) : false };
     });
     renderSlots();
     renderScore();
@@ -9316,6 +9714,7 @@ function tplHouse(kind, floorId, wallId) {
       var rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = (idx + 1) + '.';
       var av = document.createElement('span'); av.className = 'pav'; av.innerHTML = avatarSvg(p.av || p.nick, 26);
       var nm = document.createElement('b'); nm.textContent = p.nick;
+      if (p.pt) { var bd = document.createElement('span'); bd.className = 'rpt'; bd.textContent = 'PLANTÃO'; nm.appendChild(bd); }
       var tg = document.createElement('span'); tg.className = 'ptag'; tg.textContent = p.drawing ? 'DESENHA' : (p.guessed ? 'ACERTOU' : '');
       var pt = document.createElement('span'); pt.className = 'pts'; pt.textContent = String(p.score || 0);
       row.appendChild(rk); row.appendChild(av); row.appendChild(nm); row.appendChild(tg); row.appendChild(pt);
@@ -9475,6 +9874,7 @@ function tplHouse(kind, floorId, wallId) {
     sock.on('disconnect', function (why) {
       if (why === 'io server disconnect') sock.connect();
       if (mp.joined) addChat({ k: 'warn', text: 'Conexão perdida. Tentando reconectar...' });
+      try { Hall.central.state(null); Hall.central.me(null); } catch (e) { /* segue */ }
     });
     sock.on('join_error', function (m) { if (m && m.taken) setTaken(m.taken); mpFail((m && m.msg) || 'Não foi possível entrar.'); if (m && m.code === 'av') { setTab('pre'); $('diceBtn').focus(); } if (m && m.code === 'pin') { $('pin').value = ''; savePin(''); $('pin').focus(); } });
     sock.on('account', function (a) { setAcct(a); onAcctInModal(); });
@@ -9486,6 +9886,10 @@ function tplHouse(kind, floorId, wallId) {
     sock.on('top', onTop);
     sock.on('joined', onJoined);
     sock.on('players', setPlayers);
+    sock.on('central_state', function (m) { Hall.central.state(m); });
+    sock.on('central_me', function (m) { Hall.central.me(m); });
+    sock.on('sim_res', function (m) { Hall.central.simRes(m); });
+    sock.on('cofre_goal', function (m) { Hall.central.goal(m); });
     sock.on('chat', addChat);
     sock.on('game_start', onGameStart);
     sock.on('round', onRound);

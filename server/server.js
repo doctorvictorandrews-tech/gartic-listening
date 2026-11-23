@@ -156,8 +156,7 @@ const duoWait = {};
 
 function setPl(p, id) {
   id = String(id || '').slice(0, 16);
-  if (id && !SOLO_IDS.has(id) && !DUO_IDS.has(id)) id = '';
-  if (room.phase !== 'lobby') id = '';
+  if (id && !/^[a-z0-9_]{1,16}$/.test(id)) id = '';
   if ((p.pl || '') === id) return;
   p.pl = id;
   sendPlayers();
@@ -190,7 +189,13 @@ function publicPlayers() {
       pl: p.pl || '',
       pt: plantOn(p.key) ? 1 : 0,
       lv: levelOfPlayer(p),
-      pet: p.acct && p.acct.items ? p.acct.items.pet : '',
+      pet: '',
+      w: w7Eq(p),
+      cx: p.c ? p.c.x : 0,
+      cz: p.c ? p.c.z : 0,
+      cr: p.c ? p.c.r : 0,
+      gin: p.gin ? 1 : 0,
+      rm: p.rm || '',
       sc: p.sc || 'arcade',
       drawing: room.phase === 'round' && room.drawer === p.key,
       guessed: room.phase === 'round' && p.guessed
@@ -202,7 +207,7 @@ function sendPlayers() { io.emit('players', publicPlayers()); }
 function sys(text, kind) { io.emit('chat', { k: kind || 'sys', text: text }); }
 
 function computeAwards() {
-  const ps = room.players;
+  const ps = gPl();
   const out = [];
   function pick(id, title, score, detail) {
     let w = null, v = null;
@@ -223,7 +228,7 @@ function computeAwards() {
 }
 
 function ranking() {
-  return room.players
+  return gPl()
     .map(function (p, i) { return { nick: p.nick, score: p.score, i: i }; })
     .sort(function (a, b) { return b.score - a.score || a.i - b.i; })
     .map(function (r) { return { nick: r.nick, score: r.score }; });
@@ -262,7 +267,7 @@ function maybeReveal() {
   }
   if (changed) {
     room.mask = makeMask();
-    room.players.forEach(function (p) {
+    gPl().forEach(function (p) {
       if (p.id && p.key !== room.drawer && !p.guessed) io.to(p.id).emit('hint', { mask: room.mask });
     });
   }
@@ -283,7 +288,8 @@ function roundPayload() {
 
 function startGame(starter, data) {
   if (room.phase !== 'lobby') return;
-  if (onlinePlayers().length < 2) {
+  if (!playerOf(starter) || !playerOf(starter).gin) return;
+  if (gOn().length < 2) {
     starter.emit('chat', { k: 'warn', text: 'É preciso pelo menos 2 pessoas na sala.' });
     return;
   }
@@ -314,11 +320,11 @@ function startGame(starter, data) {
   room.bag = shuffle(words.slice());
   room.n = 0;
   room.turn = -1;
-  room.order = shuffle(onlinePlayers().map(function (p) { return p.key; }));
-  room.players.forEach(function (p) { p.score = 0; p.gain = 0; p.guessed = false; p.stats = newStats(); });
+  room.order = shuffle(gOn().map(function (p) { return p.key; }));
+  gPl().forEach(function (p) { p.score = 0; p.gain = 0; p.guessed = false; p.stats = newStats(); });
   endAllDuos();
-  io.emit('game_start', { key: room.cfg.key, nome: room.cfg.nome, total: total, seconds: seconds, by: playerOf(starter).nick });
-  sys('Partida iniciada: ' + room.cfg.nome + ', ' + total + ' rodadas de ' + seconds + 's.');
+  gio().emit('game_start', { key: room.cfg.key, nome: room.cfg.nome, total: total, seconds: seconds, by: playerOf(starter).nick });
+  gsys('Partida iniciada: ' + room.cfg.nome + ', ' + total + ' rodadas de ' + seconds + 's.');
   startRound();
 }
 
@@ -333,7 +339,7 @@ function nextDrawer() {
 
 function startRound() {
   clearTimers();
-  if (onlinePlayers().length < 2) { abortGame('few'); return; }
+  if (gOn().length < 2) { abortGame('few'); return; }
   const p = nextDrawer();
   if (!p) { abortGame('few'); return; }
   room.n++;
@@ -345,11 +351,11 @@ function startRound() {
   room.cur = null;
   room.drawer = p.key;
   room.phase = 'round';
-  room.players.forEach(function (q) { q.guessed = false; q.gain = 0; });
+  gPl().forEach(function (q) { q.guessed = false; q.gain = 0; });
   room.endAt = Date.now() + room.cfg.seconds * 1000;
-  io.emit('round', roundPayload());
+  gio().emit('round', roundPayload());
   if (p.id) io.to(p.id).emit('word', { word: room.word });
-  sys('Rodada ' + room.n + '/' + room.cfg.total + ': ' + p.nick + ' vai desenhar.');
+  gsys('Rodada ' + room.n + '/' + room.cfg.total + ': ' + p.nick + ' vai desenhar.');
   sendPlayers();
   room.timer = setInterval(tickRound, 500);
 }
@@ -361,7 +367,7 @@ function tickRound() {
 }
 
 function everyoneGuessed() {
-  const guessers = onlinePlayers().filter(function (p) { return p.key !== room.drawer; });
+  const guessers = gOn().filter(function (p) { return p.key !== room.drawer; });
   return guessers.length > 0 && guessers.every(function (p) { return p.guessed; });
 }
 
@@ -372,12 +378,12 @@ function endRound(reason) {
   commitCur();
   const last = room.n >= room.cfg.total;
   const drawer = playerByKey(room.drawer);
-  if (drawer && reason === 'time' && !room.players.some(function (q) { return q.guessed; })) drawer.stats.mystery++;
-  const gains = room.players
+  if (drawer && reason === 'time' && !gPl().some(function (q) { return q.guessed; })) drawer.stats.mystery++;
+  const gains = gPl()
     .filter(function (p) { return p.gain > 0; })
     .sort(function (a, b) { return b.gain - a.gain; })
     .map(function (p) { return { nick: p.nick, gain: p.gain }; });
-  io.emit('round_end', {
+  gio().emit('round_end', {
     word: room.word,
     reason: reason,
     last: last,
@@ -403,7 +409,7 @@ function abortGame(reason) {
   const wasRunning = room.phase !== 'lobby';
   clearTimers();
   if (wasRunning) {
-    io.emit('round_end', { word: '', reason: reason, last: true, nextIn: 0, drawer: '', gains: [], ranking: ranking() });
+    gio().emit('round_end', { word: '', reason: reason, last: true, nextIn: 0, drawer: '', gains: [], ranking: ranking() });
   }
   room.phase = 'lobby';
   room.drawer = null;
@@ -428,7 +434,7 @@ function correctGuess(p) {
     d.score += dp;
     d.gain += dp;
   }
-  sys(p.nick + ' acertou! (+' + pts + ')', 'ok');
+  gsys(p.nick + ' acertou! (+' + pts + ')', 'ok');
   if (p.id) io.to(p.id).emit('word', { word: room.word });
   sendPlayers();
   if (everyoneGuessed()) endRound('all');
@@ -437,7 +443,7 @@ function correctGuess(p) {
 /* ---------- entrada e saída de jogadores ---------- */
 
 function sendStateTo(socket, p) {
-  if (room.phase === 'lobby' || !room.cfg) return;
+  if (room.phase === 'lobby' || !room.cfg || !p.gin) return;
   socket.emit('game_start', { key: room.cfg.key, nome: room.cfg.nome, total: room.cfg.total, seconds: room.cfg.seconds, by: '' });
   if (room.phase === 'round') {
     socket.emit('round', roundPayload());
@@ -452,12 +458,14 @@ function removePlayer(p) {
   const idx = room.players.indexOf(p);
   if (idx === -1) return;
   duoLeave(p);
+  try { rmLeave(p, 'gone'); } catch (e) { /* segue */ }
+  try { gLeave(p); } catch (e) { /* segue */ }
   saveAcct(p, true);
   room.players.splice(idx, 1);
   sys(p.nick + ' saiu.');
   if (room.phase === 'round' && p.key === room.drawer) endRound('drawer_left');
   else if (room.phase === 'round' && everyoneGuessed()) endRound('all');
-  if (room.phase !== 'lobby' && onlinePlayers().length < 2) abortGame('few');
+  if (room.phase !== 'lobby' && gOn().length < 2) abortGame('few');
   if (!room.players.length) resetRoom();
   sendPlayers();
 }
@@ -507,7 +515,7 @@ function handleDraw(socket, m) {
       if (!a || a.t === 'fill' || a.t === 'clear') return;
       commitCur();
       room.cur = a;
-      socket.broadcast.emit('draw', { k: 'begin', a: a });
+      socket.to('gartic').emit('draw', { k: 'begin', a: a });
       break;
     }
     case 'pts': {
@@ -515,7 +523,7 @@ function handleDraw(socket, m) {
       const p = nums(m.p, 4000);
       if (!p.length || room.cur.p.length > 40000) return;
       for (let i = 0; i < p.length; i++) room.cur.p.push(p[i]);
-      socket.broadcast.emit('draw', { k: 'pts', p: p });
+      socket.to('gartic').emit('draw', { k: 'pts', p: p });
       break;
     }
     case 'shape': {
@@ -523,25 +531,25 @@ function handleDraw(socket, m) {
       const a = nums(m.a, 4);
       if (a.length !== 4) return;
       room.cur.a = a;
-      socket.broadcast.emit('draw', { k: 'shape', a: a });
+      socket.to('gartic').emit('draw', { k: 'shape', a: a });
       break;
     }
     case 'end':
       commitCur();
-      socket.broadcast.emit('draw', { k: 'end' });
+      socket.to('gartic').emit('draw', { k: 'end' });
       break;
     case 'act': {
       const a = cleanAction(m.a);
       if (!a || (a.t !== 'fill' && a.t !== 'clear')) return;
       commitCur();
       if (room.actions.length < 4000) room.actions.push(a);
-      socket.broadcast.emit('draw', { k: 'act', a: a });
+      socket.to('gartic').emit('draw', { k: 'act', a: a });
       break;
     }
     case 'undo':
       commitCur();
       room.actions.pop();
-      socket.broadcast.emit('draw', { k: 'undo' });
+      socket.to('gartic').emit('draw', { k: 'undo' });
       break;
     default:
   }
@@ -637,7 +645,7 @@ const fails = {};   // chave -> { n, until }
 /* ---------- níveis e títulos ---------- */
 function lvOf(xp) { return Math.max(1, Math.floor((1 + Math.sqrt(1 + Math.max(0, xp) / 12.5)) / 2)); }
 function xpAt(l) { return 50 * l * (l - 1); }
-const TITLES = [[1, 'Novato do Fliperama'], [3, 'Ficha Quente'], [5, 'Craque do Joystick'], [8, 'Mestre dos Pixels'], [12, 'Lenda do Salão'], [16, 'Rei do Fliperama'], [20, 'Imortal do Arcade']];
+const TITLES = [[1, 'Turista da Orla'], [3, 'Figura do Calçadão'], [5, 'Craque da Praia'], [8, 'Mestre dos Jogos'], [12, 'Lenda da Cidade'], [16, 'Rei da Orla'], [20, 'Imortal da Listening City']];
 function titleOf(l) { let t = TITLES[0][1]; TITLES.forEach(function (r) { if (l >= r[0]) t = r[1]; }); return t; }
 
 /* ---------- datas (horário de Brasília) ---------- */
@@ -716,13 +724,14 @@ function normalizeAcct(a) {
   normItems(a);
   a.coins = a.coins | 0; a.xp = a.xp | 0; a.total_coins = a.total_coins | 0; a.streak = a.streak | 0;
   a.last_daily = a.last_daily || '';
+  norm7(a);
   return a;
 }
 function acctPayload(p) {
   const a = p.acct, l = lvOf(a.xp), solo = {};
   Object.keys(a.stats.solo).forEach(function (g) { solo[g] = { n: a.stats.solo[g].n, best: a.stats.solo[g].best }; });
   return { nick: p.nick, coins: a.coins, xp: a.xp, lv: l, lo: xpAt(l), hi: xpAt(l + 1), title: titleOf(l), ach: Object.keys(a.ach), streak: a.streak,
-    items: itemsPub(a), stats: { runs: a.stats.runs, solo: solo, duoW: a.stats.duoW, duoL: a.stats.duoL, duoD: a.stats.duoD, g: a.stats.g } };
+    items: itemsPub(a), w7: w7Pub(a), stats: { runs: a.stats.runs, solo: solo, duoW: a.stats.duoW, duoL: a.stats.duoL, duoD: a.stats.duoD, g: a.stats.g } };
 }
 function levelOfPlayer(p) { return p.acct ? lvOf(p.acct.xp) : 1; }
 
@@ -788,7 +797,7 @@ function giveStarter(p) {
   const a = p.acct;
   if (!a) return;
   let gift = 0;
-  if (!a.items.starter) gift = STARTER; else if (!a.items.starter2) gift = Math.max(0, STARTER - STARTER_OLD);
+  if (!a.items.starter) gift = START7;
   a.items.starter = 1; a.items.starter2 = 1;
   if (!gift) return;
   a.coins += gift;
@@ -924,7 +933,7 @@ function handleDuoResult(p, m) {
 
 /* ---------- Gartic: recompensas no fim da partida ---------- */
 function garticRewards() {
-  const list = room.players.filter(function (p) { return p.acct; }).slice().sort(function (a, b) { return b.score - a.score; });
+  const list = gPl().filter(function (p) { return p.acct; }).slice().sort(function (a, b) { return b.score - a.score; });
   if (!list.length) return;
   const top = list[0].score;
   list.forEach(function (p, i) {
@@ -998,7 +1007,7 @@ function evMult() {
 function evSale() { let s = 0; activeEvents().forEach(function (e) { if (e.sale && e.sale > s) s = e.sale; }); return s; }
 function eventsPayload() {
   const list = activeEvents().map(function (e) { return { id: e.id, n: e.n }; });
-  if (isSextou()) list.push({ id: 'sextou', n: 'Sextou no Fliperama' });
+  if (isSextou()) list.push({ id: 'sextou', n: 'Sextou na Cidade' });
   return { ev: list, mult: evMult(), sale: evSale(), season: seasonOf(), shop: EVENTS.filter(function (e) { return evActive(e, true); }).map(function (e) { return e.id; }) };
 }
 
@@ -1700,13 +1709,414 @@ const IMG_RE = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/;
 /* ---------- aplica o multiplicador de eventos nas moedas de partidas ---------- */
 function boosted(coins) { return Math.round(coins * evMult() * EASY); }
 
+/* ====================================================================
+   FASE 7: LISTENING CITY (mundo 3D, salas de jogos, reset, limite de 15)
+   ==================================================================== */
+const MAX_ONLINE = Number(process.env.MAX_ONLINE) || 15;
+const START7 = 300;           // moedas iniciais depois do reset
+const CITY_LIM = 175;         // limite do mapa, em metros
+const CATALOG7 = [{"id": "voo", "n": "Voo Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 3000}, {"id": "praia", "n": "Corrida da Praia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 150, "cap": 60000}, {"id": "torre", "n": "Torre de Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 10, "cap": 600}, {"id": "travessia", "n": "Travessia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 50, "cap": 20000}, {"id": "comecoco", "n": "Comecoco Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 200, "cap": 40000}, {"id": "caixotes", "n": "Caixotes do Porto", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "sudoku", "n": "Sudoku Sunset", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "cacapal", "n": "Caça-Palavras", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "damas", "n": "Damas", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "reversi", "n": "Reversi", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "xadrez", "n": "Xadrez Relâmpago", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "mancala", "n": "Mancala", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "rps", "n": "Pedra, Papel e Tesoura", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "senha", "n": "Mestre da Senha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "memduelo", "n": "Memória em Duelo", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tron", "n": "Tron Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tanques", "n": "Tanques de Praia", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "ludo", "n": "Ludo Sunset", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cartas", "n": "Cartas Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cabo", "n": "Cabo de Guerra", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "quizeq", "n": "Quiz de Equipes", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "codigo", "n": "Agentes em Código", "cat": "team", "min": 4, "max": 12, "tm": 1, "bots": 1}, {"id": "revez", "n": "Revezamento de Digitação", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "termoco", "n": "Termo Coop", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "forca", "n": "Forca em Grupo", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "bingo", "n": "Bingo da Orla", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "sumo", "n": "Sumô de Bolas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "pega", "n": "Pega-Pega Neon", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "batata", "n": "Batata Quente", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "reflexo", "n": "Reflexo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "digite", "n": "Corrida de Digitação", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stop", "n": "Stop do Monitoramento", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "lobo", "n": "Impostor na Praia", "cat": "todos", "min": 3, "max": 15, "bots": 1}];
+const G7 = {};
+CATALOG7.forEach(function (g) { G7[g.id] = g; });
+/* jogos solo novos entram no mesmo caminho dos antigos (evento run, placar, moedas) */
+CATALOG7.forEach(function (g) {
+  if (!g.sc) return;
+  SOLO_IDS.add(g.id); DIV[g.id] = g.div || 50; SCORE_CAP[g.id] = g.cap || 100000; TOP_GAMES.add(g.id);
+});
+
+/* loja da orla: carros, emotes, auras, bichinhos e acessórios */
+const SHOP7 = [
+  { id: 'car0', n: 'Cupê Sunset', s: 'car', p: 0 }, { id: 'car1', n: 'Cupê Azul Piscina', s: 'car', p: 150 },
+  { id: 'car2', n: 'Cupê Verde Palmeira', s: 'car', p: 150 }, { id: 'car3', n: 'Preto Fosco', s: 'car', p: 250 },
+  { id: 'car4', n: 'Dourado', s: 'car', p: 400 }, { id: 'car5', n: 'Buggy de Praia', s: 'car', p: 300 },
+  { id: 'car6', n: 'Kombi Neon', s: 'car', p: 200 },
+  { id: 'emo0', n: 'Acenar', s: 'emo', p: 0 }, { id: 'emo1', n: 'Dançar', s: 'emo', p: 0 },
+  { id: 'emo2', n: 'Flexionar', s: 'emo', p: 60 }, { id: 'emo3', n: 'Palmas', s: 'emo', p: 60 },
+  { id: 'emo4', n: 'Giro', s: 'emo', p: 80 }, { id: 'emo5', n: 'Robô', s: 'emo', p: 120 },
+  { id: 'emo6', n: 'Sentar', s: 'emo', p: 60 }, { id: 'emo7', n: 'Pular de alegria', s: 'emo', p: 80 },
+  { id: 'aur0', n: 'Sem aura', s: 'aur', p: 0 }, { id: 'aur1', n: 'Aura Rosa', s: 'aur', p: 100 },
+  { id: 'aur2', n: 'Aura Ciano', s: 'aur', p: 100 }, { id: 'aur3', n: 'Aura Lima', s: 'aur', p: 150 },
+  { id: 'aur4', n: 'Aura Arco-íris', s: 'aur', p: 300 },
+  { id: 'pet0', n: 'Sem bichinho', s: 'pet', p: 0 }, { id: 'pet1', n: 'Gatinho Neon', s: 'pet', p: 200 },
+  { id: 'pet2', n: 'Cachorrinho', s: 'pet', p: 200 }, { id: 'pet3', n: 'Robozinho', s: 'pet', p: 250 },
+  { id: 'pet4', n: 'Fantasminha', s: 'pet', p: 250 },
+  { id: 'hd0', n: 'Sem item na cabeça', s: 'head', p: 0 }, { id: 'hd1', n: 'Chapéu de Palha', s: 'head', p: 80 },
+  { id: 'hd2', n: 'Fone de Ouvido', s: 'head', p: 90 }, { id: 'hd3', n: 'Coroa', s: 'head', p: 250 },
+  { id: 'hd4', n: 'Boné ao Contrário', s: 'head', p: 70 },
+  { id: 'bk0', n: 'Sem item nas costas', s: 'back', p: 0 }, { id: 'bk1', n: 'Mochila', s: 'back', p: 70 },
+  { id: 'bk2', n: 'Asas Neon', s: 'back', p: 300 }, { id: 'bk3', n: 'Capa', s: 'back', p: 150 },
+  { id: 'bk4', n: 'Prancha de Surfe', s: 'back', p: 120 },
+  { id: 'fc0', n: 'Sem item no rosto', s: 'face', p: 0 }, { id: 'fc1', n: 'Óculos Neon', s: 'face', p: 90 },
+  { id: 'fc2', n: 'Óculos de Sol', s: 'face', p: 60 }, { id: 'fc3', n: 'Máscara Retrô', s: 'face', p: 110 }
+];
+const SHOP7_MAP = {};
+SHOP7.forEach(function (it) { SHOP7_MAP[it.id] = it; });
+const SLOT_DEF = { car: 'car0', emo: 'emo0', aur: 'aur0', pet: 'pet0', head: 'hd0', back: 'bk0', face: 'fc0' };
+
+function norm7(a) {
+  const it = a.items;
+  if (!it.v7) {
+    const hadStarter = !!it.starter;
+    it.own = {}; it.house = blankHouse(); it.pet = ''; it.likes = {}; it.visits = {};
+    it.v7 = 1;
+    if (hadStarter) { a.coins = START7; it.reset7 = 1; }
+  }
+  const c = it.c7 && typeof it.c7 === 'object' ? it.c7 : {};
+  c.own = c.own && typeof c.own === 'object' ? c.own : {};
+  c.eq = c.eq && typeof c.eq === 'object' ? c.eq : {};
+  Object.keys(SLOT_DEF).forEach(function (s) {
+    const id = c.eq[s];
+    const ok = id && SHOP7_MAP[id] && SHOP7_MAP[id].s === s && (SHOP7_MAP[id].p === 0 || c.own[id]);
+    c.eq[s] = ok ? id : SLOT_DEF[s];
+  });
+  const g = it.g7 && typeof it.g7 === 'object' ? it.g7 : {};
+  g.games = g.games | 0; g.wins = g.wins | 0; g.kinds = g.kinds && typeof g.kinds === 'object' ? g.kinds : {};
+  it.c7 = c; it.g7 = g;
+  return a;
+}
+function w7Eq(p) { return p && p.acct && p.acct.items && p.acct.items.c7 ? p.acct.items.c7.eq : {}; }
+function w7Pub(a) { return { own: Object.keys(a.items.c7.own), eq: a.items.c7.eq, g: { games: a.items.g7.games, wins: a.items.g7.wins, kinds: Object.keys(a.items.g7.kinds).length } }; }
+
+/* conquistas novas da cidade; as que dependiam da casa saem da lista */
+ACH.push(
+  { id: 'cidade1', n: 'Bem-vindo à cidade', d: 'Jogue a sua primeira partida em grupo.', c: 15, t: function (s, a) { return a.items.g7 && a.items.g7.games >= 1; } },
+  { id: 'cidade10', n: 'Turma da Orla', d: 'Jogue 10 partidas em grupo.', c: 50, t: function (s, a) { return a.items.g7 && a.items.g7.games >= 10; } },
+  { id: 'cidade_v5', n: 'Campeão do Calçadão', d: 'Vença 5 partidas em grupo.', c: 70, t: function (s, a) { return a.items.g7 && a.items.g7.wins >= 5; } },
+  { id: 'cidade_var', n: 'Jogo de Cintura', d: 'Jogue 10 jogos diferentes em grupo.', c: 60, t: function (s, a) { return a.items.g7 && Object.keys(a.items.g7.kinds).length >= 10; } },
+  { id: 'estilo', n: 'Estilo da Cidade', d: 'Compre um item na Loja da Orla.', c: 10, t: function (s, a) { return a.items.c7 && Object.keys(a.items.c7.own).length >= 1; } }
+);
+['decorador', 'visitante', 'popular', 'adotou', 'colecionador', 'comprador'].forEach(function (id) {
+  const i = ACH.findIndex(function (x) { return x.id === id; });
+  if (i >= 0) ACH.splice(i, 1);
+});
+ACH_PUB.length = 0;
+ACH.forEach(function (a) { ACH_PUB.push({ id: a.id, n: a.n, d: a.d, c: a.c }); });
+
+function spawn7() { return { x: (Math.random() - 0.5) * 8, z: -4.5 + Math.random() * 2.5, r: 0, a: 0, v: 0 }; }
+function onlineCount() { return room.players.filter(function (p) { return p.online; }).length; }
+
+/* ---------- presença: posições em tempo real ---------- */
+let cityDirty = false;
+setInterval(function () {
+  try {
+    if (!cityDirty) return;
+    cityDirty = false;
+    const arr = [];
+    room.players.forEach(function (p) {
+      if (p.online && p.c) arr.push([p.nick, Math.round(p.c.x * 100) / 100, Math.round(p.c.z * 100) / 100, Math.round(p.c.r * 100) / 100, p.c.a | 0, p.c.v | 0]);
+    });
+    io.volatile.emit('cpos', arr);
+  } catch (e) { console.error('cpos', e); }
+}, 90);
+
+/* ---------- Gartic como mesa opcional ---------- */
+function gPl() { return room.players.filter(function (p) { return p.gin; }); }
+function gOn() { return room.players.filter(function (p) { return p.gin && p.online; }); }
+function gio() { return io.to('gartic'); }
+function gsys(text, kind) { io.to('gartic').emit('chat', { k: kind || 'sys', text: text }); }
+function garticLobbyPub() { return { pl: gOn().map(function (p) { return p.nick; }), run: room.phase !== 'lobby', theme: room.cfg ? room.cfg.nome : '' }; }
+function sendGLobby() { io.emit('gartic_lobby', garticLobbyPub()); }
+function gJoin(p, on) {
+  const s = p.id ? io.sockets.sockets.get(p.id) : null;
+  if (on) {
+    if (p.rm) rmLeave(p);
+    p.gin = true;
+    if (s) { s.join('gartic'); if (room.phase !== 'lobby') sendStateTo(s, p); }
+  } else {
+    gLeave(p);
+  }
+  sendGLobby();
+  sendPlayers();
+}
+function gLeave(p) {
+  if (!p.gin) return;
+  p.gin = false;
+  const s = p.id ? io.sockets.sockets.get(p.id) : null;
+  if (s) s.leave('gartic');
+  if (room.phase === 'round' && p.key === room.drawer) endRound('drawer_left');
+  else if (room.phase === 'round' && everyoneGuessed()) endRound('all');
+  if (room.phase !== 'lobby' && gOn().length < 2) abortGame('few');
+  sendGLobby();
+}
+
+/* ---------- salas de jogos ---------- */
+const rooms7 = new Map();
+let RM_SEQ = 0, rmListT = 0, rmListTimer = null;
+function rmPub(r) {
+  return { id: r.id, g: r.g, name: r.name, host: r.host, st: r.st, max: r.max, min: r.min, tm: r.tm, solo: r.solo ? 1 : 0, opts: r.opts,
+    pl: r.pl.map(function (q) { return { k: q.k, n: q.n, av: q.av || '', t: q.t, r: q.r ? 1 : 0, bot: q.bot ? 1 : 0 }; }) };
+}
+function rmList() { return Array.from(rooms7.values()).filter(function (r) { return !r.solo; }).map(rmPub); }
+function rmEmitList() {
+  const now = Date.now();
+  if (now - rmListT < 200) { if (!rmListTimer) rmListTimer = setTimeout(function () { rmListTimer = null; rmEmitList(); }, 220); return; }
+  rmListT = now;
+  io.emit('rm_list', rmList());
+}
+function rmToRoom(r, ev, data) { io.to('rm:' + r.id).emit(ev, data); }
+function rmState(r) { rmToRoom(r, 'rm_state', rmPub(r)); rmEmitList(); }
+function rmOf(p) { return p && p.rm ? rooms7.get(p.rm) : null; }
+function rmHumans(r) { return r.pl.filter(function (q) { return !q.bot; }); }
+function rmClose(r, why) {
+  rmToRoom(r, 'rm_closed', { id: r.id, why: why || '' });
+  rmHumans(r).forEach(function (q) {
+    const pp = playerByKey(q.k);
+    if (pp) { pp.rm = ''; pp.pl = ''; const s = pp.id ? io.sockets.sockets.get(pp.id) : null; if (s) s.leave('rm:' + r.id); }
+  });
+  rooms7.delete(r.id);
+  sendPlayers();
+  rmEmitList();
+}
+function rmLeave(p, why) {
+  const r = rmOf(p);
+  if (!r) { p.rm = ''; return; }
+  const s = p.id ? io.sockets.sockets.get(p.id) : null;
+  if (s) s.leave('rm:' + r.id);
+  p.rm = ''; p.pl = '';
+  r.pl = r.pl.filter(function (q) { return q.k !== p.key; });
+  const humans = rmHumans(r);
+  if (!humans.length) { rooms7.delete(r.id); rmEmitList(); sendPlayers(); return; }
+  if (r.host === p.key) {
+    if (r.st === 'play') { rmClose(r, 'host'); return; }
+    r.host = humans[0].k;
+  }
+  if (r.st === 'play') rmToRoom(r, 'rm_gone', { k: p.key, n: p.nick, why: why || '' });
+  rmState(r);
+  sendPlayers();
+}
+function rmAutoTeam(r) {
+  const c = [0, 0];
+  r.pl.forEach(function (q) { c[q.t === 1 ? 1 : 0]++; });
+  return c[0] <= c[1] ? 0 : 1;
+}
+function rmReward(r, res) {
+  const now = nowMs();
+  if (!res || !Array.isArray(res.rk)) return;
+  const dur = (now - (r.t0 || now)) / 1000;
+  if (dur < 20) return;
+  const humans = rmHumans(r), multi = humans.length >= 2;
+  res.rk.slice(0, 20).forEach(function (x) {
+    const q = r.pl.find(function (y) { return y.k === x.k && !y.bot; });
+    const p = q ? playerByKey(q.k) : null;
+    if (!p || !p.acct) return;
+    const s = p.acct.stats, today = dayKey(), g7 = p.acct.items.g7;
+    const win = x.rank === 1 || x.w === 1;
+    g7.games++; if (win && multi) g7.wins++;
+    g7.kinds[r.g] = (g7.kinds[r.g] || 0) + 1;
+    if (s.dayCoins.d !== today) s.dayCoins = { d: today, n: 0 };
+    let coins = multi ? (win ? 14 : (x.rank === 2 ? 8 : 5)) : (win ? 4 : 2);
+    coins = Math.max(0, Math.min(coins, DAY_COIN_CAP - s.dayCoins.n));
+    s.dayCoins.n += coins;
+    const xp = (multi ? 12 : 5) + (win ? 12 : 0);
+    grant(p, { kind: 'room', game: r.g, win: win && multi, multi: multi, mult: evMult(), coins: boosted(coins), xp: xp });
+  });
+}
+
+function registerCity(socket) {
+  const live = function () { const p = playerOf(socket); return p && p.id === socket.id ? p : null; };
+
+  socket.on('cmove', function (m) {
+    try {
+      const p = live(); if (!p || !m) return;
+      const now = Date.now();
+      if (now - (p.lastMove || 0) < 55) return;
+      p.lastMove = now;
+      const x = Number(m.x), z = Number(m.z), r = Number(m.r);
+      if (!isFinite(x) || !isFinite(z) || !isFinite(r)) return;
+      p.c = { x: Math.max(-CITY_LIM, Math.min(CITY_LIM, x)), z: Math.max(-CITY_LIM, Math.min(CITY_LIM, z)), r: r % 7, a: (m.a | 0) & 31, v: m.v ? 1 : 0 };
+      cityDirty = true;
+    } catch (e) { console.error('cmove', e); }
+  });
+  socket.on('csay', function (txt) {
+    try {
+      const p = live(); if (!p) return;
+      const now = Date.now();
+      if (now - p.lastSay < 700) return;
+      p.lastSay = now;
+      const text = String(txt || '').replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90);
+      if (!text) return;
+      io.emit('say', { nick: p.nick, text: text });
+    } catch (e) { console.error('csay', e); }
+  });
+  socket.on('cemote', function (id) {
+    try {
+      const p = live(); if (!p || !p.acct) return;
+      const now = Date.now();
+      if (now - (p.lastEmo || 0) < 600) return;
+      p.lastEmo = now;
+      id = String(id || '');
+      const it = SHOP7_MAP[id];
+      if (!it || it.s !== 'emo' || !(it.p === 0 || p.acct.items.c7.own[id])) return;
+      io.emit('cemote', { nick: p.nick, id: id });
+    } catch (e) { console.error('cemote', e); }
+  });
+
+  /* loja da orla */
+  socket.on('shop7_buy', function (m) {
+    try {
+      const p = live(); if (!p || !p.acct) return;
+      const id = String((m && m.id) || ''), it = SHOP7_MAP[id], a = p.acct, c = a.items.c7;
+      const fail = function (msg) { socket.emit('shop_err', { id: id, msg: msg }); };
+      if (!it || it.p === 0) return fail('Esse item não existe.');
+      if (c.own[id]) return fail('Você já tem esse item.');
+      const price = Math.max(1, Math.round(it.p * (1 - evSale())));
+      if (a.coins < price) return fail('Faltam ' + (price - a.coins) + ' moedas.');
+      a.coins -= price; c.own[id] = 1; c.eq[it.s] = id;
+      saveAcct(p);
+      socket.emit('shop_ok', { id: id, price: price, name: it.n });
+      sendPlayers();
+      grant(p, { kind: 'shop', coins: 0, xp: 3, spent: price });
+    } catch (e) { console.error('shop7_buy', e); }
+  });
+  socket.on('shop7_equip', function (m) {
+    try {
+      const p = live(); if (!p || !p.acct || !m) return;
+      const s = String(m.s || ''), id = String(m.id || '') || SLOT_DEF[s], c = p.acct.items.c7;
+      if (!SLOT_DEF[s]) return;
+      const it = SHOP7_MAP[id];
+      if (!it || it.s !== s || !(it.p === 0 || c.own[id])) return;
+      c.eq[s] = id;
+      saveAcct(p);
+      socket.emit('account', acctPayload(p));
+      sendPlayers();
+    } catch (e) { console.error('shop7_equip', e); }
+  });
+
+  /* Gartic: mesa opcional */
+  socket.on('gartic_join', function (on) {
+    try { const p = live(); if (!p) return; gJoin(p, !!on); } catch (e) { console.error('gartic_join', e); }
+  });
+
+  /* salas */
+  socket.on('rm_list', function () { try { socket.emit('rm_list', rmList()); socket.emit('gartic_lobby', garticLobbyPub()); } catch (e) { console.error('rm_list', e); } });
+  socket.on('rm_create', function (m) {
+    try {
+      const p = live(); if (!p || !p.acct || !m) return;
+      const g = G7[String(m.g || '')];
+      if (!g) return;
+      const now = Date.now();
+      if (now - (p.lastRmMk || 0) < 800) return;
+      p.lastRmMk = now;
+      if (p.gin) gLeave(p);
+      if (p.rm) rmLeave(p);
+      duoLeave(p);
+      const solo = !!m.solo || g.max === 1;
+      const r = { id: 'r' + (++RM_SEQ), g: g.id, name: String(m.name || '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 28) || (g.n + ' de ' + p.nick),
+        host: p.key, st: 'lobby', min: g.min, max: Math.max(g.min, Math.min(g.max, Number(m.max) || g.max)), tm: g.tm ? 1 : 0, solo: solo, opts: m.opts && typeof m.opts === 'object' ? JSON.parse(JSON.stringify(m.opts).slice(0, 600) || '{}') : {},
+        pl: [{ k: p.key, n: p.nick, av: p.av || '', t: 0, r: 1, bot: 0 }], t0: 0, seed: 0 };
+      if (solo) r.max = 1;
+      rooms7.set(r.id, r);
+      p.rm = r.id;
+      socket.join('rm:' + r.id);
+      socket.emit('rm_state', rmPub(r));
+      rmEmitList();
+    } catch (e) { console.error('rm_create', e); }
+  });
+  socket.on('rm_join', function (m) {
+    try {
+      const p = live(); if (!p || !p.acct) return;
+      const r = rooms7.get(String((m && m.id) || ''));
+      if (!r || r.solo) { socket.emit('rm_err', { msg: 'Essa sala não existe mais.' }); return; }
+      if (r.st !== 'lobby') { socket.emit('rm_err', { msg: 'Essa partida já começou.' }); return; }
+      if (r.pl.length >= r.max) { socket.emit('rm_err', { msg: 'A sala está cheia.' }); return; }
+      if (p.rm === r.id) { socket.emit('rm_state', rmPub(r)); return; }
+      if (p.gin) gLeave(p);
+      if (p.rm) rmLeave(p);
+      duoLeave(p);
+      r.pl.push({ k: p.key, n: p.nick, av: p.av || '', t: r.tm ? rmAutoTeam(r) : 0, r: 0, bot: 0 });
+      p.rm = r.id;
+      socket.join('rm:' + r.id);
+      rmState(r);
+    } catch (e) { console.error('rm_join', e); }
+  });
+  socket.on('rm_leave', function () { try { const p = live(); if (p) rmLeave(p, 'left'); } catch (e) { console.error('rm_leave', e); } });
+  socket.on('rm_team', function (t) {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || r.st !== 'lobby' || !r.tm) return;
+      const q = r.pl.find(function (y) { return y.k === p.key; }); if (!q) return;
+      q.t = (t | 0) === 1 ? 1 : 0; q.r = r.host === p.key ? 1 : 0;
+      rmState(r);
+    } catch (e) { console.error('rm_team', e); }
+  });
+  socket.on('rm_ready', function (on) {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || r.st !== 'lobby') return;
+      const q = r.pl.find(function (y) { return y.k === p.key; }); if (!q) return;
+      q.r = r.host === p.key ? 1 : (on ? 1 : 0);
+      rmState(r);
+    } catch (e) { console.error('rm_ready', e); }
+  });
+  socket.on('rm_bot', function (m) {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || r.st !== 'lobby' || r.host !== p.key || r.solo) return;
+      const g = G7[r.g]; if (!g || !g.bots) { socket.emit('rm_err', { msg: 'Esse jogo não tem robôs.' }); return; }
+      if (m && m.rm) {
+        for (let i = r.pl.length - 1; i >= 0; i--) if (r.pl[i].bot) { r.pl.splice(i, 1); break; }
+      } else {
+        if (r.pl.length >= r.max) return;
+        const n = r.pl.filter(function (q) { return q.bot; }).length + 1;
+        r.pl.push({ k: 'bot' + n + '_' + r.id, n: 'Robô ' + n, av: '', t: r.tm ? rmAutoTeam(r) : 0, r: 1, bot: 1 });
+      }
+      rmState(r);
+    } catch (e) { console.error('rm_bot', e); }
+  });
+  socket.on('rm_start', function () {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || r.st !== 'lobby' || r.host !== p.key) return;
+      if (r.pl.length < r.min) { socket.emit('rm_err', { msg: 'Faltam jogadores: mínimo de ' + r.min + '.' }); return; }
+      if (r.pl.some(function (q) { return !q.r; })) { socket.emit('rm_err', { msg: 'Nem todo mundo está pronto.' }); return; }
+      if (r.tm && r.pl.length >= 2) {
+        const c = [0, 0]; r.pl.forEach(function (q) { c[q.t === 1 ? 1 : 0]++; });
+        if (!c[0] || !c[1]) { socket.emit('rm_err', { msg: 'Cada equipe precisa de pelo menos uma pessoa.' }); return; }
+      }
+      r.st = 'play'; r.t0 = nowMs(); r.seed = Math.floor(Math.random() * 2147483646) + 1;
+      r.pl.forEach(function (q) { const pp = q.bot ? null : playerByKey(q.k); if (pp) pp.pl = r.g; });
+      rmToRoom(r, 'rm_start', { room: rmPub(r), seed: r.seed });
+      rmEmitList(); sendPlayers();
+    } catch (e) { console.error('rm_start', e); }
+  });
+  socket.on('rm_msg', function (m) {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || !m || typeof m !== 'object') return;
+      const now = Date.now();
+      if (!p.rl || now - p.rl.t > 1000) p.rl = { t: now, n: 0 };
+      if (++p.rl.n > 120) return;
+      const d = m.d;
+      let len = 0; try { len = JSON.stringify(d).length; } catch (e) { return; }
+      if (len > 9000) return;
+      const to = String(m.to || 'all');
+      if (to === 'host') { const h = playerByKey(r.host); if (h && h.id && h.key !== p.key) io.to(h.id).emit('rm_msg', { f: p.key, d: d }); }
+      else if (to === 'all') socket.to('rm:' + r.id).emit('rm_msg', { f: p.key, d: d });
+      else { const q = r.pl.find(function (y) { return y.k === to && !y.bot; }); const pp = q ? playerByKey(q.k) : null; if (pp && pp.id) io.to(pp.id).emit('rm_msg', { f: p.key, d: d }); }
+    } catch (e) { console.error('rm_msg', e); }
+  });
+  socket.on('rm_end', function (m) {
+    try {
+      const p = live(); const r = rmOf(p); if (!r || r.st !== 'play' || r.host !== p.key) return;
+      if (Date.now() - (r.lastEnd || 0) < 8000) return;
+      r.lastEnd = Date.now();
+      try { rmReward(r, m); } catch (e) { console.error('recompensa sala', e); }
+      r.st = 'lobby'; r.t0 = 0;
+      r.pl.forEach(function (q) { q.r = q.bot || q.k === r.host ? 1 : 0; const pp = q.bot ? null : playerByKey(q.k); if (pp) pp.pl = ''; });
+      if (r.solo) { rooms7.delete(r.id); rmHumans(r).forEach(function (q) { const pp = playerByKey(q.k); if (pp) pp.rm = ''; }); rmToRoom(r, 'rm_closed', { id: r.id, why: 'solo' }); sendPlayers(); return; }
+      rmState(r); sendPlayers();
+    } catch (e) { console.error('rm_end', e); }
+  });
+}
+
+function cityJoinPayload(p) {
+  const a = p.acct, reset = !!(a && a.items && a.items.reset7);
+  if (reset) { delete a.items.reset7; saveAcct(p); }
+  return { max: MAX_ONLINE, cat: CATALOG7, shop: SHOP7, reset: reset, start: START7, rooms: rmList(), gl: garticLobbyPub(), pos: p.c };
+}
+
 /* ---------- servidor http e socket ---------- */
 
 const server = http.createServer(function (req, res) {
   const url = (req.url || '/').split('?')[0];
   if (url === '/' || url === '/health') {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
-    res.end('Servidor do Gartic Listening no ar. Jogadores conectados: ' + onlinePlayers().length + ' de ' + MAX_PLAYERS + '.');
+    res.end('Servidor da Listening City no ar. Jogadores conectados: ' + onlinePlayers().length + ' de ' + MAX_ONLINE + '.');
     return;
   }
   if (url === '/admin/reset-pin') {
@@ -1766,6 +2176,7 @@ io.on('connection', function (socket) {
       const checkRoom = function () {
         const q = playerByKey(key);
         if (q && q.online) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return false; }
+        if (onlineCount() >= MAX_ONLINE) { socket.emit('join_error', { msg: 'A cidade está cheia (' + MAX_ONLINE + ' online). Tente de novo em instantes.' }); return false; }
         if (!q && room.players.length >= MAX_PLAYERS) { socket.emit('join_error', { msg: 'A sala está cheia (' + MAX_PLAYERS + ' jogadores).' }); return false; }
         if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return false; }
         return true;
@@ -1815,12 +2226,14 @@ io.on('connection', function (socket) {
         room.players.push(p);
       }
       p.acct = acct;
+      if (!p.c) p.c = spawn7();
       if (av) acct.av = av;
       if (p.nick !== nick) { p.nick = nick; acct.nick = nick; }
       socket.data.key = key;
-      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase, isNew: isNew, achs: ACH_PUB, account: acctPayload(p), store: Store.kind, shop: CAT_PUB, events: eventsPayload() });
+      socket.emit('joined', { nick: p.nick, av: p.av || '', players: publicPlayers(), phase: room.phase, isNew: isNew, achs: ACH_PUB, account: acctPayload(p), store: Store.kind, shop: CAT_PUB, events: eventsPayload(), city: cityJoinPayload(p) });
       sys(p.nick + (returning ? ' voltou.' : ' entrou.'));
       sendPlayers();
+      if (p.gin) socket.join('gartic');
       sendStateTo(socket, p);
       saveAcct(p);
       dailyBonus(p);
@@ -1859,7 +2272,9 @@ io.on('connection', function (socket) {
   socket.on('duo_find', function (id) {
     try {
       const p = playerOf(socket);
-      if (!p || room.phase !== 'lobby') return;
+      if (!p) return;
+      if (p.rm) rmLeave(p);
+      if (p.gin) gLeave(p);
       id = String(id || '');
       if (!DUO_IDS.has(id)) return;
       duoLeave(p);
@@ -1952,7 +2367,7 @@ io.on('connection', function (socket) {
   socket.on('say', function (txt) {
     try {
       const p = playerOf(socket);
-      if (!p || room.phase !== 'lobby') return;
+      if (!p) return;
       const now = Date.now();
       if (now - p.lastSay < 700) return;
       p.lastSay = now;
@@ -1964,7 +2379,7 @@ io.on('connection', function (socket) {
   socket.on('react', function (m) {
     try {
       const p = playerOf(socket);
-      if (!p || room.phase !== 'round') return;
+      if (!p || !p.gin || room.phase !== 'round') return;
       const now = Date.now();
       if (now - p.lastReact < 500) return;
       const e = Math.floor(Number(m && m.e));
@@ -1972,21 +2387,21 @@ io.on('connection', function (socket) {
       p.lastReact = now;
       const d = playerByKey(room.drawer);
       if (d && d !== p) d.stats.reacts++;
-      io.emit('react', { nick: p.nick, e: e });
+      gio().emit('react', { nick: p.nick, e: e });
     } catch (err) { console.error('react', err); }
   });
   socket.on('skip', function () {
     try {
       const p = playerOf(socket);
       if (!p || room.phase !== 'round' || p.key !== room.drawer) return;
-      if (room.players.some(function (q) { return q.guessed; })) return;
+      if (gPl().some(function (q) { return q.guessed; })) return;
       if (!room.bag.length) room.bag = shuffle(room.cfg.words.slice());
       room.word = room.bag.pop();
       room.revealed = new Set();
       room.mask = makeMask();
       room.actions = [];
       room.cur = null;
-      io.emit('round', roundPayload());
+      gio().emit('round', roundPayload());
       io.to(socket.id).emit('word', { word: room.word });
     } catch (e) { console.error('skip', e); }
   });
@@ -1994,7 +2409,7 @@ io.on('connection', function (socket) {
   socket.on('guess', function (txt) {
     try {
       const p = playerOf(socket);
-      if (!p) return;
+      if (!p || !p.gin) return;
       const now = Date.now();
       if (now - p.lastMsg < 250) return;
       p.lastMsg = now;
@@ -2009,14 +2424,14 @@ io.on('connection', function (socket) {
         }
         if (w.length >= 5 && lev(t, w) <= 1) socket.emit('chat', { k: 'warn', text: 'Quase! Está perto.' });
         p.stats.misses++;
-        io.emit('chat', { k: 'msg', nick: p.nick, text: text });
+        gio().emit('chat', { k: 'msg', nick: p.nick, text: text });
       } else if (room.phase === 'round') {
         // quem já sabe a palavra só conversa com quem também sabe
-        room.players.forEach(function (q) {
+        gPl().forEach(function (q) {
           if (q.id && (q.guessed || q.key === room.drawer)) io.to(q.id).emit('chat', { k: 'msg', nick: p.nick, text: text, priv: true });
         });
       } else {
-        io.emit('chat', { k: 'msg', nick: p.nick, text: text });
+        gio().emit('chat', { k: 'msg', nick: p.nick, text: text });
       }
     } catch (e) { console.error('guess', e); }
   });
@@ -2255,6 +2670,8 @@ io.on('connection', function (socket) {
     } catch (e) { console.error('sim_answer', e); }
   });
 
+  registerCity(socket);
+
   socket.on('disconnect', function () {
     try {
       const p = playerOf(socket);
@@ -2263,6 +2680,7 @@ io.on('connection', function (socket) {
       p.online = false;
       p.pl = '';
       duoLeave(p);
+      try { rmLeave(p, 'disc'); } catch (e2) { /* segue */ }
       saveAcct(p, true);
       p.offTimer = setTimeout(function () { removePlayer(p); }, GRACE_MS);
       if (room.phase === 'round' && room.drawer !== p.key && everyoneGuessed()) endRound('all');
@@ -2285,7 +2703,7 @@ server.listen(PORT, function () {
   initLots();
   loadCentral();
   setInterval(function () { try { if (cenTick()) { sendPlayers(); cenEmitAll(); } } catch (e) { console.error('central tick', e); } }, 60000);
-  console.log('Servidor do Gartic Listening rodando na porta ' + PORT + '.');
+  console.log('Servidor da Listening City rodando na porta ' + PORT + '.');
   console.log(Store.kind === 'supabase' ? 'Banco: Supabase conectado.' : 'ATENÇÃO: sem Supabase configurado. Salvando em arquivo local (some se o servidor reiniciar na hospedagem grátis).');
   console.log(ALLOWED.length ? 'Aceitando conexões de: ' + ALLOWED.join(', ') : 'ALLOWED_ORIGIN vazio: aceitando conexões de qualquer site (modo de teste).');
 });

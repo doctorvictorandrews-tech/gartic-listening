@@ -1715,7 +1715,7 @@ function boosted(coins) { return Math.round(coins * evMult() * EASY); }
 const MAX_ONLINE = Number(process.env.MAX_ONLINE) || 15;
 const START7 = 300;           // moedas iniciais depois do reset
 const CITY_LIM = 300;         // limite do mapa, em metros
-const CATALOG7 = [{"id": "voo", "n": "Voo Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 3000}, {"id": "praia", "n": "Corrida da Praia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 150, "cap": 60000}, {"id": "torre", "n": "Torre de Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 10, "cap": 600}, {"id": "travessia", "n": "Travessia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 50, "cap": 20000}, {"id": "comecoco", "n": "Comecoco Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 200, "cap": 40000}, {"id": "caixotes", "n": "Caixotes do Porto", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "sudoku", "n": "Sudoku Sunset", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "cacapal", "n": "Caça-Palavras", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "damas", "n": "Damas", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "reversi", "n": "Reversi", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "xadrez", "n": "Xadrez Relâmpago", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "mancala", "n": "Mancala", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "rps", "n": "Pedra, Papel e Tesoura", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "senha", "n": "Mestre da Senha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "memduelo", "n": "Memória em Duelo", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tron", "n": "Tron Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tanques", "n": "Tanques de Praia", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "ludo", "n": "Ludo Sunset", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cartas", "n": "Cartas Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cabo", "n": "Cabo de Guerra", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "quizeq", "n": "Quiz de Equipes", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "codigo", "n": "Agentes em Código", "cat": "team", "min": 4, "max": 12, "tm": 1, "bots": 1}, {"id": "revez", "n": "Revezamento de Digitação", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "termoco", "n": "Termo Coop", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "forca", "n": "Forca em Grupo", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "bingo", "n": "Bingo da Orla", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "sumo", "n": "Sumô de Bolas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "pega", "n": "Pega-Pega Neon", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "batata", "n": "Batata Quente", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "reflexo", "n": "Reflexo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "digite", "n": "Corrida de Digitação", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stop", "n": "Stop do Monitoramento", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "lobo", "n": "Impostor na Praia", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "imoveis", "n": "Imóveis da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "domino", "n": "Dominó da Orla", "cat": "group", "min": 2, "max": 4, "bots": 1, "mesa": 1}];
+const CATALOG7 = [{"id": "voo", "n": "Voo Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 3000}, {"id": "praia", "n": "Corrida da Praia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 150, "cap": 60000}, {"id": "torre", "n": "Torre de Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 10, "cap": 600}, {"id": "travessia", "n": "Travessia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 50, "cap": 20000}, {"id": "comecoco", "n": "Comecoco Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 200, "cap": 40000}, {"id": "caixotes", "n": "Caixotes do Porto", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "sudoku", "n": "Sudoku Sunset", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "cacapal", "n": "Caça-Palavras", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "damas", "n": "Damas", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "reversi", "n": "Reversi", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "xadrez", "n": "Xadrez Relâmpago", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "mancala", "n": "Mancala", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "rps", "n": "Pedra, Papel e Tesoura", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "senha", "n": "Mestre da Senha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "memduelo", "n": "Memória em Duelo", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tron", "n": "Tron Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tanques", "n": "Tanques de Praia", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "ludo", "n": "Ludo Sunset", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cartas", "n": "Cartas Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cabo", "n": "Cabo de Guerra", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "quizeq", "n": "Quiz de Equipes", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "codigo", "n": "Agentes em Código", "cat": "team", "min": 4, "max": 12, "tm": 1, "bots": 1}, {"id": "revez", "n": "Revezamento de Digitação", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "termoco", "n": "Termo Coop", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "forca", "n": "Forca em Grupo", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "bingo", "n": "Bingo da Orla", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "sumo", "n": "Sumô de Bolas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "pega", "n": "Pega-Pega Neon", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "batata", "n": "Batata Quente", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "reflexo", "n": "Reflexo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "digite", "n": "Corrida de Digitação", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stop", "n": "Stop do Monitoramento", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "lobo", "n": "Impostor na Praia", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "imoveis", "n": "Imóveis da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "domino", "n": "Dominó da Orla", "cat": "group", "min": 2, "max": 4, "bots": 1, "mesa": 1}, {"id": "war", "n": "War da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "detetive", "n": "Detetive do Casarão", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "general", "n": "General da Mesa", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "frevo", "n": "Frevo das Cartas", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}];
 const G7 = {};
 CATALOG7.forEach(function (g) { G7[g.id] = g; });
 /* jogos solo novos entram no mesmo caminho dos antigos (evento run, placar, moedas) */
@@ -1753,6 +1753,7 @@ const SHOP7_MAP = {};
 SHOP7.forEach(function (it) { SHOP7_MAP[it.id] = it; });
 const SLOT_DEF = { car: 'car0', emo: 'emo0', aur: 'aur0', pet: 'pet0', head: 'hd0', back: 'bk0', face: 'fc0' };
 
+const NPC_IDS = ['zeCoco', 'cleo', 'zeca', 'capitao', 'tati', 'mimi', 'valdir', 'beto', 'guarda', 'quintino', 'anselmo', 'nando', 'marlene', 'lia', 'drglitch'];
 function norm7(a) {
   const it = a.items;
   if (!it.v7) {
@@ -1764,6 +1765,7 @@ function norm7(a) {
   const c = it.c7 && typeof it.c7 === 'object' ? it.c7 : {};
   c.own = c.own && typeof c.own === 'object' ? c.own : {};
   c.eq = c.eq && typeof c.eq === 'object' ? c.eq : {};
+  c.npc = c.npc && typeof c.npc === 'object' ? c.npc : {};
   Object.keys(SLOT_DEF).forEach(function (s) {
     const id = c.eq[s];
     const ok = id && SHOP7_MAP[id] && SHOP7_MAP[id].s === s && (SHOP7_MAP[id].p === 0 || c.own[id]);
@@ -1775,7 +1777,7 @@ function norm7(a) {
   return a;
 }
 function w7Eq(p) { return p && p.acct && p.acct.items && p.acct.items.c7 ? p.acct.items.c7.eq : {}; }
-function w7Pub(a) { return { own: Object.keys(a.items.c7.own), eq: a.items.c7.eq, g: { games: a.items.g7.games, wins: a.items.g7.wins, kinds: Object.keys(a.items.g7.kinds).length } }; }
+function w7Pub(a) { return { own: Object.keys(a.items.c7.own), eq: a.items.c7.eq, npc: a.items.c7.npc, g: { games: a.items.g7.games, wins: a.items.g7.wins, kinds: Object.keys(a.items.g7.kinds).length } }; }
 
 /* conquistas novas da cidade; as que dependiam da casa saem da lista */
 ACH.push(
@@ -1980,6 +1982,21 @@ function registerCity(socket) {
       socket.emit('account', acctPayload(p));
       sendPlayers();
     } catch (e) { console.error('shop7_equip', e); }
+  });
+
+  /* relação de cada conta com cada morador da cidade */
+  socket.on('npc_save', function (m) {
+    try {
+      const p = live(); if (!p || !p.acct || !m || typeof m !== 'object') return;
+      const id = String(m.id || '');
+      if (NPC_IDS.indexOf(id) < 0) return;
+      const now = Date.now();
+      if (now - (p.lastNpc || 0) < 250) return;
+      p.lastNpc = now;
+      const r = Math.max(-12, Math.min(60, m.r | 0)), mk = (m.m | 0) & 0x3fffffff, f = (m.f | 0) & 0xffff, d = Math.max(0, Math.min(99999, m.d | 0));
+      p.acct.items.c7.npc[id] = [r, mk, f, d];
+      saveAcct(p);
+    } catch (e) { console.error('npc_save', e); }
   });
 
   /* Gartic: mesa opcional */

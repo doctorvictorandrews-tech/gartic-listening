@@ -12323,6 +12323,11 @@ var City = (function () {
     host.hidden = false; active = true;
     resize();
     if (lastList && scene) syncPlayers(lastList);
+    else if (scene && !my && myNick()) {
+      /* modo treino (sem servidor): cria o personagem local para poder andar */
+      syncPlayers([{ nick: myNick(), av: me && me.av, online: true, me: true }]);
+      if (!init) setTimeout(function () { pushFeed('<b>Sem conexão com o servidor.</b> Você pode passear pela cidade, mas os jogos online e a loja precisam dele.', 'sys'); }, 600);
+    }
     updateMe(); renderEmotes(); renderRooms(); renderOnline();
     if (isMob()) { $c('c7mb').hidden = false; $c('c7help').hidden = true; } else $c('c7mb').hidden = true;
     if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(frame); }

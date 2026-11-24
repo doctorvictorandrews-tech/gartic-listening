@@ -2178,15 +2178,16 @@ io.on('connection', function (socket) {
       const lock = fails[key];
       if (lock && lock.until > Date.now()) { socket.emit('join_error', { code: 'pin', msg: 'PIN errado várias vezes. Tente de novo em ' + Math.ceil((lock.until - Date.now()) / 60000) + ' min.' }); return; }
       const av = cleanAvatar(data && data.av);
-      const checkRoom = function () {
+      let pinOk = false;
+      const checkRoom = function (soft) {
         const q = playerByKey(key);
-        if (q && q.online) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return false; }
-        if (onlineCount() >= MAX_ONLINE) { socket.emit('join_error', { msg: 'A cidade está cheia (' + MAX_ONLINE + ' online). Tente de novo em instantes.' }); return false; }
+        if (q && q.online && !pinOk && !(soft && q.acct && q.acct.hash)) { socket.emit('join_error', { msg: 'Esse apelido já está em uso por alguém na sala.' }); return false; }
+        if (!(q && q.online) && onlineCount() >= MAX_ONLINE) { socket.emit('join_error', { msg: 'A cidade está cheia (' + MAX_ONLINE + ' online). Tente de novo em instantes.' }); return false; }
         if (!q && room.players.length >= MAX_PLAYERS) { socket.emit('join_error', { msg: 'A sala está cheia (' + MAX_PLAYERS + ' jogadores).' }); return false; }
         if (av && avatarTaken(av, key)) { socket.emit('join_error', { code: 'av', msg: 'Esse visual já está em uso por outra pessoa. Escolha outro.', taken: takenList() }); return false; }
         return true;
       };
-      if (!checkRoom()) return;
+      if (!checkRoom(true)) return;
       let p = playerByKey(key);
       let acct = p && p.acct ? p.acct : null;
       let isNew = false;
@@ -2204,6 +2205,7 @@ io.on('connection', function (socket) {
           return;
         }
         delete fails[key];
+        pinOk = true;
       } else if (acct) {
         acct.salt = crypto.randomBytes(8).toString('hex');
         acct.hash = await hashPin(pin, acct.salt);
@@ -2222,6 +2224,17 @@ io.on('connection', function (socket) {
       if (p) {
         if (p.offTimer) { clearTimeout(p.offTimer); p.offTimer = null; }
         if (av) p.av = av;
+        if (p.online && p.id && p.id !== socket.id) {
+          const old = io.sockets.sockets.get(p.id);
+          try { duoLeave(p); } catch (e2) { /* segue */ }
+          try { rmLeave(p, 'disc'); } catch (e2) { /* segue */ }
+          p.pl = '';
+          if (old) {
+            old.data.key = null;
+            old.emit('kicked', { msg: 'Sua conta entrou em outro lugar. Essa janela foi desconectada.' });
+            setTimeout(function () { try { old.disconnect(true); } catch (e3) { /* segue */ } }, 80);
+          }
+        }
         p.id = socket.id;
         p.online = true;
         returning = true;

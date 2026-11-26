@@ -1715,7 +1715,7 @@ function boosted(coins) { return Math.round(coins * evMult() * EASY); }
 const MAX_ONLINE = Number(process.env.MAX_ONLINE) || 15;
 const START7 = 300;           // moedas iniciais depois do reset
 const CITY_LIM = 300;         // limite do mapa, em metros
-const CATALOG7 = [{"id": "voo", "n": "Voo Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 3000}, {"id": "praia", "n": "Corrida da Praia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 150, "cap": 60000}, {"id": "torre", "n": "Torre de Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 10, "cap": 600}, {"id": "travessia", "n": "Travessia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 50, "cap": 20000}, {"id": "comecoco", "n": "Comecoco Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 200, "cap": 40000}, {"id": "caixotes", "n": "Caixotes do Porto", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "sudoku", "n": "Sudoku Sunset", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "cacapal", "n": "Caça-Palavras", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "damas", "n": "Damas", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "reversi", "n": "Reversi", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "xadrez", "n": "Xadrez Relâmpago", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "mancala", "n": "Mancala", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "rps", "n": "Pedra, Papel e Tesoura", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "senha", "n": "Mestre da Senha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "memduelo", "n": "Memória em Duelo", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tron", "n": "Tron Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tanques", "n": "Tanques de Praia", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "ludo", "n": "Ludo Sunset", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cartas", "n": "Cartas Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cabo", "n": "Cabo de Guerra", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "quizeq", "n": "Quiz de Equipes", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "codigo", "n": "Agentes em Código", "cat": "team", "min": 4, "max": 12, "tm": 1, "bots": 1}, {"id": "revez", "n": "Revezamento de Digitação", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "termoco", "n": "Termo Coop", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "forca", "n": "Forca em Grupo", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "bingo", "n": "Bingo da Orla", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "sumo", "n": "Sumô de Bolas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "pega", "n": "Pega-Pega Neon", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "batata", "n": "Batata Quente", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "reflexo", "n": "Reflexo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "digite", "n": "Corrida de Digitação", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stop", "n": "Stop do Monitoramento", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "lobo", "n": "Impostor na Praia", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "imoveis", "n": "Imóveis da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "domino", "n": "Dominó da Orla", "cat": "group", "min": 2, "max": 4, "bots": 1, "mesa": 1}, {"id": "war", "n": "War da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "detetive", "n": "Detetive do Casarão", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "general", "n": "General da Mesa", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "frevo", "n": "Frevo das Cartas", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}];
+const CATALOG7 = [{"id": "voo", "n": "Voo Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 3000}, {"id": "praia", "n": "Corrida da Praia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 150, "cap": 60000}, {"id": "torre", "n": "Torre de Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 10, "cap": 600}, {"id": "travessia", "n": "Travessia", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 50, "cap": 20000}, {"id": "comecoco", "n": "Comecoco Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 200, "cap": 40000}, {"id": "caixotes", "n": "Caixotes do Porto", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "sudoku", "n": "Sudoku Sunset", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "cacapal", "n": "Caça-Palavras", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "damas", "n": "Damas", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "reversi", "n": "Reversi", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "xadrez", "n": "Xadrez Relâmpago", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "mancala", "n": "Mancala", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "rps", "n": "Pedra, Papel e Tesoura", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "senha", "n": "Mestre da Senha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "memduelo", "n": "Memória em Duelo", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tron", "n": "Tron Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tanques", "n": "Tanques de Praia", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "ludo", "n": "Ludo Sunset", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cartas", "n": "Cartas Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cabo", "n": "Cabo de Guerra", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "quizeq", "n": "Quiz de Equipes", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "codigo", "n": "Agentes em Código", "cat": "team", "min": 4, "max": 12, "tm": 1, "bots": 1}, {"id": "revez", "n": "Revezamento de Digitação", "cat": "team", "min": 2, "max": 15, "tm": 1, "bots": 1}, {"id": "termoco", "n": "Termo Coop", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "forca", "n": "Forca em Grupo", "cat": "coop", "min": 1, "max": 15, "bots": 1}, {"id": "bingo", "n": "Bingo da Orla", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "sumo", "n": "Sumô de Bolas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "pega", "n": "Pega-Pega Neon", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "batata", "n": "Batata Quente", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "reflexo", "n": "Reflexo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "digite", "n": "Corrida de Digitação", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stop", "n": "Stop do Monitoramento", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "lobo", "n": "Impostor na Praia", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "imoveis", "n": "Imóveis da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "domino", "n": "Dominó da Orla", "cat": "group", "min": 2, "max": 4, "bots": 1, "mesa": 1}, {"id": "war", "n": "War da Orla", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "detetive", "n": "Detetive do Casarão", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "general", "n": "General da Mesa", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "frevo", "n": "Frevo das Cartas", "cat": "group", "min": 2, "max": 6, "bots": 1, "mesa": 1}, {"id": "q_recife", "n": "Quiz Recife e Pernambuco", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_brasil", "n": "Quiz Geografia do Brasil", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_ciencia", "n": "Quiz Ciência e Natureza", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_historia", "n": "Quiz História do Brasil", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_musica", "n": "Quiz Música Brasileira", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_esporte", "n": "Quiz Esportes", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_listening", "n": "Quiz Social Listening", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "q_comida", "n": "Quiz Sabores do Brasil", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "calculo", "n": "Cálculo Relâmpago", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "stroop", "n": "Cor ou Palavra", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "contagem", "n": "Conte os Pontos", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "intruso", "n": "O Intruso", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "sequencia", "n": "Próximo da Sequência", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "relogio", "n": "Que Horas São?", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "maior", "n": "Qual é Maior?", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "pula", "n": "Pula-Pula Neon", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 1000}, {"id": "carang", "n": "Caranguejo Corredor", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 400, "cap": 20000}, {"id": "cocos", "n": "Chuva de Cocos", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "mare", "n": "Labirinto da Maré", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 100, "cap": 5000}, {"id": "desliza", "n": "Quebra-Cabeça Deslizante", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 24, "cap": 1200}, {"id": "luzes", "n": "Luzes Apagadas", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 18, "cap": 900}, {"id": "alvo", "n": "Tiro ao Alvo", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 30, "cap": 1500}, {"id": "golfe", "n": "Minigolfe da Orla", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 34, "cap": 1700}, {"id": "hanoi", "n": "Torre de Hanói", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 30, "cap": 1500}, {"id": "frutas", "n": "Corte de Frutas", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 20, "cap": 1000}, {"id": "ritmo", "n": "Frevo Rítmico", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 300, "cap": 15000}, {"id": "inund", "n": "Inundação", "cat": "solo", "min": 1, "max": 1, "sc": 1, "div": 30, "cap": 1500}, {"id": "gomoku", "n": "Cinco em Linha", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "pontinhos", "n": "Pontinhos", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "palitos", "n": "Jogo dos Palitos", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "hex", "n": "Hex", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "curling", "n": "Curling da Orla", "cat": "duo", "min": 2, "max": 2, "bots": 1}, {"id": "bombas", "n": "Bombas da Orla", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "cobras", "n": "Cobras Neon", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "tinta", "n": "Guerra de Tinta", "cat": "group", "min": 2, "max": 4, "bots": 1}, {"id": "vinte", "n": "Vinte e Um", "cat": "group", "min": 2, "max": 6, "bots": 1}, {"id": "mico", "n": "Mico da Praia", "cat": "group", "min": 2, "max": 5, "bots": 1}, {"id": "chao", "n": "Chão que Cai", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "cadeira", "n": "Cadeira Musical", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "moedas", "n": "Caça-Moedas", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "esquiva", "n": "Chuva de Boias", "cat": "todos", "min": 1, "max": 15, "bots": 1}, {"id": "terco", "n": "Dois Terços da Média", "cat": "todos", "min": 3, "max": 15, "bots": 1}, {"id": "quente", "n": "Quente ou Frio", "cat": "todos", "min": 2, "max": 15, "bots": 1}, {"id": "eco", "n": "Eco Neon", "cat": "todos", "min": 1, "max": 15, "bots": 1}];
 const G7 = {};
 CATALOG7.forEach(function (g) { G7[g.id] = g; });
 /* jogos solo novos entram no mesmo caminho dos antigos (evento run, placar, moedas) */
@@ -1914,8 +1914,59 @@ function rmReward(r, res) {
   });
 }
 
+
+/* ---------- voz: o servidor só faz a sinalização; o áudio vai direto entre as pessoas (WebRTC) ---------- */
+const VOICE = new Map(); // socket.id -> { nick, m (tem microfone), mu (mudo) }
+const ICE7 = (function () {
+  try { if (process.env.ICE_SERVERS) { const j = JSON.parse(process.env.ICE_SERVERS); if (Array.isArray(j) && j.length) return j; } } catch (e) { /* usa o padrão */ }
+  return [
+    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+    { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turns:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }
+  ];
+})();
+function voiceLeave(id) {
+  if (!VOICE.has(id)) return;
+  VOICE.delete(id);
+  VOICE.forEach(function (v, oid) { io.to(oid).emit('v_left', { id: id }); });
+}
+function voiceList() { return Array.from(VOICE.entries()).map(function (e) { return { id: e[0], n: e[1].nick, m: e[1].m, mu: e[1].mu }; }); }
+
 function registerCity(socket) {
   const live = function () { const p = playerOf(socket); return p && p.id === socket.id ? p : null; };
+  let vSigN = 0, vSigT = 0;
+  socket.on('v_on', function (m) {
+    try {
+      const p = live(); if (!p) return;
+      if (!VOICE.has(socket.id) && VOICE.size >= 15) { socket.emit('v_err', { msg: 'A sala de voz está cheia.' }); return; }
+      const others = voiceList().filter(function (o) { return o.id !== socket.id; });
+      const me = { nick: p.nick, m: m && m.m ? 1 : 0, mu: 0 };
+      VOICE.set(socket.id, me);
+      socket.emit('v_peers', { ice: ICE7, peers: others, id: socket.id });
+      others.forEach(function (o) { io.to(o.id).emit('v_joined', { id: socket.id, n: me.nick, m: me.m, mu: 0 }); });
+    } catch (e) { console.error('v_on', e); }
+  });
+  socket.on('v_off', function () { try { voiceLeave(socket.id); } catch (e) { console.error('v_off', e); } });
+  socket.on('v_mu', function (f) {
+    try {
+      const v = VOICE.get(socket.id); if (!v) return;
+      v.mu = f ? 1 : 0;
+      VOICE.forEach(function (x, oid) { if (oid !== socket.id) io.to(oid).emit('v_mu', { id: socket.id, mu: v.mu }); });
+    } catch (e) { console.error('v_mu', e); }
+  });
+  socket.on('v_sig', function (m) {
+    try {
+      if (!m || typeof m !== 'object' || !VOICE.has(socket.id)) return;
+      const now = Date.now();
+      if (now - vSigT > 10000) { vSigT = now; vSigN = 0; }
+      if (++vSigN > 300) return;
+      const to = String(m.to || '');
+      if (!VOICE.has(to) || to === socket.id) return;
+      const d = m.d; if (!d || typeof d !== 'object') return;
+      if (JSON.stringify(d).length > 20000) return;
+      io.to(to).emit('v_sig', { from: socket.id, d: d });
+    } catch (e) { console.error('v_sig', e); }
+  });
+  socket.on('disconnect', function () { try { voiceLeave(socket.id); } catch (e) { /* segue */ } });
 
   socket.on('cmove', function (m) {
     try {
@@ -2026,7 +2077,7 @@ function registerCity(socket) {
       p.rm = r.id;
       socket.join('rm:' + r.id);
       socket.emit('rm_state', rmPub(r));
-      rmEmitList();
+      rmEmitList(); sendPlayers();
     } catch (e) { console.error('rm_create', e); }
   });
   socket.on('rm_join', function (m) {
@@ -2043,7 +2094,7 @@ function registerCity(socket) {
       r.pl.push({ k: p.key, n: p.nick, av: p.av || '', t: r.tm ? rmAutoTeam(r) : 0, r: 0, bot: 0 });
       p.rm = r.id;
       socket.join('rm:' + r.id);
-      rmState(r);
+      rmState(r); sendPlayers();
     } catch (e) { console.error('rm_join', e); }
   });
   socket.on('rm_leave', function () { try { const p = live(); if (p) rmLeave(p, 'left'); } catch (e) { console.error('rm_leave', e); } });
